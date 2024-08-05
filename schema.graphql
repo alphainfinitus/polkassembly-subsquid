@@ -4,11 +4,8 @@ enum ProposalType {
   TreasuryProposal
   Referendum
   CouncilMotion
-  Bounty
-  Tip
-  ChildBounty
-  ReferendumV2
-  FellowshipReferendum
+  CommunityCouncilMotion
+  CommunityTreasuryProposal
 }
 
 enum ProposalStatus {
@@ -19,9 +16,6 @@ enum ProposalStatus {
   Passed
   NotPassed
   Cancelled
-  CuratorProposed
-  CuratorAssigned
-  CuratorUnassigned
   Executed
   ExecutionFailed
   Used
@@ -193,8 +187,6 @@ union VoteBalance = StandardVoteBalance | SplitVoteBalance
 enum VoteType {
   Referendum
   Motion
-  ReferendumV2
-  Fellowship
   DemocracyProposal
 }
 
@@ -225,14 +217,13 @@ type Tippers @entity {
 
 type ProposalGroup @entity {
   id: ID!
+  communityTreasuryIndex: Int @index
   treasuryIndex: Int @index
-  bountyIndex: Int @index
-  tipHash: String @index
+  communityCouncilMotionIndex: Int @index
   councilMotionIndex: Int @index
   democracyProposalIndex: Int @index
   referendumIndex: Int @index
   techCommitteeProposalIndex: Int @index
-  referendumV2Index: Int @index
   proposals: [Proposal] @derivedFrom(field: "group")
 }
 

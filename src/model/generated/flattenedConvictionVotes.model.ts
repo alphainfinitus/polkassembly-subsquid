@@ -1,4 +1,4 @@
-import {Entity as Entity_, Column as Column_, PrimaryColumn as PrimaryColumn_, Index as Index_, ManyToOne as ManyToOne_} from "typeorm"
+import {Entity as Entity_, Column as Column_, PrimaryColumn as PrimaryColumn_, StringColumn as StringColumn_, Index as Index_, ManyToOne as ManyToOne_, BooleanColumn as BooleanColumn_, IntColumn as IntColumn_, DateTimeColumn as DateTimeColumn_} from "@subsquid/typeorm-store"
 import * as marshal from "./marshal"
 import {ConvictionVote} from "./convictionVote.model"
 import {Proposal} from "./proposal.model"
@@ -16,39 +16,39 @@ export class FlattenedConvictionVotes {
     id!: string
 
     @Index_()
-    @Column_("text", {nullable: true})
+    @StringColumn_({nullable: true})
     voter!: string | undefined | null
 
     @Index_()
     @ManyToOne_(() => ConvictionVote, {nullable: true})
     parentVote!: ConvictionVote | undefined | null
 
-    @Column_("bool", {nullable: true})
+    @BooleanColumn_({nullable: true})
     isDelegated!: boolean | undefined | null
 
     @Index_()
-    @Column_("text", {nullable: true})
+    @StringColumn_({nullable: true})
     delegatedTo!: string | undefined | null
 
     @Index_()
-    @Column_("int4", {nullable: false})
+    @IntColumn_({nullable: false})
     proposalIndex!: number
 
     @Index_()
     @ManyToOne_(() => Proposal, {nullable: true})
     proposal!: Proposal
 
-    @Column_("int4", {nullable: false})
+    @IntColumn_({nullable: false})
     createdAtBlock!: number
 
     @Index_()
-    @Column_("int4", {nullable: true})
+    @IntColumn_({nullable: true})
     removedAtBlock!: number | undefined | null
 
-    @Column_("timestamp with time zone", {nullable: false})
+    @DateTimeColumn_({nullable: false})
     createdAt!: Date
 
-    @Column_("timestamp with time zone", {nullable: true})
+    @DateTimeColumn_({nullable: true})
     removedAt!: Date | undefined | null
 
     @Index_()
@@ -58,7 +58,7 @@ export class FlattenedConvictionVotes {
     @Column_("jsonb", {transformer: {to: obj => obj.toJSON(), from: obj => obj == null ? undefined : fromJsonVoteBalance(obj)}, nullable: false})
     balance!: VoteBalance
 
-    @Column_("int4", {nullable: true})
+    @IntColumn_({nullable: true})
     lockPeriod!: number | undefined | null
 
     @Column_("varchar", {length: 17, nullable: false})

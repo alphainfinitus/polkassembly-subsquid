@@ -1,5 +1,7 @@
 import {sts, Block, Bytes, Option, Result, EventType, RuntimeCtx} from '../support'
-import * as v1 from '../v1'
+import * as v63 from '../v63'
+import * as v83 from '../v83'
+import * as v105 from '../v105'
 
 export const proposed =  {
     name: 'TechnicalCommittee.Proposed',
@@ -7,12 +9,12 @@ export const proposed =  {
      * A motion (given hash) has been proposed (by given account) with a threshold (given
      * `MemberCount`).
      */
-    v1: new EventType(
+    v63: new EventType(
         'TechnicalCommittee.Proposed',
         sts.struct({
-            account: v1.AccountId32,
+            account: v63.AccountId32,
             proposalIndex: sts.number(),
-            proposalHash: v1.H256,
+            proposalHash: v63.H256,
             threshold: sts.number(),
         })
     ),
@@ -24,11 +26,11 @@ export const voted =  {
      * A motion (given hash) has been voted on by given account, leaving
      * a tally (yes votes and no votes given respectively as `MemberCount`).
      */
-    v1: new EventType(
+    v63: new EventType(
         'TechnicalCommittee.Voted',
         sts.struct({
-            account: v1.AccountId32,
-            proposalHash: v1.H256,
+            account: v63.AccountId32,
+            proposalHash: v63.H256,
             voted: sts.boolean(),
             yes: sts.number(),
             no: sts.number(),
@@ -41,10 +43,10 @@ export const approved =  {
     /**
      * A motion was approved by the required threshold.
      */
-    v1: new EventType(
+    v63: new EventType(
         'TechnicalCommittee.Approved',
         sts.struct({
-            proposalHash: v1.H256,
+            proposalHash: v63.H256,
         })
     ),
 }
@@ -54,10 +56,10 @@ export const disapproved =  {
     /**
      * A motion was not approved by the required threshold.
      */
-    v1: new EventType(
+    v63: new EventType(
         'TechnicalCommittee.Disapproved',
         sts.struct({
-            proposalHash: v1.H256,
+            proposalHash: v63.H256,
         })
     ),
 }
@@ -67,11 +69,31 @@ export const executed =  {
     /**
      * A motion was executed; result will be `Ok` if it returned without error.
      */
-    v1: new EventType(
+    v63: new EventType(
         'TechnicalCommittee.Executed',
         sts.struct({
-            proposalHash: v1.H256,
-            result: sts.result(() => sts.unit(), () => v1.DispatchError),
+            proposalHash: v63.H256,
+            result: sts.result(() => sts.unit(), () => v63.DispatchError),
+        })
+    ),
+    /**
+     * A motion was executed; result will be `Ok` if it returned without error.
+     */
+    v83: new EventType(
+        'TechnicalCommittee.Executed',
+        sts.struct({
+            proposalHash: v83.H256,
+            result: sts.result(() => sts.unit(), () => v83.DispatchError),
+        })
+    ),
+    /**
+     * A motion was executed; result will be `Ok` if it returned without error.
+     */
+    v105: new EventType(
+        'TechnicalCommittee.Executed',
+        sts.struct({
+            proposalHash: v105.H256,
+            result: sts.result(() => sts.unit(), () => v105.DispatchError),
         })
     ),
 }
@@ -81,10 +103,10 @@ export const closed =  {
     /**
      * A proposal was closed because its threshold was reached or after its duration was up.
      */
-    v1: new EventType(
+    v63: new EventType(
         'TechnicalCommittee.Closed',
         sts.struct({
-            proposalHash: v1.H256,
+            proposalHash: v63.H256,
             yes: sts.number(),
             no: sts.number(),
         })

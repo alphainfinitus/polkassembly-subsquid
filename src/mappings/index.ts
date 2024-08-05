@@ -1,9 +1,9 @@
-import democracy from './democracy'
-import council from './council'
-import treasury from './treasury'
-import bounties from './bounties'
-import techComittee from './techCommittee'
-import childBounties from './childBounties'
-import preimageV2 from './preimageV2'
+import democracy from "./democracy";
+import council from "./council";
+import treasury from "./treasury";
+import techComittee from "./techCommittee";
+import preimageV2 from "./preimageV2";
+import communityCouncil from "./communityCouncil";
+import communityTreasury from "./communityTreasury";
 
-export { democracy, council, treasury, bounties, techComittee, childBounties, preimageV2 }
+export { democracy, communityCouncil, communityTreasury, council, treasury, techComittee, preimageV2 };

@@ -1,13 +1,21 @@
 {
   "outDir": "../src/types",
-  "specVersions": "https://v2.archive.subsquid.io/metadata/pendulum",
+  "specVersions": "https://v2.archive.subsquid.io/metadata/shibuya-substrate",
   "pallets": {
     "Democracy": {
       "events": [
-        "Proposed", "Tabled", "Started", "Passed", "NotPassed", "Cancelled", "Executed", "Seconded", "PreimageNoted", "PreimageUsed", "PreimageInvalid", "PreimageMissing", "PreimageReaped"
+        "Proposed", "Tabled", "ProposalCanceled", "Started", "Passed", "NotPassed", "Cancelled", "Seconded"
       ],
       "calls": ["vote", "remove_vote", "remove_other_vote", "delegate", "undelegate"],
-      "storage": ["Preimages", "PublicProps", "ReferendumInfoOf"],
+      "storage": ["PublicProps", "DepositOf", "ReferendumInfoOf", "VotingOf"],
+      "constants": []
+    },
+    "CommunityCouncil": {
+      "events": [
+        "Proposed", "Voted", "Approved", "Disapproved", "Executed", "Closed"
+      ],
+      "calls": [],
+      "storage": ["Proposals", "Voting", "Members", "ProposalCount", "ProposalOf"],
       "constants": []
     },
     "Council": {
@@ -15,7 +23,7 @@
         "Proposed", "Voted", "Approved", "Disapproved", "Executed", "Closed"
       ],
       "calls": [],
-      "storage": ["Members", "ProposalCount", "ProposalOf"],
+      "storage": ["Proposals", "Voting", "Members", "ProposalCount", "ProposalOf"],
       "constants": []
     },
     "TechnicalCommittee": {
@@ -23,50 +31,23 @@
         "Proposed", "Voted", "Approved", "Disapproved", "Executed", "Closed"
       ],
       "calls": [],
-      "storage": ["ProposalOf"],
+      "storage": ["Proposals", "Voting", "Members", "ProposalCount", "ProposalOf"],
+      "constants": []
+    },
+    "CommunityTreasury": {
+      "events": [
+        "Proposed", "Awarded", "Rejected", "SpendApproved"
+      ],
+      "calls": [],
+      "storage": ["Proposals", "ProposalCount", "Approvals"],
       "constants": []
     },
     "Treasury": {
       "events": [
-        "Proposed", "Awarded", "Rejected", "SpendApproved", "NewTip", "TipClosed", "TipRetracted", "TipSlashed", "BountyProposed", "BountyRejected", "BountyBecameActive", "BountyAwarded", "BountyCanceled", "BountyClaimed",
-        "BountyExtended"
+        "Proposed", "Awarded", "Rejected", "SpendApproved"
       ],
-      "calls": ["tip", "accept_curator", "unassign_curator"],
-      "storage": ["Proposals", "Tips", "Bounties", "BountyDescriptions", "Reasons"],
-      "constants": []
-    },
-    "Tips": {
-      "events": [
-        "NewTip", "TipClosed", "TipRetracted", "TipSlashed"
-      ],
-      "calls": ["tip"],
-      "storage": ["Tips", "Reasons"],
-      "constants": []
-    },
-    "Bounties": {
-      "events": [
-        "BountyProposed", "BountyRejected", "BountyBecameActive", "BountyAwarded", "BountyCanceled", "BountyClaimed",
-        "BountyExtended"
-      ],
-      "calls": ["accept_curator", "unassign_curator", "propose_curator"],
-      "storage": ["Bounties", "BountyDescriptions"],
-      "constants": []
-    },
-    "ChildBounties": {
-      "events": [
-        "Added", "Awarded", "Claimed", "Canceled"
-      ],
-      "calls": ["accept_curator", "unassign_curator", "propose_curator"],
-      "storage": ["ChildBounties", "ChildBountyDescriptions"],
-      "constants": []
-    },
-    "Referenda": {
-      "events": [
-        "Submitted", "DecisionDepositPlaced", "DecisionStarted", "ConfirmStarted", "ConfirmAborted", "Confirmed", "Approved", "Executed", "Rejected", "TimedOut", "Cancelled", "Killed",
-        "MetadataSet", "MetadataCleared"
-      ],
-      "calls": ["vote", "remove_vote", "remove_other_vote", "delegate", "undelegate"],
-      "storage": ["ReferendumInfoFor"],
+      "calls": [],
+      "storage": ["Proposals", "ProposalCount", "Approvals"],
       "constants": []
     },
     "Preimage": {
@@ -74,7 +55,7 @@
         "Noted", "Requested", "Cleared"
       ],
       "calls": [],
-      "storage": ["StatusFor", "PreimageFor"],
+      "storage": ["StatusFor", "PreimageFor", "RequestStatusFor"],
       "constants": []
     },
     "Scheduler": {
@@ -85,30 +66,10 @@
       "storage": [],
       "constants": []
     },
-    "Instance1Collective": {
-      "events": [
-      ],
-      "calls": [],
-      "storage": ["Members", "ProposalCount", "ProposalOf"],
-      "constants": []
-    },
-    "Instance2Collective": {
-      "events": [
-      ],
-      "calls": [],
-      "storage": ["ProposalOf"],
-      "constants": []
-    },
     "Balances": {
       "events": [],
       "calls": [],
       "storage": ["TotalIssuance", "InactiveIssuance", "Account"],
-      "constants": []
-    },
-    "ConvictionVoting": {
-      "events": [],
-      "calls": ["vote", "remove_vote", "remove_other_vote", "delegate", "undelegate"],
-      "storage": ["VotingFor"],
       "constants": []
     }
   }

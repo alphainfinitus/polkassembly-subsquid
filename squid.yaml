@@ -1,8 +1,8 @@
 manifestVersion: subsquid.io/v0.1
-name: pendulum-polkassembly
+name: shibuya-townhall
 version: 1
 description: |-
-  Pendulum's governance proposals
+  Astar's Sihibuya network's governance proposals
 
 build:
 

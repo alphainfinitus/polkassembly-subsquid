@@ -1,5 +1,6 @@
 import {sts, Block, Bytes, Option, Result, CallType, RuntimeCtx} from '../support'
-import * as v1 from '../v1'
+import * as v63 from '../v63'
+import * as v69 from '../v69'
 
 export const vote =  {
     name: 'Democracy.vote',
@@ -11,12 +12,14 @@ export const vote =  {
      * 
      * - `ref_index`: The index of the referendum to vote for.
      * - `vote`: The vote configuration.
+     * 
+     * Weight: `O(R)` where R is the number of referendums the voter has voted on.
      */
-    v1: new CallType(
+    v63: new CallType(
         'Democracy.vote',
         sts.struct({
             refIndex: sts.number(),
-            vote: v1.AccountVote,
+            vote: v63.AccountVote,
         })
     ),
 }
@@ -45,11 +48,41 @@ export const delegate =  {
      * Weight: `O(R)` where R is the number of referendums the voter delegating to has
      *   voted on. Weight is charged as if maximum votes.
      */
-    v1: new CallType(
+    v63: new CallType(
         'Democracy.delegate',
         sts.struct({
-            to: v1.MultiAddress,
-            conviction: v1.Conviction,
+            to: v63.AccountId32,
+            conviction: v63.Conviction,
+            balance: sts.bigint(),
+        })
+    ),
+    /**
+     * Delegate the voting power (with some given conviction) of the sending account.
+     * 
+     * The balance delegated is locked for as long as it's delegated, and thereafter for the
+     * time appropriate for the conviction's lock period.
+     * 
+     * The dispatch origin of this call must be _Signed_, and the signing account must either:
+     *   - be delegating already; or
+     *   - have no voting activity (if there is, then it will need to be removed/consolidated
+     *     through `reap_vote` or `unvote`).
+     * 
+     * - `to`: The account whose voting the `target` account's voting power will follow.
+     * - `conviction`: The conviction that will be attached to the delegated votes. When the
+     *   account is undelegated, the funds will be locked for the corresponding period.
+     * - `balance`: The amount of the account's balance to be used in delegating. This must not
+     *   be more than the account's current balance.
+     * 
+     * Emits `Delegated`.
+     * 
+     * Weight: `O(R)` where R is the number of referendums the voter delegating to has
+     *   voted on. Weight is charged as if maximum votes.
+     */
+    v69: new CallType(
+        'Democracy.delegate',
+        sts.struct({
+            to: v69.MultiAddress,
+            conviction: v69.Conviction,
             balance: sts.bigint(),
         })
     ),
@@ -71,7 +104,7 @@ export const undelegate =  {
      * Weight: `O(R)` where R is the number of referendums the voter delegating to has
      *   voted on. Weight is charged as if maximum votes.
      */
-    v1: new CallType(
+    v63: new CallType(
         'Democracy.undelegate',
         sts.unit()
     ),
@@ -108,7 +141,7 @@ export const removeVote =  {
      * Weight: `O(R + log R)` where R is the number of referenda that `target` has voted on.
      *   Weight is calculated for the maximum number of vote.
      */
-    v1: new CallType(
+    v63: new CallType(
         'Democracy.remove_vote',
         sts.struct({
             index: sts.number(),
@@ -135,10 +168,34 @@ export const removeOtherVote =  {
      * Weight: `O(R + log R)` where R is the number of referenda that `target` has voted on.
      *   Weight is calculated for the maximum number of vote.
      */
-    v1: new CallType(
+    v63: new CallType(
         'Democracy.remove_other_vote',
         sts.struct({
-            target: v1.MultiAddress,
+            target: v63.AccountId32,
+            index: sts.number(),
+        })
+    ),
+    /**
+     * Remove a vote for a referendum.
+     * 
+     * If the `target` is equal to the signer, then this function is exactly equivalent to
+     * `remove_vote`. If not equal to the signer, then the vote must have expired,
+     * either because the referendum was cancelled, because the voter lost the referendum or
+     * because the conviction period is over.
+     * 
+     * The dispatch origin of this call must be _Signed_.
+     * 
+     * - `target`: The account of the vote to be removed; this account must have voted for
+     *   referendum `index`.
+     * - `index`: The index of referendum of the vote to be removed.
+     * 
+     * Weight: `O(R + log R)` where R is the number of referenda that `target` has voted on.
+     *   Weight is calculated for the maximum number of vote.
+     */
+    v69: new CallType(
+        'Democracy.remove_other_vote',
+        sts.struct({
+            target: v69.MultiAddress,
             index: sts.number(),
         })
     ),
