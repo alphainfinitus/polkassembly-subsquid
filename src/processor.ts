@@ -15,7 +15,7 @@ import assert from "assert";
 const processor = new SubstrateBatchProcessor()
   .setGateway("https://v2.archive.subsquid.io/network/shibuya-substrate")
   .setRpcEndpoint("wss://rpc.shibuya.astar.network")
-  .setBlockRange({ from: 0 })
+  .setBlockRange({ from: 6857665 }) //block for first democracy related preimage after fork
   .setFields({
     event: {},
     call: { origin: true, success: true, error: true },
