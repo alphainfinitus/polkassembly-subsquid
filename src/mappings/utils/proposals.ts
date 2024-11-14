@@ -1293,28 +1293,32 @@ export async function sendGovEvent(
         return
     }
 
-    ctx.log.info(`Sending gov event: ${event} for proposal index: ${proposalIndex} and proposal type: ${proposalType || ''} with address: ${address}`);
-
-    const response = await fetch(GOV_EVENT_URL, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'x-api-key': process.env.GOV_EVENT_API_KEY || '',
-            'x-network': 'kusama'
-        },
-        body: JSON.stringify({
-            event,
-            address,
-            proposalIndex,
-            proposalType: proposalType || '',
-            addressTo
-        }),
-    })
-
-    ctx.log.info(`gov event api response: ${JSON.stringify(response)}`)
-
-    if (response.status !== 200) {
+    try {
+        const response = await fetch(GOV_EVENT_URL, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'x-api-key': process.env.GOV_EVENT_API_KEY || '',
+                'x-network': 'kusama'
+            },
+            body: JSON.stringify({
+                event,
+                address,
+                proposalIndex,
+                proposalType: proposalType || '',
+                addressTo
+            }),
+        })
+    
+    
+        if (response.status !== 200) {
+            ctx.log.error(`Failed to send gov event: ${event} for proposal index: ${proposalIndex} and proposal type: ${proposalType || ''} with address ${address}`)
+            ctx.log.info(`gov event api response: ${JSON.stringify(response)}`);
+            return;
+        }
+    } catch (e) {
         ctx.log.error(`Failed to send gov event: ${event} for proposal index: ${proposalIndex} and proposal type: ${proposalType || ''} with address ${address}`)
-        return;
+        ctx.log.error(`Error: ${e}`)
     }
+
 }
