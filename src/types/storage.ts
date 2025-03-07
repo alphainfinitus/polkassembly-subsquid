@@ -1,6 +1,5 @@
 export * as balances from './balances/storage'
-export * as treasury from './treasury/storage'
-export * as democracy from './democracy/storage'
 export * as council from './council/storage'
-export * as technicalCommittee from './technical-committee/storage'
 export * as preimage from './preimage/storage'
+export * as democracy from './democracy/storage'
+export * as treasury from './treasury/storage'

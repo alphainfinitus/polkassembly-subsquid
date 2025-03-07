@@ -1,20 +1,20 @@
 import {sts, Block, Bytes, Option, Result, StorageType, RuntimeCtx} from '../support'
-import * as v5000 from '../v5000'
+import * as v1013 from '../v1013'
 
 export const publicProps =  {
     /**
      *  The public proposals. Unsorted. The second item is the proposal.
      */
-    v5000: new StorageType('Democracy.PublicProps', 'Default', [], sts.array(() => sts.tuple(() => [sts.number(), v5000.Bounded, v5000.AccountId32]))) as PublicPropsV5000,
+    v1013: new StorageType('Democracy.PublicProps', 'Default', [], sts.array(() => sts.tuple(() => [sts.number(), v1013.Bounded, v1013.AccountId20]))) as PublicPropsV1013,
 }
 
 /**
  *  The public proposals. Unsorted. The second item is the proposal.
  */
-export interface PublicPropsV5000  {
+export interface PublicPropsV1013  {
     is(block: RuntimeCtx): boolean
-    getDefault(block: Block): [number, v5000.Bounded, v5000.AccountId32][]
-    get(block: Block): Promise<([number, v5000.Bounded, v5000.AccountId32][] | undefined)>
+    getDefault(block: Block): [number, v1013.Bounded, v1013.AccountId20][]
+    get(block: Block): Promise<([number, v1013.Bounded, v1013.AccountId20][] | undefined)>
 }
 
 export const referendumInfoOf =  {
@@ -23,7 +23,7 @@ export const referendumInfoOf =  {
      * 
      *  TWOX-NOTE: SAFE as indexes are not under an attacker’s control.
      */
-    v5000: new StorageType('Democracy.ReferendumInfoOf', 'Optional', [sts.number()], v5000.ReferendumInfo) as ReferendumInfoOfV5000,
+    v1013: new StorageType('Democracy.ReferendumInfoOf', 'Optional', [sts.number()], v1013.ReferendumInfo) as ReferendumInfoOfV1013,
 }
 
 /**
@@ -31,16 +31,16 @@ export const referendumInfoOf =  {
  * 
  *  TWOX-NOTE: SAFE as indexes are not under an attacker’s control.
  */
-export interface ReferendumInfoOfV5000  {
+export interface ReferendumInfoOfV1013  {
     is(block: RuntimeCtx): boolean
-    get(block: Block, key: number): Promise<(v5000.ReferendumInfo | undefined)>
-    getMany(block: Block, keys: number[]): Promise<(v5000.ReferendumInfo | undefined)[]>
+    get(block: Block, key: number): Promise<(v1013.ReferendumInfo | undefined)>
+    getMany(block: Block, keys: number[]): Promise<(v1013.ReferendumInfo | undefined)[]>
     getKeys(block: Block): Promise<number[]>
     getKeys(block: Block, key: number): Promise<number[]>
     getKeysPaged(pageSize: number, block: Block): AsyncIterable<number[]>
     getKeysPaged(pageSize: number, block: Block, key: number): AsyncIterable<number[]>
-    getPairs(block: Block): Promise<[k: number, v: (v5000.ReferendumInfo | undefined)][]>
-    getPairs(block: Block, key: number): Promise<[k: number, v: (v5000.ReferendumInfo | undefined)][]>
-    getPairsPaged(pageSize: number, block: Block): AsyncIterable<[k: number, v: (v5000.ReferendumInfo | undefined)][]>
-    getPairsPaged(pageSize: number, block: Block, key: number): AsyncIterable<[k: number, v: (v5000.ReferendumInfo | undefined)][]>
+    getPairs(block: Block): Promise<[k: number, v: (v1013.ReferendumInfo | undefined)][]>
+    getPairs(block: Block, key: number): Promise<[k: number, v: (v1013.ReferendumInfo | undefined)][]>
+    getPairsPaged(pageSize: number, block: Block): AsyncIterable<[k: number, v: (v1013.ReferendumInfo | undefined)][]>
+    getPairsPaged(pageSize: number, block: Block, key: number): AsyncIterable<[k: number, v: (v1013.ReferendumInfo | undefined)][]>
 }

@@ -5,7 +5,7 @@ const config: any = {
     name: "mythos",
     prefix: 29972,
   },
-  typesBundle: "polkadot",
+  // typesBundle: "polkadot",
   batchSize: 500,
   blockRange: {
     from: 0,

@@ -1,12 +1,12 @@
 import {sts, Block, Bytes, Option, Result, EventType, RuntimeCtx} from '../support'
-import * as v5000 from '../v5000'
+import * as v1013 from '../v1013'
 
 export const proposed =  {
     name: 'Democracy.Proposed',
     /**
      * A motion has been proposed by a public account.
      */
-    v5000: new EventType(
+    v1013: new EventType(
         'Democracy.Proposed',
         sts.struct({
             proposalIndex: sts.number(),
@@ -20,7 +20,7 @@ export const tabled =  {
     /**
      * A public proposal has been tabled for referendum vote.
      */
-    v5000: new EventType(
+    v1013: new EventType(
         'Democracy.Tabled',
         sts.struct({
             proposalIndex: sts.number(),
@@ -34,11 +34,11 @@ export const started =  {
     /**
      * A referendum has begun.
      */
-    v5000: new EventType(
+    v1013: new EventType(
         'Democracy.Started',
         sts.struct({
             refIndex: sts.number(),
-            threshold: v5000.VoteThreshold,
+            threshold: v1013.VoteThreshold,
         })
     ),
 }
@@ -48,7 +48,7 @@ export const passed =  {
     /**
      * A proposal has been approved by referendum.
      */
-    v5000: new EventType(
+    v1013: new EventType(
         'Democracy.Passed',
         sts.struct({
             refIndex: sts.number(),
@@ -61,7 +61,7 @@ export const notPassed =  {
     /**
      * A proposal has been rejected by referendum.
      */
-    v5000: new EventType(
+    v1013: new EventType(
         'Democracy.NotPassed',
         sts.struct({
             refIndex: sts.number(),
@@ -74,7 +74,7 @@ export const cancelled =  {
     /**
      * A referendum has been cancelled.
      */
-    v5000: new EventType(
+    v1013: new EventType(
         'Democracy.Cancelled',
         sts.struct({
             refIndex: sts.number(),
@@ -85,12 +85,12 @@ export const cancelled =  {
 export const seconded =  {
     name: 'Democracy.Seconded',
     /**
-     * An account has secconded a proposal
+     * An account has seconded a proposal
      */
-    v5000: new EventType(
+    v1013: new EventType(
         'Democracy.Seconded',
         sts.struct({
-            seconder: v5000.AccountId32,
+            seconder: v1013.AccountId20,
             propIndex: sts.number(),
         })
     ),
