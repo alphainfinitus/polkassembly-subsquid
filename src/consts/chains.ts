@@ -906,6 +906,21 @@ const chains = [
         genesisHash: null,
         website: 'https://zeitgeist.pm',
     },
+    {
+        name: 'mythos',
+        displayName: 'Mythos',
+        prefix: 29972,
+        tokens: [
+            {
+                symbol: 'MYTH',
+                decimals: 18,
+            },
+        ],
+        paraId: 2101,
+        relay: 'kusama',
+        genesisHash: null,
+        website: 'https://mythos.foundation',
+    },
 ] as const
 
 export default chains
