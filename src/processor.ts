@@ -16,7 +16,7 @@ const processor = new SubstrateBatchProcessor()
   .setDataSource({
     chain: "wss://polkadot-mythos-rpc.polkadot.io",
   })
-  .setBlockRange({ from: 0 })
+  .setBlockRange({ from: 4340781 })
   .setFields({
     event: {},
     call: { origin: true, success: true, error: true },
