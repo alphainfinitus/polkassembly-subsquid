@@ -1,18 +1,17 @@
-import {lookupArchive} from "@subsquid/archive-registry"
+import { lookupArchive } from "@subsquid/archive-registry"
 
 const config: any = {
     chain: {
-        name: 'amplitude',
-        prefix: 57,
+        name: 'mythos',
+        prefix: 29972,
     },
     dataSource: {
-        chain: 'wss://rpc-amplitude.pendulumchain.tech',
-        archive: lookupArchive('amplitude',  {type: 'Substrate', release: 'ArrowSquid' }),
+        chain: 'wss://polkadot-mythos-rpc.polkadot.io',
     },
-    typesBundle: 'amplitude',
+    typesBundle: 'mythos',
     batchSize: 500,
     blockRange: {
-        from: 0,
+        from: 4342322,
     },
 }
 

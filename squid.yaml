@@ -1,8 +1,8 @@
 manifestVersion: subsquid.io/v0.1
-name: amplitude-polkassembly
+name: mythos-polkassembly
 version: 1
 description: |-
-  Amplitude's governance proposals
+  Mythos' governance proposals
 
 build:
 
