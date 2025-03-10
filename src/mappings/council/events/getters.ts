@@ -12,38 +12,34 @@ import {
 import { Event } from '../../../processor'
 
 export function getApprovedData(itemEvent: Event): string {
-    if (approved.v1.is(itemEvent)) {
-        return approved.v1.decode(itemEvent).proposalHash
+    if (approved.v1004.is(itemEvent)) {
+        return approved.v1004.decode(itemEvent).proposalHash
     } else {
         throw new UnknownVersionError(itemEvent.name)
     }
 }
 
 export function getClosedData(itemEvent: Event): string {
-    if (closed.v1.is(itemEvent)) {
-        return closed.v1.decode(itemEvent).proposalHash
+    if (closed.v1004.is(itemEvent)) {
+        return closed.v1004.decode(itemEvent).proposalHash
     } else {
         throw new UnknownVersionError(itemEvent.name)
     }
 }
 
 export function getDisapprovedData(itemEvent: Event): string {
-    if (disapproved.v1.is(itemEvent)) {
-        return disapproved.v1.decode(itemEvent).proposalHash
+    if (disapproved.v1004.is(itemEvent)) {
+        return disapproved.v1004.decode(itemEvent).proposalHash
     } else {
         throw new UnknownVersionError(itemEvent.name)
     }
 }
 
 export function getExecutedData(itemEvent: Event): string {
-    if (executed.v1.is(itemEvent)) {
-        return executed.v1.decode(itemEvent).proposalHash
-    } else if (executed.v7.is(itemEvent)) {
-        return executed.v7.decode(itemEvent).proposalHash
-    }else if (executed.v15.is(itemEvent)) {
-        return executed.v15.decode(itemEvent).proposalHash
-    } else if (executed.v19.is(itemEvent)) {
-        return executed.v19.decode(itemEvent).proposalHash
+    if (executed.v1004.is(itemEvent)) {
+        return executed.v1004.decode(itemEvent).proposalHash
+    } else if (executed.v1013.is(itemEvent)) {
+        return executed.v1013.decode(itemEvent).proposalHash
     } else {
         throw new UnknownVersionError(itemEvent.name)
     }
@@ -57,8 +53,8 @@ export interface ProposedData {
 }
 
 export function getProposedData(itemEvent: Event): ProposedData {
-    if (proposed.v1.is(itemEvent)) {
-        const { account, proposalIndex, proposalHash, threshold } = proposed.v1.decode(itemEvent)
+    if (proposed.v1004.is(itemEvent)) {
+        const { account, proposalIndex, proposalHash, threshold } = proposed.v1004.decode(itemEvent)
         return {
             proposer: account,
             index: proposalIndex,
@@ -77,8 +73,8 @@ export interface VotedData {
 }
 
 export function getVotedData(itemEvent: Event): VotedData {
-    if (voted.v1.is(itemEvent)) {
-        const { account, proposalHash, voted: voteData } = voted.v1.decode(itemEvent)
+    if (voted.v1004.is(itemEvent)) {
+        const { account, proposalHash, voted: voteData } = voted.v1004.decode(itemEvent)
         return {
             voter: account,
             hash: proposalHash,

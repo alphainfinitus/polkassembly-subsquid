@@ -8,25 +8,17 @@ import { ProcessorContext, Event } from '../../../processor'
 interface TabledEventData {
     index: number
     deposit: bigint
-    depositors?: string[]
 }
 
 function getEventData(itemEvent: Event): TabledEventData {
-    if (tabled.v1.is(itemEvent)) {
-        const { proposalIndex: index, deposit, depositors } = tabled.v1.decode(itemEvent)
-        return {
-            index,
-            deposit,
-            depositors,
-        }
-    } else if (tabled.v7.is(itemEvent)) {
-        const { proposalIndex: index, deposit } = tabled.v7.decode(itemEvent)
+    if (tabled.v1013.is(itemEvent)) {
+        const { proposalIndex: index, deposit } = tabled.v1013.decode(itemEvent)
         return {
             index,
             deposit,
         }
     }
-     else {
+    else {
         throw new UnknownVersionError(itemEvent.name)
     }
 }

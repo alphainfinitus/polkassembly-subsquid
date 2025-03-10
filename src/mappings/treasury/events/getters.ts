@@ -1,43 +1,14 @@
 import { UnknownVersionError } from '../../../common/errors'
-import { awarded, proposed, rejected, spendApproved } from '../../../types/treasury/events'
+import { awarded, spendApproved } from '../../../types/treasury/events'
 import { Event } from '../../../processor'
-interface ProposedData {
-    index: number
-}
-
-export function getProposedData(itemEvent: Event): ProposedData {
-    if (proposed.v3.is(itemEvent)) {
-        const { proposalIndex: index } = proposed.v3.decode(itemEvent)
-        return {
-            index,
-        }
-    } else {
-        throw new UnknownVersionError(itemEvent.name)
-    }
-}
-
-interface RejectedData {
-    index: number
-}
-
-export function getRejectedData(itemEvent: Event): RejectedData {
-    if (rejected.v3.is(itemEvent)) {
-        const { proposalIndex: index } = rejected.v3.decode(itemEvent)
-        return {
-            index,
-        }
-    } else {
-        throw new UnknownVersionError(itemEvent.name)
-    }
-}
 
 interface AwarderData {
     index: number
 }
 
-export function getAwarderData(itemEvent: Event): AwarderData {
-    if (awarded.v3.is(itemEvent)) {
-        const { proposalIndex: index } = awarded.v3.decode(itemEvent)
+export function getAwardedData(itemEvent: Event): AwarderData {
+    if (awarded.v1013.is(itemEvent)) {
+        const { proposalIndex: index } = awarded.v1013.decode(itemEvent)
         return {
             index,
         }
@@ -54,8 +25,8 @@ interface SpendApprovedData {
 }
 
 export function getSpendApprovedData(itemEvent: Event): SpendApprovedData {
-    if (spendApproved.v3.is(itemEvent)) {
-        const { proposalIndex, amount, beneficiary}= spendApproved.v3.decode(itemEvent)
+    if (spendApproved.v1013.is(itemEvent)) {
+        const { proposalIndex, amount, beneficiary } = spendApproved.v1013.decode(itemEvent)
         return {
             proposalIndex,
             amount,

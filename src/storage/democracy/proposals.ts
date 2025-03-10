@@ -10,40 +10,19 @@ interface DemocracyProposalStorageData {
 }
 
 async function getStorageData(ctx: ProcessorContext<Store>, block: any): Promise<DemocracyProposalStorageData[] | undefined> {
-    if (publicProps.v1.is(block)) {
-        const storageData = await publicProps.v1.get(block)
+    if (publicProps.v1013.is(block)) {
+        const storageData = await publicProps.v1013.get(block)
         if (!storageData) return undefined
 
         return storageData.map((proposal): DemocracyProposalStorageData => {
             const [index, hash, proposer] = proposal
             return {
                 index,
-                hash: hash,
+                hash: hash.__kind === 'Inline' ? hash.value : hash.hash,
                 proposer,
             }
         })
-    } else if(publicProps.v7.is(block)){
-        const storageData = await publicProps.v7.get(block)
-        if (!storageData) return undefined
-
-        return storageData.map((proposal): DemocracyProposalStorageData => {
-            const [index, hash, proposer] = proposal
-            if(hash.__kind === 'Inline'){
-                return {
-                    index,
-                    hash: hash.value,
-                    proposer,
-                }
-            }else{
-                return {
-                    index,
-                    hash: hash.hash,
-                    proposer,
-                }
-            }
-        })
-
-    }else {
+    } else {
         throw new UnknownVersionError("Democracy.publicProps")
     }
 }

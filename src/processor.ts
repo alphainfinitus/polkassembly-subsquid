@@ -82,23 +82,8 @@ processor.run(new TypeormDatabase(), async (ctx: any) => {
             if (item.name == 'Democracy.undelegate') {
                 await modules.democracy.extrinsics.handleUndelegate(ctx, item, block.header)
             }
-            if (item.name == 'Bounties.accept_curator') {
-                await modules.bounties.extrinsic.handleAcceptCurator(ctx, item, block.header)
-            }
-            if (item.name == 'Bounties.unassign_curator') {
-                await modules.bounties.extrinsic.handleUnassignCurator(ctx, item, block.header)
-            }
-            if (item.name == 'Bounties.propose_curator') {
-                await modules.bounties.extrinsic.handleProposeCurator(ctx, item, block.header)
-            }
-            if (item.name == 'ChildBounties.accept_curator') {
-                await modules.childBounties.extrinsic.handleAcceptCurator(ctx, item, block.header)
-            }
-            if (item.name == 'ChildBounties.propose_curator') {
-                await modules.childBounties.extrinsic.handleProposeCurator(ctx, item, block.header)
-            }
-            if (item.name == 'ChildBounties.unassign_curator') {
-                await modules.childBounties.extrinsic.handleUnassignCurator(ctx, item, block.header)
+            if (item.name == 'Treasury.remove_approval') {
+                await modules.treasury.extrinsics.handleRemoveApproval(ctx, item, block.header)
             }
         }
         for (let item of block.events) {
@@ -120,26 +105,8 @@ processor.run(new TypeormDatabase(), async (ctx: any) => {
             if (item.name == 'Democracy.Cancelled') {
                 await modules.democracy.events.handleCancelled(ctx, item, block.header)
             }
-            if (item.name == 'Democracy.Executed') {
-                await modules.democracy.events.handleExecuted(ctx, item, block.header)
-            }
             if (item.name == 'Democracy.Seconded') {
                 await modules.democracy.events.handleDemocracySeconds(ctx, item, block.header)
-            }
-            if (item.name == 'Democracy.PreimageNoted') {
-                await modules.democracy.events.handlePreimageNoted(ctx, item, block.header)
-            }
-            if (item.name == 'Democracy.PreimageUsed') {
-                await modules.democracy.events.handlePreimageUsed(ctx, item, block.header)
-            }
-            if (item.name == 'Democracy.PreimageInvalid') {
-                await modules.democracy.events.handlePreimageInvalid(ctx, item, block.header)
-            }
-            if (item.name == 'Democracy.PreimageMissing') {
-                await modules.democracy.events.handlePreimageMissing(ctx, item, block.header)
-            }
-            if (item.name == 'Democracy.PreimageReaped') {
-                await modules.democracy.events.handlePreimageReaped(ctx, item, block.header)
             }
             if (item.name == 'Council.Proposed') {
                 await modules.council.events.handleProposed(ctx, item, block.header)
@@ -159,68 +126,11 @@ processor.run(new TypeormDatabase(), async (ctx: any) => {
             if (item.name == 'Council.Approved') {
                 await modules.council.events.handleApproved(ctx, item, block.header)
             }
-            if (item.name == 'TechnicalCommittee.Proposed') {
-                await modules.techComittee.events.handleProposed(ctx, item, block.header)
-            }
-            if (item.name == 'TechnicalCommittee.Approved') {
-                await modules.techComittee.events.handleApproved(ctx, item, block.header)
-            }
-            if (item.name == 'TechnicalCommittee.Disapproved') {
-                await modules.techComittee.events.handleDisapproved(ctx, item, block.header)
-            }
-            if (item.name == 'TechnicalCommittee.Closed') {
-                await modules.techComittee.events.handleClosed(ctx, item, block.header)
-            }
-            if (item.name == 'TechnicalCommittee.Voted') {
-                await modules.techComittee.events.handleVoted(ctx, item, block.header)
-            }
-            if (item.name == 'TechnicalCommittee.Executed') {
-                await modules.techComittee.events.handleExecuted(ctx, item, block.header)
-            }
-            if (item.name == 'Treasury.Proposed') {
-                await modules.treasury.events.handleProposed(ctx, item, block.header)
-            }
             if (item.name == 'Treasury.Awarded') {
                 await modules.treasury.events.handleAwarded(ctx, item, block.header)
             }
-            if (item.name == 'Treasury.Rejected') {
-                await modules.treasury.events.handleRejected(ctx, item, block.header)
-            }
             if (item.name == 'Treasury.SpendApproved') {
                 await modules.treasury.events.handleSpendApproved(ctx, item, block.header)
-            }
-            if (item.name == 'Bounties.BountyProposed') {
-                await modules.bounties.events.handleProposed(ctx, item, block.header)
-            }
-            if (item.name == 'Bounties.BountyRejected') {
-                await modules.bounties.events.handleRejected(ctx, item, block.header)
-            }
-            if (item.name == 'Bounties.BountyBecameActive') {
-                await modules.bounties.events.handleBecameActive(ctx, item, block.header)
-            }
-            if (item.name == 'Bounties.BountyAwarded') {
-                await modules.bounties.events.handleAwarded(ctx, item, block.header)
-            }
-            if (item.name == 'Bounties.BountyClaimed') {
-                await modules.bounties.events.handleClaimed(ctx, item, block.header)
-            }
-            if (item.name == 'Bounties.BountyCanceled') {
-                await modules.bounties.events.handleCanceled(ctx, item, block.header)
-            }
-            if (item.name == 'Bounties.BountyExtended') {
-                await modules.bounties.events.handleExtended(ctx, item, block.header)
-            }
-            if (item.name == 'ChildBounties.Added') {
-                await modules.childBounties.events.handleProposed(ctx, item, block.header)
-            }
-            if (item.name == 'ChildBounties.Awarded') {
-                await modules.childBounties.events.handleAwarded(ctx, item, block.header)
-            }
-            if (item.name == 'ChildBounties.Claimed') {
-                await modules.childBounties.events.handleClaimed(ctx, item, block.header)
-            }
-            if (item.name == 'ChildBounties.Canceled') {
-                await modules.childBounties.events.handleCancelled(ctx, item, block.header)
             }
             if (item.name == 'Preimage.Noted') {
                 await modules.preimageV2.events.handlePreimageV2Noted(ctx, item, block.header)
