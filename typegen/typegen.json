@@ -1,10 +1,10 @@
 {
   "outDir": "../src/types",
-  "specVersions": "https://v2.archive.subsquid.io/metadata/amplitude",
+  "specVersions": "versions.jsonl",
   "pallets": {
     "Democracy": {
       "events": [
-        "Proposed", "Tabled", "Started", "Passed", "NotPassed", "Cancelled", "Executed", "Seconded", "PreimageNoted", "PreimageUsed", "PreimageInvalid", "PreimageMissing", "PreimageReaped"
+        "Proposed", "Tabled", "Started", "Passed", "NotPassed", "Cancelled", "Executed", "Seconded", "ProposalCanceled", "PreimageNoted", "PreimageUsed", "PreimageInvalid", "PreimageMissing", "PreimageReaped"
       ],
       "calls": ["vote", "remove_vote", "remove_other_vote", "delegate", "undelegate"],
       "storage": ["Preimages", "PublicProps", "ReferendumInfoOf"],
@@ -18,72 +18,14 @@
       "storage": ["Members", "ProposalCount", "ProposalOf"],
       "constants": []
     },
-    "TechnicalCommittee": {
-      "events": [
-        "Proposed", "Voted", "Approved", "Disapproved", "Executed", "Closed"
-      ],
-      "calls": [],
-      "storage": ["ProposalOf"],
-      "constants": []
-    },
     "Treasury": {
       "events": [
         "Proposed", "Awarded", "Rejected", "SpendApproved", "NewTip", "TipClosed", "TipRetracted", "TipSlashed", "BountyProposed", "BountyRejected", "BountyBecameActive", "BountyAwarded", "BountyCanceled", "BountyClaimed",
         "BountyExtended"
       ],
-      "calls": ["tip", "accept_curator", "unassign_curator"],
+      "calls": ["tip", "accept_curator", "unassign_curator", "remove_approval"],
       "storage": ["Proposals", "Tips", "Bounties", "BountyDescriptions", "Reasons"],
       "constants": []
-    },
-    "Tips": {
-      "events": [
-        "NewTip", "TipClosed", "TipRetracted", "TipSlashed"
-      ],
-      "calls": ["tip"],
-      "storage": ["Tips", "Reasons"],
-      "constants": []
-    },
-    "Bounties": {
-      "events": [
-        "BountyProposed", "BountyRejected", "BountyBecameActive", "BountyAwarded", "BountyCanceled", "BountyClaimed",
-        "BountyExtended"
-      ],
-      "calls": ["accept_curator", "unassign_curator", "propose_curator"],
-      "storage": ["Bounties", "BountyDescriptions"],
-      "constants": []
-    },
-    "ChildBounties": {
-      "events": [
-        "Added", "Awarded", "Claimed", "Canceled"
-      ],
-      "calls": ["accept_curator", "unassign_curator", "propose_curator"],
-      "storage": ["ChildBounties", "ChildBountyDescriptions"],
-      "constants": []
-    },
-    "Referenda": {
-      "events": [
-        "Submitted", "DecisionDepositPlaced", "DecisionStarted", "ConfirmStarted", "ConfirmAborted", "Confirmed", "Approved", "Executed", "Rejected", "TimedOut", "Cancelled", "Killed",
-        "MetadataSet", "MetadataCleared"
-      ],
-      "calls": ["vote", "remove_vote", "remove_other_vote", "delegate", "undelegate"],
-      "storage": ["ReferendumInfoFor"],
-      "constants": []
-    },
-    "FellowshipReferenda": {
-      "events": [
-        "Submitted", "DecisionDepositPlaced", "DecisionStarted", "ConfirmStarted", "ConfirmAborted", "Confirmed", "Approved", "Executed", "Rejected", "TimedOut", "Cancelled", "Killed",
-        "MetadataSet", "MetadataCleared", "Voted"
-      ],
-      "calls": ["vote", "remove_vote", "remove_other_vote", "delegate", "undelegate"],
-      "storage": ["ReferendumInfoFor"],
-      "constants": []
-    },
-    "FellowshipCollective": {
-      "events": [
-        "Voted"
-      ],
-      "calls": [],
-      "storage": []
     },
     "Preimage": {
       "events": [
@@ -119,12 +61,6 @@
       "events": [],
       "calls": [],
       "storage": ["TotalIssuance", "InactiveIssuance", "Account"],
-      "constants": []
-    },
-    "ConvictionVoting": {
-      "events": [],
-      "calls": ["vote", "remove_vote", "remove_other_vote", "delegate", "undelegate"],
-      "storage": ["VotingFor"],
       "constants": []
     }
   }
