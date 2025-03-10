@@ -1,20 +1,20 @@
-import { UnknownVersionError } from '../../../common/errors'
+import { UnknownVersionError } from "../../../common/errors";
 import {
-    cancelled,
-    notPassed,
-    passed,
-    seconded,
-} from '../../../types/democracy/events'
-import { Event } from '../../../processor'
-import { ss58codec } from '../../../common/tools'
-import { decodeHex } from '@subsquid/substrate-processor'
+  cancelled,
+  notPassed,
+  passed,
+  seconded,
+} from "../../../types/democracy/events";
+import { Event } from "../../../processor";
+import { ss58codec } from "../../../common/tools";
+import { decodeHex } from "@subsquid/substrate-processor";
 
 export function getCancelledData(itemEvent: Event): number {
-    if (cancelled.v5000.decode(itemEvent)) {
-        return cancelled.v5000.decode(itemEvent).refIndex
-    } else {
-        throw new UnknownVersionError(itemEvent.name)
-    }
+  if (cancelled.v1013.decode(itemEvent)) {
+    return cancelled.v1013.decode(itemEvent).refIndex;
+  } else {
+    throw new UnknownVersionError(itemEvent.name);
+  }
 }
 
 // export function getExecutedData(itemEvent: Event): number {
@@ -36,35 +36,36 @@ export function getCancelledData(itemEvent: Event): number {
 // }
 
 export function getNotPassedData(itemEvent: Event): number {
-    if (notPassed.v5000.is(itemEvent)) {
-        return notPassed.v5000.decode(itemEvent).refIndex
-    } else {
-        throw new UnknownVersionError(itemEvent.name)
-    }
+  if (notPassed.v1013.is(itemEvent)) {
+    return notPassed.v1013.decode(itemEvent).refIndex;
+  } else {
+    throw new UnknownVersionError(itemEvent.name);
+  }
 }
 
 export function getPassedData(itemEvent: Event): number {
-    if (passed.v5000.is(itemEvent)) {
-        return passed.v5000.decode(itemEvent).refIndex
-    } else {
-        throw new UnknownVersionError(itemEvent.name)
-    }
+  if (passed.v1013.is(itemEvent)) {
+    return passed.v1013.decode(itemEvent).refIndex;
+  } else {
+    throw new UnknownVersionError(itemEvent.name);
+  }
 }
 
 interface DemocracySecondedData {
-    accountId: string
-    refIndex: number
+  accountId: string;
+  refIndex: number;
 }
 
-export function getDemocracySecondedData(itemEvent: Event): DemocracySecondedData {
-    if (seconded.v5000.is(itemEvent)) {
-        const {seconder, propIndex} = seconded.v5000.decode(itemEvent)
-        return {
-            accountId: seconder,
-            refIndex: propIndex
-        }
-    }
-    else {
-        throw new UnknownVersionError(itemEvent.name)
-    }
+export function getDemocracySecondedData(
+  itemEvent: Event
+): DemocracySecondedData {
+  if (seconded.v1013.is(itemEvent)) {
+    const { seconder, propIndex } = seconded.v1013.decode(itemEvent);
+    return {
+      accountId: seconder,
+      refIndex: propIndex,
+    };
+  } else {
+    throw new UnknownVersionError(itemEvent.name);
+  }
 }

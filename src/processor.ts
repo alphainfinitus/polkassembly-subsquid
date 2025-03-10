@@ -13,7 +13,9 @@ import assert from "assert";
 
 //@ts-ignore ts(2589)
 const processor = new SubstrateBatchProcessor()
-  .setRpcEndpoint("wss://polkadot-mythos-rpc.polkadot.io")
+  .setDataSource({
+    chain: "wss://polkadot-mythos-rpc.polkadot.io",
+  })
   .setBlockRange({ from: 0 })
   .setFields({
     event: {},
@@ -23,11 +25,6 @@ const processor = new SubstrateBatchProcessor()
   })
   .addCall({
     name: [
-      "ConvictionVoting.vote",
-      "ConvictionVoting.delegate",
-      "ConvictionVoting.undelegate",
-      "ConvictionVoting.remove_vote",
-      "ConvictionVoting.remove_other_vote",
       "Democracy.vote",
       "Democracy.remove_vote",
       "Democracy.remove_other_vote",
@@ -43,28 +40,15 @@ const processor = new SubstrateBatchProcessor()
       "ChildBounties.unassign_curator",
       "Tips.tip",
       "Treasury.tip",
+      "Treasury.remove_approval",
     ],
   })
   .addEvent({
     name: [
-      "Referenda.Submitted",
-      "Referenda.DecisionDepositPlaced",
-      "Referenda.Rejected",
-      "Referenda.MetadataSet",
-      "Referenda.MetadataCleared",
-      "Referenda.TimedOut",
-      "Referenda.Approved",
-      "Referenda.DecisionStarted",
-      "Referenda.ConfirmStarted",
-      "Referenda.ConfirmAborted",
-      "Referenda.Killed",
-      "Referenda.Confirmed",
       "Preimage.Requested",
       "Preimage.Noted",
       "Preimage.Cleared",
       "Preimage.Cleared",
-      "Referenda.ConfirmStarted",
-      "Referenda.Cancelled",
       "Democracy.Proposed",
       "Democracy.Tabled",
       "Democracy.Started",
@@ -138,7 +122,7 @@ processor.run(new TypeormDatabase(), async (ctx: any) => {
           assert("multisig" in item.event.args);
           multisigAddress = item.event.args.multisig;
         } else {
-          throw new Error("Unextpected case");
+          throw new Error("Unexpected case");
         }
 
         let extrinsicHash = item.event.extrinsic!.hash;
@@ -190,6 +174,13 @@ processor.run(new TypeormDatabase(), async (ctx: any) => {
       }
       if (item.name == "Democracy.undelegate") {
         await modules.democracy.extrinsics.handleUndelegate(
+          ctx,
+          item,
+          block.header
+        );
+      }
+      if (item.name == "Treasury.remove_approval") {
+        await modules.treasury.extrinsics.handleRemoveApproval(
           ctx,
           item,
           block.header
@@ -258,49 +249,15 @@ processor.run(new TypeormDatabase(), async (ctx: any) => {
       if (item.name == "Council.Approved") {
         await modules.council.events.handleApproved(ctx, item, block.header);
       }
-      if (item.name == "TechnicalCommittee.Proposed") {
-        await modules.techComittee.events.handleProposed(
-          ctx,
-          item,
-          block.header
-        );
-      }
-      if (item.name == "TechnicalCommittee.Approved") {
-        await modules.techComittee.events.handleApproved(
-          ctx,
-          item,
-          block.header
-        );
-      }
-      if (item.name == "TechnicalCommittee.Disapproved") {
-        await modules.techComittee.events.handleDisapproved(
-          ctx,
-          item,
-          block.header
-        );
-      }
-      if (item.name == "TechnicalCommittee.Closed") {
-        await modules.techComittee.events.handleClosed(ctx, item, block.header);
-      }
-      if (item.name == "TechnicalCommittee.Voted") {
-        await modules.techComittee.events.handleVoted(ctx, item, block.header);
-      }
-      if (item.name == "TechnicalCommittee.Executed") {
-        await modules.techComittee.events.handleExecuted(
-          ctx,
-          item,
-          block.header
-        );
-      }
-      if (item.name == "Treasury.Proposed") {
-        await modules.treasury.events.handleProposed(ctx, item, block.header);
-      }
+      //   if (item.name == "Treasury.Proposed") {
+      //     await modules.treasury.events.handleProposed(ctx, item, block.header);
+      //   }
       if (item.name == "Treasury.Awarded") {
         await modules.treasury.events.handleAwarded(ctx, item, block.header);
       }
-      if (item.name == "Treasury.Rejected") {
-        await modules.treasury.events.handleRejected(ctx, item, block.header);
-      }
+      //   if (item.name == "Treasury.Rejected") {
+      //     await modules.treasury.events.handleRejected(ctx, item, block.header);
+      //   }
       if (item.name == "Treasury.SpendApproved") {
         await modules.treasury.events.handleSpendApproved(
           ctx,

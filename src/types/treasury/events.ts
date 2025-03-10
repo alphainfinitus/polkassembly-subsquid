@@ -30,3 +30,33 @@ export const spendApproved =  {
         })
     ),
 }
+
+export const assetSpendApproved =  {
+    name: 'Treasury.AssetSpendApproved',
+    /**
+     * A new asset spend proposal has been approved.
+     */
+    v1013: new EventType(
+        'Treasury.AssetSpendApproved',
+        sts.struct({
+            index: sts.number(),
+            amount: sts.bigint(),
+            beneficiary: v1013.AccountId20,
+            validFrom: sts.number(),
+            expireAt: sts.number(),
+        })
+    ),
+}
+
+export const assetSpendVoided =  {
+    name: 'Treasury.AssetSpendVoided',
+    /**
+     * An approved spend was voided.
+     */
+    v1013: new EventType(
+        'Treasury.AssetSpendVoided',
+        sts.struct({
+            index: sts.number(),
+        })
+    ),
+}

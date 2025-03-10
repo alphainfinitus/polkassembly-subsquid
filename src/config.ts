@@ -3,7 +3,7 @@ import { lookupArchive } from "@subsquid/archive-registry";
 const config: any = {
   chain: {
     name: "mythos",
-    prefix: 29972,
+    useEvmAddresses: true,
   },
   // typesBundle: "polkadot",
   batchSize: 500,
