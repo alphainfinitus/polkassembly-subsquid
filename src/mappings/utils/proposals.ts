@@ -1,7 +1,6 @@
 import { FindOneOptions, Store } from '@subsquid/typeorm-store'
 import { toJSON } from '@subsquid/util-internal-json'
 import { MissingProposalRecordWarn } from '../../common/errors'
-import { ss58codec } from '../../common/tools'
 import fetch from 'node-fetch'
 import { NOTIFICATION_URL, REDIS_CF_URL } from '../../consts/consts'
 import { referendumV2EnactmentBlocks, fellowshipEnactmentBlocks } from '../../common/originEnactBlock'
@@ -44,6 +43,7 @@ import {
 } from '../types/data'
 import { randomUUID } from 'crypto'
 import { ProcessorContext } from '../../processor'
+import { toHex } from '@subsquid/substrate-processor'
 
 type ProposalUpdateData = Partial<
     Omit<
@@ -102,7 +102,7 @@ export async function updatePreimageStatusV2(
         data?: ProposalUpdateData
     }
 ) {
-    const proposal = await ctx.store.get(Preimage, { where: { hash: hash }, order: {createdAtBlock: 'DESC'}})
+    const proposal = await ctx.store.get(Preimage, { where: { hash: hash }, order: { createdAtBlock: 'DESC' } })
 
     if (!proposal) {
         ctx.log.warn(MissingProposalRecordWarn('PreimageV2', `with hash ${hash} not found`,))
@@ -168,13 +168,13 @@ export async function updateProposalStatus(
         where:
             typeof hashOrIndex === 'string'
                 ? {
-                      hash: hashOrIndex,
-                      type,
-                  }
+                    hash: hashOrIndex,
+                    type,
+                }
                 : {
-                      index: hashOrIndex,
-                      type,
-                  },
+                    index: hashOrIndex,
+                    type,
+                },
         order: {
             id: 'DESC',
         },
@@ -195,10 +195,10 @@ export async function updateProposalStatus(
         proposal.endedAt = proposal.updatedAt
     }
 
-    if(type == ProposalType.ReferendumV2 && options.status == ProposalStatus.Confirmed && proposal.origin){
+    if (type == ProposalType.ReferendumV2 && options.status == ProposalStatus.Confirmed && proposal.origin) {
         proposal.executeAtBlockNumber = header.height + referendumV2EnactmentBlocks[proposal.origin]
     }
-    if(type == ProposalType.FellowshipReferendum && options.status == ProposalStatus.Confirmed && proposal.trackNumber){
+    if (type == ProposalType.FellowshipReferendum && options.status == ProposalStatus.Confirmed && proposal.trackNumber) {
         proposal.executeAtBlockNumber = header.height + fellowshipEnactmentBlocks[proposal.trackNumber]
     }
 
@@ -224,8 +224,7 @@ async function getOrCreateProposalGroup(
     type: ProposalType,
     parentId: number,
     parentType: ProposalType
-): Promise<ProposalGroup>
- {
+): Promise<ProposalGroup> {
     const condition: FindOneOptions<ProposalGroup>['where'] = {}
     switch (type) {
         case ProposalType.Bounty:
@@ -253,7 +252,7 @@ async function getOrCreateProposalGroup(
             throw new Error(`Unknown proposal type ${type}`)
     }
     let link = await ctx.store.get(ProposalGroup, { where: condition })
-    if(link){
+    if (link) {
         switch (parentType) {
             case ProposalType.Bounty:
                 link.bountyIndex = parentId as number
@@ -343,8 +342,8 @@ async function getOrCreateProposalGroup(
 
 async function getProposalId(store: Store, type: ProposalType) {
     const count = await store.count(Proposal, { where: { type } })
-    
-    if(type == ProposalType.ReferendumV2){
+
+    if (type == ProposalType.ReferendumV2) {
         return `${Buffer.from(type.toLowerCase()).toString('hex')}-${count
             .toString()
             .padStart(8, '0')}`
@@ -420,7 +419,7 @@ export async function createDemocracyProposal(
     return proposal
 }
 
-export async function createReferendum( ctx: ProcessorContext<Store>, header: any,  extrinsicIndex: string, data: ReferendumData): Promise<Proposal> {
+export async function createReferendum(ctx: ProcessorContext<Store>, header: any, extrinsicIndex: string, data: ReferendumData): Promise<Proposal> {
     const { index, threshold, hash, status, end, delay } = data
 
     const type = ProposalType.Referendum
@@ -432,7 +431,7 @@ export async function createReferendum( ctx: ProcessorContext<Store>, header: an
     let preimage = null;
     let proposer = null;
 
-    if(hash){
+    if (hash) {
         const associatedProposal = await ctx.store.get(Proposal, {
             where: {
                 hash: hash,
@@ -462,11 +461,11 @@ export async function createReferendum( ctx: ProcessorContext<Store>, header: an
                 createdAtBlock: 'DESC'
             }
         })
-        if(associatedProposal && associatedProposal.index !=null && associatedProposal.index != undefined && associatedProposal.type){
+        if (associatedProposal && associatedProposal.index != null && associatedProposal.index != undefined && associatedProposal.type) {
             group = await getOrCreateProposalGroup(ctx, associatedProposal.index, associatedProposal.type as ProposalType, index, type)
             associatedProposal.group = group
             await ctx.store.save(associatedProposal)
-            if(!preimage && associatedProposal.preimage){
+            if (!preimage && associatedProposal.preimage) {
                 preimage = associatedProposal.preimage
                 proposer = associatedProposal.proposer
             }
@@ -488,7 +487,7 @@ export async function createReferendum( ctx: ProcessorContext<Store>, header: an
     if (!proposer && preimage && preimage.proposer) {
         proposer = preimage.proposer
     }
-    
+
     const proposal = new Proposal({
         id,
         index,
@@ -539,8 +538,8 @@ export async function createCoucilMotion(
     let preimage = null
     let hexHash = null;
 
-    if (call.args){
-        if(call.args['proposalHash']){
+    if (call.args) {
+        if (call.args['proposalHash']) {
             hexHash = call.args['proposalHash'] as string
             preimage = await ctx.store.get(Preimage, {
                 where: {
@@ -552,9 +551,9 @@ export async function createCoucilMotion(
                 }
             })
         }
-        if(call.args['proposal']){
+        if (call.args['proposal']) {
             const prop = call.args['proposal'] as any
-            if(prop.hash){
+            if (prop.hash) {
                 hexHash = prop.hash
                 preimage = await ctx.store.get(Preimage, {
                     where: {
@@ -690,7 +689,7 @@ export async function createTechCommitteeMotion(
     return await createCoucilMotion(ctx, header, extrinsicIndex, data, ProposalType.TechCommitteeProposal)
 }
 
-export async function createTip( ctx: ProcessorContext<Store>, header: any, extrinsicIndex: string, data: TipData): Promise<Proposal> {
+export async function createTip(ctx: ProcessorContext<Store>, header: any, extrinsicIndex: string, data: TipData): Promise<Proposal> {
     const { status, hash, proposer, payee, deposit, reason } = data
 
     const type = ProposalType.Tip
@@ -729,7 +728,7 @@ export async function createTip( ctx: ProcessorContext<Store>, header: any, extr
     return proposal
 }
 
-export async function createBounty( ctx: ProcessorContext<Store>, header: any, extrinsicIndex: string, data: BountyData): Promise<Proposal> {
+export async function createBounty(ctx: ProcessorContext<Store>, header: any, extrinsicIndex: string, data: BountyData): Promise<Proposal> {
     const { status, index, proposer, deposit, reward, curatorDeposit, description, fee } = data
 
     const type = ProposalType.Bounty
@@ -772,7 +771,7 @@ export async function createBounty( ctx: ProcessorContext<Store>, header: any, e
     return proposal
 }
 
-export async function createChildBounty( ctx: ProcessorContext<Store>, header: any, extrinsicIndex: string, data: ChildBountyData): Promise<Proposal> {
+export async function createChildBounty(ctx: ProcessorContext<Store>, header: any, extrinsicIndex: string, data: ChildBountyData): Promise<Proposal> {
     const { status, index, parentBountyIndex, curatorDeposit, reward, fee, description, proposer } = data
 
     const type = ProposalType.ChildBounty
@@ -815,7 +814,7 @@ export async function createChildBounty( ctx: ProcessorContext<Store>, header: a
     return proposal
 }
 
-export async function createTreasury( ctx: ProcessorContext<Store>, header: any, extrinsicIndex: string, data: TreasuryData): Promise<Proposal> {
+export async function createTreasury(ctx: ProcessorContext<Store>, header: any, extrinsicIndex: string, data: TreasuryData): Promise<Proposal> {
     const { status, index, proposer, deposit, reward, payee } = data
 
     const type = ProposalType.TreasuryProposal
@@ -825,7 +824,7 @@ export async function createTreasury( ctx: ProcessorContext<Store>, header: any,
     let group = null;
     let refProposer = null;
 
-    if(status === ProposalStatus.Approved) {
+    if (status === ProposalStatus.Approved) {
         const referendumV2 = await ctx.store.get(Proposal, {
             where: {
                 type: ProposalType.ReferendumV2,
@@ -839,10 +838,10 @@ export async function createTreasury( ctx: ProcessorContext<Store>, header: any,
                 status: ProposalStatus.Executed,
             }
         })
-        if(referendumV2 && referendumV2.trackNumber && [11, 30, 31, 32, 33, 34].includes(referendumV2.trackNumber) && referendumV2.index !== null && referendumV2.index !== undefined) {
+        if (referendumV2 && referendumV2.trackNumber && [11, 30, 31, 32, 33, 34].includes(referendumV2.trackNumber) && referendumV2.index !== null && referendumV2.index !== undefined) {
             refProposer = referendumV2.proposer
             group = await getOrCreateProposalGroup(ctx, index, ProposalType.TreasuryProposal, referendumV2.index, referendumV2.type)
-            if(group) {
+            if (group) {
                 referendumV2.group = group
                 await ctx.store.save(referendumV2)
             }
@@ -883,7 +882,7 @@ export async function createTreasury( ctx: ProcessorContext<Store>, header: any,
     return proposal
 }
 
-export async function createPreimage( ctx: ProcessorContext<Store>, header: any, extrinsicIndex: string, data: PreimageData): Promise<Preimage> {
+export async function createPreimage(ctx: ProcessorContext<Store>, header: any, extrinsicIndex: string, data: PreimageData): Promise<Preimage> {
     const { status, hash, proposer, call, section, method } = data
 
     // const type = ProposalType.Preimage
@@ -928,7 +927,7 @@ export async function createPreimage( ctx: ProcessorContext<Store>, header: any,
     return preimage
 }
 
-export async function createPreimageV2( ctx: ProcessorContext<Store>, header: any, extrinsicIndex: string, data: PreimageData): Promise<Preimage> {
+export async function createPreimageV2(ctx: ProcessorContext<Store>, header: any, extrinsicIndex: string, data: PreimageData): Promise<Preimage> {
     const { status, hash, proposer, call, section, method, deposit, length } = data
 
     // const type = ProposalType.Preimage
@@ -956,7 +955,7 @@ export async function createPreimageV2( ctx: ProcessorContext<Store>, header: an
 
     const associatedProposal = await ctx.store.get(Proposal, { where: { hash, type: ProposalType.ReferendumV2 }, order: { createdAt: 'DESC' } })
 
-    if(associatedProposal && !associatedProposal.preimage) {
+    if (associatedProposal && !associatedProposal.preimage) {
         associatedProposal.preimage = preimage
         await ctx.store.save(associatedProposal)
     }
@@ -975,7 +974,7 @@ export async function createPreimageV2( ctx: ProcessorContext<Store>, header: an
     return preimage
 }
 
-export async function createReferendumV2( ctx: ProcessorContext<Store>, header: any, extrinsicIndex: string, data: ReferendumDataV2, type: ProposalType): Promise<Proposal> {
+export async function createReferendumV2(ctx: ProcessorContext<Store>, header: any, extrinsicIndex: string, data: ReferendumDataV2, type: ProposalType): Promise<Proposal> {
 
     const { status, index, proposer, hash, tally, origin, trackNumber, submissionDeposit, submittedAt, enactmentAfter, enactmentAt, deciding, decisionDeposit } = data
 
@@ -1009,12 +1008,12 @@ export async function createReferendumV2( ctx: ProcessorContext<Store>, header: 
     //     }
     // }
 
-    const subDeposit = {who: ss58codec.encode(submissionDeposit.who), amount: submissionDeposit.amount}
+    const subDeposit = { who: toHex(submissionDeposit.who), amount: submissionDeposit.amount }
 
     let decDeposit = undefined
 
     if (decisionDeposit) {
-        decDeposit = {who: ss58codec.encode(decisionDeposit.who), amount: decisionDeposit.amount}
+        decDeposit = { who: toHex(decisionDeposit.who), amount: decisionDeposit.amount }
     }
 
     const proposal = new Proposal({
@@ -1162,7 +1161,7 @@ export async function sendNotification(ctx: ProcessorContext<Store>, proposal: P
     // }
 }
 
-export async function updateRedis(ctx: ProcessorContext<Store>, proposal: Proposal){
+export async function updateRedis(ctx: ProcessorContext<Store>, proposal: Proposal) {
     const { hash, type, index, proposer, curator, status, trackNumber } = proposal
     return
     // try{
@@ -1183,9 +1182,9 @@ export async function updateRedis(ctx: ProcessorContext<Store>, proposal: Propos
     //             },
     //             body: JSON.stringify(redisData),
     //         })
-        
+
     //         ctx.log.info(`Notification response ${JSON.stringify(response)}`)
-        
+
     //         if (response.status !== 200) {
     //             ctx.log.error(`Redis call failed for proposal ${index || hash} with status ${response.status}`)
     //             return

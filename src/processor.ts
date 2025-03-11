@@ -1,4 +1,3 @@
-import { lookupArchive } from '@subsquid/archive-registry'
 import { BlockHeader, DataHandlerContext, SubstrateBatchProcessor, SubstrateBatchProcessorFields, Event as _Event, Call as _Call, Extrinsic as _Extrinsic } from '@subsquid/substrate-processor'
 import { TypeormDatabase } from '@subsquid/typeorm-store'
 import * as modules from './mappings'
@@ -9,7 +8,7 @@ const processor = new SubstrateBatchProcessor()
     .setDataSource({
         chain: 'wss://polkadot-mythos-rpc.polkadot.io',
     })
-    .setBlockRange({ from: 4342322 })
+    .setBlockRange({ from: 4344650 })
     .setFields({ event: {}, call: { origin: true, success: true, error: true }, extrinsic: { hash: true, fee: true, tip: true }, block: { timestamp: true } })
     .addCall({
         name: ['ConvictionVoting.vote', 'ConvictionVoting.delegate', 'ConvictionVoting.undelegate', 'ConvictionVoting.remove_vote', 'ConvictionVoting.remove_other_vote', 'Democracy.vote',

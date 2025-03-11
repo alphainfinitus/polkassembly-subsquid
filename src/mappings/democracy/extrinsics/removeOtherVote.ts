@@ -1,6 +1,5 @@
 import { Proposal, ProposalType } from '../../../model'
 import { Store } from '@subsquid/typeorm-store'
-import { ss58codec } from '../../../common/tools'
 import { getRemoveOtherVoteData } from './getters'
 import { MissingProposalRecordWarn } from '../../../common/errors'
 import { removeVote } from './utils'
@@ -11,7 +10,7 @@ export async function handleRemoveOtherVote(ctx: ProcessorContext<Store>,
     header: any): Promise<void> {
     if (!(item as any).success) return
     const { target, index } = getRemoveOtherVoteData(item)
-    const referendum = await ctx.store.get(Proposal, { where: { index, type: ProposalType.Referendum} })
+    const referendum = await ctx.store.get(Proposal, { where: { index, type: ProposalType.Referendum } })
     if (!referendum || referendum.index == undefined || referendum.index == null) {
         ctx.log.warn(MissingProposalRecordWarn(ProposalType.Referendum, index))
         return
@@ -19,10 +18,10 @@ export async function handleRemoveOtherVote(ctx: ProcessorContext<Store>,
     if (referendum.endedAtBlock && referendum.endedAtBlock < header.height) {
         return
     }
-    if (!target){
+    if (!target) {
         return
-    } 
+    }
 
-    const wallet = ss58codec.encode(target)
+    const wallet = target
     await removeVote(ctx, wallet, index, header.height, referendum.index, true)
 }

@@ -1,8 +1,6 @@
-import { toHex } from '@subsquid/substrate-processor'
 import { proposed } from '../../../types/democracy/events'
 import { StorageNotExistsWarn, UnknownVersionError } from '../../../common/errors'
 import { ProposalStatus, ProposalType } from '../../../model'
-import { ss58codec } from '../../../common/tools'
 import { storage } from '../../../storage'
 import { createDemocracyProposal } from '../../utils/proposals'
 import { Store } from '@subsquid/typeorm-store'
@@ -47,7 +45,7 @@ export async function handleProposed(ctx: ProcessorContext<Store>,
     await createDemocracyProposal(ctx, header, extrinsicIndex, {
         hash,
         index,
-        proposer: ss58codec.encode(proposer),
+        proposer,
         status: ProposalStatus.Proposed,
         deposit,
     })

@@ -1,6 +1,5 @@
 import { toHex } from '@subsquid/substrate-processor'
 import { MissingProposalRecordWarn } from '../../../common/errors'
-import { ss58codec } from '../../../common/tools'
 import { Proposal, ProposalType, Vote, VoteDecision, VoteType } from '../../../model'
 import { getVotedData } from './getters'
 import { Store } from '@subsquid/typeorm-store'
@@ -28,7 +27,7 @@ export async function handleVoted(ctx: ProcessorContext<Store>,
     await ctx.store.insert(
         new Vote({
             id: randomUUID(),
-            voter: ss58codec.encode(voter),
+            voter,
             blockNumber: header.height,
             decision: decision ? VoteDecision.yes : VoteDecision.no,
             proposal,

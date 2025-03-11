@@ -1,6 +1,5 @@
 import { randomUUID } from 'crypto'
 import { MissingProposalRecordWarn } from '../../../common/errors'
-import { ss58codec } from '../../../common/tools'
 import { Proposal, ProposalType, StandardVoteBalance, Vote, VoteType } from '../../../model'
 import { getDemocracySecondedData } from './getters'
 import { Store } from '@subsquid/typeorm-store'
@@ -26,7 +25,7 @@ export async function handleDemocracySeconds(ctx: ProcessorContext<Store>,
     await ctx.store.insert(
         new Vote({
             id: randomUUID(),
-            voter: ss58codec.encode(accountId),
+            voter: accountId,
             blockNumber: header.height,
             decision: VoteDecision.yes,
             proposal,

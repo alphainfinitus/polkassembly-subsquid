@@ -1,7 +1,6 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 import { StorageNotExistsWarn } from '../../../common/errors'
 import { ProposalStatus, ProposalType } from '../../../model'
-import { ss58codec } from '../../../common/tools'
 import { storage } from '../../../storage'
 import { createTreasury } from '../../utils/proposals'
 import { getSpendApprovedData } from './getters'
@@ -16,10 +15,10 @@ export async function handleSpendApproved(ctx: ProcessorContext<Store>,
 
     await createTreasury(ctx, header, extrinsicIndex, {
         index: proposalIndex,
-        proposer: ss58codec.encode(beneficiary),
+        proposer: beneficiary,
         status: ProposalStatus.Approved,
         reward: amount,
         deposit: 0 as unknown as bigint,
-        payee: ss58codec.encode(beneficiary),
+        payee: beneficiary,
     })
 }

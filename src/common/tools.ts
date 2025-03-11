@@ -1,10 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import * as ss58 from '@subsquid/ss58'
 // import { Parser } from './parser'
 import config from '../config'
 import { decodeHex } from '@subsquid/util-internal-hex'
-
-export const ss58codec = ss58.codec(config.chain.prefix)
+import { toHex } from '@subsquid/substrate-processor'
 
 interface Call {
     __kind: string
@@ -40,14 +38,15 @@ export function getOriginAccountId(origin: any) {
             switch (origin.value.__kind) {
                 case 'Signed':
                     try {
-                        return ss58codec.encode(decodeHex(origin.value.value))
+                        return toHex(decodeHex(origin.value.value))
                     }
                     catch (e) {
+                        console.log('Unexpected error continuing to next try block', JSON.stringify(e));
                     }
                     try {
-                        return ss58codec.encode(decodeHex(origin.value.value.value))
+                        return toHex(decodeHex(origin.value.value.value))
                     }
-                    catch(e){
+                    catch (e) {
                         return undefined
                     }
 
@@ -60,5 +59,5 @@ export function getOriginAccountId(origin: any) {
 }
 
 export function encodeId(id: string | Uint8Array) {
-    return ss58codec.encode(typeof id === 'string' ? decodeHex(id) : id)
+    return toHex(typeof id === 'string' ? decodeHex(id) : id)
 }

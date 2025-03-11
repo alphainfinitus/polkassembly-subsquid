@@ -2,7 +2,6 @@
 import { toHex } from '@subsquid/substrate-processor'
 import { StorageNotExistsWarn } from '../../../common/errors'
 import { ProposalStatus, ProposalType } from '../../../model'
-import { ss58codec } from '../../../common/tools'
 import { storage } from '../../../storage'
 import { createCoucilMotion } from '../../utils/proposals'
 import { getProposedData } from './getters'
@@ -30,8 +29,8 @@ export async function handleProposed(ctx: ProcessorContext<Store>,
 
     await createCoucilMotion(ctx, header, extrinsicIndex, {
         index,
-        hash: hash,
-        proposer: ss58codec.encode(proposer),
+        hash,
+        proposer,
         status: ProposalStatus.Proposed,
         threshold,
         call: {
