@@ -1,47 +1,14 @@
 {
   "outDir": "../src/types",
-  "specVersions": "https://v2.archive.subsquid.io/metadata/polkadot",
-  "typesBundle": "polkadot",
+  "specVersions": "https://v2.archive.subsquid.io/metadata/paseo",
   "pallets": {
-    "Democracy": {
-      "events": [
-        "Proposed", "Tabled", "Started", "Passed", "NotPassed", "Cancelled", "Executed", "Seconded", "PreimageNoted", "PreimageUsed", "PreimageInvalid", "PreimageMissing", "PreimageReaped"
-      ],
-      "calls": ["vote", "remove_vote", "remove_other_vote", "delegate", "undelegate"],
-      "storage": ["Preimages", "PublicProps", "ReferendumInfoOf"],
-      "constants": []
-    },
-    "Council": {
-      "events": [
-        "Proposed", "Voted", "Approved", "Disapproved", "Executed", "Closed"
-      ],
-      "calls": [],
-      "storage": ["Members", "ProposalCount", "ProposalOf"],
-      "constants": []
-    },
-    "TechnicalCommittee": {
-      "events": [
-        "Proposed", "Voted", "Approved", "Disapproved", "Executed", "Closed"
-      ],
-      "calls": [],
-      "storage": ["ProposalOf"],
-      "constants": []
-    },
     "Treasury": {
       "events": [
-        "Proposed", "Awarded", "Rejected", "SpendApproved", "NewTip", "TipClosed", "TipRetracted", "TipSlashed", "BountyProposed", "BountyRejected", "BountyBecameActive", "BountyAwarded", "BountyCanceled", "BountyClaimed",
+        "Proposed", "Awarded", "Rejected", "SpendApproved", "BountyProposed", "BountyRejected", "BountyBecameActive", "BountyAwarded", "BountyCanceled", "BountyClaimed",
         "BountyExtended"
       ],
-      "calls": ["tip", "accept_curator", "unassign_curator"],
-      "storage": ["Proposals", "Tips", "Bounties", "BountyDescriptions", "Reasons"],
-      "constants": []
-    },
-    "Tips": {
-      "events": [
-        "NewTip", "TipClosed", "TipRetracted", "TipSlashed"
-      ],
-      "calls": ["tip"],
-      "storage": ["Tips", "Reasons"],
+      "calls": ["accept_curator", "unassign_curator"],
+      "storage": ["Proposals", "Bounties", "BountyDescriptions", "Reasons"],
       "constants": []
     },
     "Bounties": {
@@ -84,20 +51,6 @@
       ],
       "calls": [],
       "storage": [],
-      "constants": []
-    },
-    "Instance1Collective": {
-      "events": [
-      ],
-      "calls": [],
-      "storage": ["Members", "ProposalCount", "ProposalOf"],
-      "constants": []
-    },
-    "Instance2Collective": {
-      "events": [
-      ],
-      "calls": [],
-      "storage": ["ProposalOf"],
       "constants": []
     },
     "Balances": {

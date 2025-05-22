@@ -12,8 +12,8 @@ interface ChildBountyBountyStorageData {
 }
 
 async function getChildBountyStorageData(ctx: ProcessorContext<Store>, parentBountyId: number, index: number, block: any): Promise<ChildBountyBountyStorageData | undefined> {
-    if (childBounties.v9190.is(block)) {
-        return await childBounties.v9190.get(block, parentBountyId,index)
+    if (childBounties.v1001002.is(block)) {
+        return await childBounties.v1001002.get(block, parentBountyId, index)
     } else {
         throw new UnknownVersionError("ChildBounties.childbounty")
     }
@@ -22,7 +22,7 @@ async function getChildBountyStorageData(ctx: ProcessorContext<Store>, parentBou
 
 export async function getChildBounties(ctx: ProcessorContext<Store>, parentBountyId: number, index: number, block: any) {
     let childBountyInfo = await getChildBountyStorageData(ctx, parentBountyId, index, block)
-    if(!childBountyInfo) return undefined;
+    if (!childBountyInfo) return undefined;
     let description = await getDescription(ctx, index, block).then((r) => r || '');
     return {
         ...childBountyInfo,
@@ -35,8 +35,8 @@ async function getDescription(ctx: ProcessorContext<Store>, index: number, block
 }
 
 async function getChildBountyStorageReasonData(ctx: ProcessorContext<Store>, index: number, block: any): Promise<string | undefined> {
-    if (childBountyDescriptions.v9190.is(block)) {
-        return await childBountyDescriptions.v9190.get(block, index).then((r) => Buffer.from(r || []).toString('utf8'))
+    if (childBountyDescriptions.v1001002.is(block)) {
+        return await childBountyDescriptions.v1001002.get(block, index).then((r) => Buffer.from(r || []).toString('utf8'))
     } else {
         throw new UnknownVersionError("ChildBounties.description")
     }

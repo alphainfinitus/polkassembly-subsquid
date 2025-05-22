@@ -6,13 +6,8 @@ interface ProposedData {
 }
 
 export function getProposedData(itemEvent: Event): ProposedData {
-    if (proposed.v0.is(itemEvent)) {
-        const index = proposed.v0.decode(itemEvent)
-        return {
-            index,
-        }
-    } else if (proposed.v9170.is(itemEvent)) {
-        const { proposalIndex: index } = proposed.v9170.decode(itemEvent)
+    if (proposed.v1001002.is(itemEvent)) {
+        const { proposalIndex: index } = proposed.v1001002.decode(itemEvent)
         return {
             index,
         }
@@ -26,13 +21,8 @@ interface RejectedData {
 }
 
 export function getRejectedData(itemEvent: Event): RejectedData {
-    if (rejected.v0.is(itemEvent)) {
-        const [index] = rejected.v0.decode(itemEvent)
-        return {
-            index,
-        }
-    } else if (rejected.v9170.is(itemEvent)) {
-        const { proposalIndex: index } = rejected.v9170.decode(itemEvent)
+    if (rejected.v1001002.is(itemEvent)) {
+        const { proposalIndex: index } = rejected.v1001002.decode(itemEvent)
         return {
             index,
         }
@@ -46,13 +36,8 @@ interface AwarderData {
 }
 
 export function getAwarderData(itemEvent: Event): AwarderData {
-    if (awarded.v0.is(itemEvent)) {
-        const [index] = awarded.v0.decode(itemEvent)
-        return {
-            index,
-        }
-    } else if (awarded.v9170.is(itemEvent)) {
-        const { proposalIndex: index } = awarded.v9170.decode(itemEvent)
+    if (awarded.v1001002.is(itemEvent)) {
+        const { proposalIndex: index } = awarded.v1001002.decode(itemEvent)
         return {
             index,
         }
@@ -69,8 +54,8 @@ interface SpendApprovedData {
 }
 
 export function getSpendApprovedData(itemEvent: Event): SpendApprovedData {
-    if (spendApproved.v9250.is(itemEvent)) {
-        const { proposalIndex, amount, beneficiary}= spendApproved.v9250.decode(itemEvent)
+    if (spendApproved.v1001002.is(itemEvent)) {
+        const { proposalIndex, amount, beneficiary } = spendApproved.v1001002.decode(itemEvent)
         return {
             proposalIndex,
             amount,

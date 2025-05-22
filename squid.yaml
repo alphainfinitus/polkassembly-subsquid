@@ -1,8 +1,8 @@
 manifestVersion: subsquid.io/v0.1
-name: polkadot-polkassembly
+name: paseo-polkassembly
 version: 1
 description: |-
-  Polkadot's governance proposals
+  Paseo's governance proposals
 
 build:
 

@@ -1,5 +1,4 @@
-import {Entity as Entity_, Column as Column_, PrimaryColumn as PrimaryColumn_, Index as Index_, ManyToOne as ManyToOne_} from "typeorm"
-import * as marshal from "./marshal"
+import {Entity as Entity_, Column as Column_, PrimaryColumn as PrimaryColumn_, IntColumn as IntColumn_, Index as Index_, ManyToOne as ManyToOne_, DateTimeColumn as DateTimeColumn_, FloatColumn as FloatColumn_} from "@subsquid/typeorm-store"
 import {Proposal} from "./proposal.model"
 
 @Entity_()
@@ -12,7 +11,7 @@ export class CurveData {
     id!: string
 
     @Index_()
-    @Column_("int4", {nullable: false})
+    @IntColumn_({nullable: false})
     block!: number
 
     @Index_()
@@ -20,18 +19,18 @@ export class CurveData {
     proposal!: Proposal
 
     @Index_()
-    @Column_("int4", {nullable: false})
+    @IntColumn_({nullable: false})
     index!: number
 
     @Index_()
-    @Column_("timestamp with time zone", {nullable: false})
+    @DateTimeColumn_({nullable: false})
     timestamp!: Date
 
     @Index_()
-    @Column_("numeric", {transformer: marshal.floatTransformer, nullable: true})
+    @FloatColumn_({nullable: true})
     approvalPercent!: number | undefined | null
 
     @Index_()
-    @Column_("numeric", {transformer: marshal.floatTransformer, nullable: true})
+    @FloatColumn_({nullable: true})
     supportPercent!: number | undefined | null
 }

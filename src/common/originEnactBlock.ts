@@ -1,6 +1,7 @@
 export const referendumV2EnactmentBlocks: Record<string, number> = {
     "Root": 14400,
     "WhitelistedCaller": 100,
+    "WishForChange": 100,
     "StakingAdmin": 100,
     "Treasurer": 14400,
     "LeaseAdmin": 100,
@@ -13,7 +14,6 @@ export const referendumV2EnactmentBlocks: Record<string, number> = {
     "BigTipper": 100,
     "SmallSpender": 14400,
     "MediumSpender": 14400,
-    "WishForChange": 100,
     "BigSpender": 14400
 }
 

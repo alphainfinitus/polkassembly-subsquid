@@ -89,7 +89,7 @@ export interface Bounded_Lookup {
 
 export type H256 = Bytes
 
-export type OriginCaller = OriginCaller_Origins | OriginCaller_ParachainsOrigin | OriginCaller_Void | OriginCaller_XcmPallet | OriginCaller_system
+export type OriginCaller = OriginCaller_Origins | OriginCaller_ParachainsOrigin | OriginCaller_XcmPallet | OriginCaller_system
 
 export interface OriginCaller_Origins {
     __kind: 'Origins'
@@ -98,17 +98,12 @@ export interface OriginCaller_Origins {
 
 export interface OriginCaller_ParachainsOrigin {
     __kind: 'ParachainsOrigin'
-    value: Type_133
-}
-
-export interface OriginCaller_Void {
-    __kind: 'Void'
-    value: Void
+    value: Type_162
 }
 
 export interface OriginCaller_XcmPallet {
     __kind: 'XcmPallet'
-    value: Type_135
+    value: Type_164
 }
 
 export interface OriginCaller_system {
@@ -133,120 +128,120 @@ export interface RawOrigin_Signed {
 
 export type AccountId32 = Bytes
 
-export type Type_135 = Type_135_Response | Type_135_Xcm
+export type Type_164 = Type_164_Response | Type_164_Xcm
 
-export interface Type_135_Response {
+export interface Type_164_Response {
     __kind: 'Response'
-    value: V3MultiLocation
+    value: V4Location
 }
 
-export interface Type_135_Xcm {
+export interface Type_164_Xcm {
     __kind: 'Xcm'
-    value: V3MultiLocation
+    value: V4Location
 }
 
-export interface V3MultiLocation {
+export interface V4Location {
     parents: number
-    interior: V3Junctions
+    interior: V4Junctions
 }
 
-export type V3Junctions = V3Junctions_Here | V3Junctions_X1 | V3Junctions_X2 | V3Junctions_X3 | V3Junctions_X4 | V3Junctions_X5 | V3Junctions_X6 | V3Junctions_X7 | V3Junctions_X8
+export type V4Junctions = V4Junctions_Here | V4Junctions_X1 | V4Junctions_X2 | V4Junctions_X3 | V4Junctions_X4 | V4Junctions_X5 | V4Junctions_X6 | V4Junctions_X7 | V4Junctions_X8
 
-export interface V3Junctions_Here {
+export interface V4Junctions_Here {
     __kind: 'Here'
 }
 
-export interface V3Junctions_X1 {
+export interface V4Junctions_X1 {
     __kind: 'X1'
-    value: V3Junction
+    value: V4Junction[]
 }
 
-export interface V3Junctions_X2 {
+export interface V4Junctions_X2 {
     __kind: 'X2'
-    value: [V3Junction, V3Junction]
+    value: V4Junction[]
 }
 
-export interface V3Junctions_X3 {
+export interface V4Junctions_X3 {
     __kind: 'X3'
-    value: [V3Junction, V3Junction, V3Junction]
+    value: V4Junction[]
 }
 
-export interface V3Junctions_X4 {
+export interface V4Junctions_X4 {
     __kind: 'X4'
-    value: [V3Junction, V3Junction, V3Junction, V3Junction]
+    value: V4Junction[]
 }
 
-export interface V3Junctions_X5 {
+export interface V4Junctions_X5 {
     __kind: 'X5'
-    value: [V3Junction, V3Junction, V3Junction, V3Junction, V3Junction]
+    value: V4Junction[]
 }
 
-export interface V3Junctions_X6 {
+export interface V4Junctions_X6 {
     __kind: 'X6'
-    value: [V3Junction, V3Junction, V3Junction, V3Junction, V3Junction, V3Junction]
+    value: V4Junction[]
 }
 
-export interface V3Junctions_X7 {
+export interface V4Junctions_X7 {
     __kind: 'X7'
-    value: [V3Junction, V3Junction, V3Junction, V3Junction, V3Junction, V3Junction, V3Junction]
+    value: V4Junction[]
 }
 
-export interface V3Junctions_X8 {
+export interface V4Junctions_X8 {
     __kind: 'X8'
-    value: [V3Junction, V3Junction, V3Junction, V3Junction, V3Junction, V3Junction, V3Junction, V3Junction]
+    value: V4Junction[]
 }
 
-export type V3Junction = V3Junction_AccountId32 | V3Junction_AccountIndex64 | V3Junction_AccountKey20 | V3Junction_GeneralIndex | V3Junction_GeneralKey | V3Junction_GlobalConsensus | V3Junction_OnlyChild | V3Junction_PalletInstance | V3Junction_Parachain | V3Junction_Plurality
+export type V4Junction = V4Junction_AccountId32 | V4Junction_AccountIndex64 | V4Junction_AccountKey20 | V4Junction_GeneralIndex | V4Junction_GeneralKey | V4Junction_GlobalConsensus | V4Junction_OnlyChild | V4Junction_PalletInstance | V4Junction_Parachain | V4Junction_Plurality
 
-export interface V3Junction_AccountId32 {
+export interface V4Junction_AccountId32 {
     __kind: 'AccountId32'
-    network?: (V3NetworkId | undefined)
+    network?: (V4NetworkId | undefined)
     id: Bytes
 }
 
-export interface V3Junction_AccountIndex64 {
+export interface V4Junction_AccountIndex64 {
     __kind: 'AccountIndex64'
-    network?: (V3NetworkId | undefined)
+    network?: (V4NetworkId | undefined)
     index: bigint
 }
 
-export interface V3Junction_AccountKey20 {
+export interface V4Junction_AccountKey20 {
     __kind: 'AccountKey20'
-    network?: (V3NetworkId | undefined)
+    network?: (V4NetworkId | undefined)
     key: Bytes
 }
 
-export interface V3Junction_GeneralIndex {
+export interface V4Junction_GeneralIndex {
     __kind: 'GeneralIndex'
     value: bigint
 }
 
-export interface V3Junction_GeneralKey {
+export interface V4Junction_GeneralKey {
     __kind: 'GeneralKey'
     length: number
     data: Bytes
 }
 
-export interface V3Junction_GlobalConsensus {
+export interface V4Junction_GlobalConsensus {
     __kind: 'GlobalConsensus'
-    value: V3NetworkId
+    value: V4NetworkId
 }
 
-export interface V3Junction_OnlyChild {
+export interface V4Junction_OnlyChild {
     __kind: 'OnlyChild'
 }
 
-export interface V3Junction_PalletInstance {
+export interface V4Junction_PalletInstance {
     __kind: 'PalletInstance'
     value: number
 }
 
-export interface V3Junction_Parachain {
+export interface V4Junction_Parachain {
     __kind: 'Parachain'
     value: number
 }
 
-export interface V3Junction_Plurality {
+export interface V4Junction_Plurality {
     __kind: 'Plurality'
     id: V3BodyId
     part: V3BodyPart
@@ -325,64 +320,66 @@ export interface V3BodyId_Unit {
     __kind: 'Unit'
 }
 
-export type V3NetworkId = V3NetworkId_BitcoinCash | V3NetworkId_BitcoinCore | V3NetworkId_ByFork | V3NetworkId_ByGenesis | V3NetworkId_Ethereum | V3NetworkId_Kusama | V3NetworkId_Polkadot | V3NetworkId_Rococo | V3NetworkId_Westend | V3NetworkId_Wococo
+export type V4NetworkId = V4NetworkId_BitcoinCash | V4NetworkId_BitcoinCore | V4NetworkId_ByFork | V4NetworkId_ByGenesis | V4NetworkId_Ethereum | V4NetworkId_Kusama | V4NetworkId_Polkadot | V4NetworkId_PolkadotBulletin | V4NetworkId_Rococo | V4NetworkId_Westend | V4NetworkId_Wococo
 
-export interface V3NetworkId_BitcoinCash {
+export interface V4NetworkId_BitcoinCash {
     __kind: 'BitcoinCash'
 }
 
-export interface V3NetworkId_BitcoinCore {
+export interface V4NetworkId_BitcoinCore {
     __kind: 'BitcoinCore'
 }
 
-export interface V3NetworkId_ByFork {
+export interface V4NetworkId_ByFork {
     __kind: 'ByFork'
     blockNumber: bigint
     blockHash: Bytes
 }
 
-export interface V3NetworkId_ByGenesis {
+export interface V4NetworkId_ByGenesis {
     __kind: 'ByGenesis'
     value: Bytes
 }
 
-export interface V3NetworkId_Ethereum {
+export interface V4NetworkId_Ethereum {
     __kind: 'Ethereum'
     chainId: bigint
 }
 
-export interface V3NetworkId_Kusama {
+export interface V4NetworkId_Kusama {
     __kind: 'Kusama'
 }
 
-export interface V3NetworkId_Polkadot {
+export interface V4NetworkId_Polkadot {
     __kind: 'Polkadot'
 }
 
-export interface V3NetworkId_Rococo {
+export interface V4NetworkId_PolkadotBulletin {
+    __kind: 'PolkadotBulletin'
+}
+
+export interface V4NetworkId_Rococo {
     __kind: 'Rococo'
 }
 
-export interface V3NetworkId_Westend {
+export interface V4NetworkId_Westend {
     __kind: 'Westend'
 }
 
-export interface V3NetworkId_Wococo {
+export interface V4NetworkId_Wococo {
     __kind: 'Wococo'
 }
 
-export type Void = never
+export type Type_162 = Type_162_Parachain
 
-export type Type_133 = Type_133_Parachain
-
-export interface Type_133_Parachain {
+export interface Type_162_Parachain {
     __kind: 'Parachain'
     value: Id
 }
 
 export type Id = number
 
-export type Origin = Origin_AuctionAdmin | Origin_BigSpender | Origin_BigTipper | Origin_FellowshipAdmin | Origin_GeneralAdmin | Origin_LeaseAdmin | Origin_MediumSpender | Origin_ReferendumCanceller | Origin_ReferendumKiller | Origin_SmallSpender | Origin_SmallTipper | Origin_StakingAdmin | Origin_Treasurer | Origin_WhitelistedCaller
+export type Origin = Origin_AuctionAdmin | Origin_BigSpender | Origin_BigTipper | Origin_FellowshipAdmin | Origin_GeneralAdmin | Origin_LeaseAdmin | Origin_MediumSpender | Origin_ReferendumCanceller | Origin_ReferendumKiller | Origin_SmallSpender | Origin_SmallTipper | Origin_StakingAdmin | Origin_Treasurer | Origin_WhitelistedCaller | Origin_WishForChange
 
 export interface Origin_AuctionAdmin {
     __kind: 'AuctionAdmin'
@@ -438,6 +435,10 @@ export interface Origin_Treasurer {
 
 export interface Origin_WhitelistedCaller {
     __kind: 'WhitelistedCaller'
+}
+
+export interface Origin_WishForChange {
+    __kind: 'WishForChange'
 }
 
 export interface Deposit {
@@ -512,9 +513,8 @@ export const H256 = sts.bytes()
 export const OriginCaller: sts.Type<OriginCaller> = sts.closedEnum(() => {
     return  {
         Origins: Origin,
-        ParachainsOrigin: Type_133,
-        Void: Void,
-        XcmPallet: Type_135,
+        ParachainsOrigin: Type_162,
+        XcmPallet: Type_164,
         system: RawOrigin,
     }
 })
@@ -529,46 +529,46 @@ export const RawOrigin: sts.Type<RawOrigin> = sts.closedEnum(() => {
 
 export const AccountId32 = sts.bytes()
 
-export const Type_135: sts.Type<Type_135> = sts.closedEnum(() => {
+export const Type_164: sts.Type<Type_164> = sts.closedEnum(() => {
     return  {
-        Response: V3MultiLocation,
-        Xcm: V3MultiLocation,
+        Response: V4Location,
+        Xcm: V4Location,
     }
 })
 
-export const V3MultiLocation: sts.Type<V3MultiLocation> = sts.struct(() => {
+export const V4Location: sts.Type<V4Location> = sts.struct(() => {
     return  {
         parents: sts.number(),
-        interior: V3Junctions,
+        interior: V4Junctions,
     }
 })
 
-export const V3Junctions: sts.Type<V3Junctions> = sts.closedEnum(() => {
+export const V4Junctions: sts.Type<V4Junctions> = sts.closedEnum(() => {
     return  {
         Here: sts.unit(),
-        X1: V3Junction,
-        X2: sts.tuple(() => [V3Junction, V3Junction]),
-        X3: sts.tuple(() => [V3Junction, V3Junction, V3Junction]),
-        X4: sts.tuple(() => [V3Junction, V3Junction, V3Junction, V3Junction]),
-        X5: sts.tuple(() => [V3Junction, V3Junction, V3Junction, V3Junction, V3Junction]),
-        X6: sts.tuple(() => [V3Junction, V3Junction, V3Junction, V3Junction, V3Junction, V3Junction]),
-        X7: sts.tuple(() => [V3Junction, V3Junction, V3Junction, V3Junction, V3Junction, V3Junction, V3Junction]),
-        X8: sts.tuple(() => [V3Junction, V3Junction, V3Junction, V3Junction, V3Junction, V3Junction, V3Junction, V3Junction]),
+        X1: sts.array(() => V4Junction),
+        X2: sts.array(() => V4Junction),
+        X3: sts.array(() => V4Junction),
+        X4: sts.array(() => V4Junction),
+        X5: sts.array(() => V4Junction),
+        X6: sts.array(() => V4Junction),
+        X7: sts.array(() => V4Junction),
+        X8: sts.array(() => V4Junction),
     }
 })
 
-export const V3Junction: sts.Type<V3Junction> = sts.closedEnum(() => {
+export const V4Junction: sts.Type<V4Junction> = sts.closedEnum(() => {
     return  {
         AccountId32: sts.enumStruct({
-            network: sts.option(() => V3NetworkId),
+            network: sts.option(() => V4NetworkId),
             id: sts.bytes(),
         }),
         AccountIndex64: sts.enumStruct({
-            network: sts.option(() => V3NetworkId),
+            network: sts.option(() => V4NetworkId),
             index: sts.bigint(),
         }),
         AccountKey20: sts.enumStruct({
-            network: sts.option(() => V3NetworkId),
+            network: sts.option(() => V4NetworkId),
             key: sts.bytes(),
         }),
         GeneralIndex: sts.bigint(),
@@ -576,7 +576,7 @@ export const V3Junction: sts.Type<V3Junction> = sts.closedEnum(() => {
             length: sts.number(),
             data: sts.bytes(),
         }),
-        GlobalConsensus: V3NetworkId,
+        GlobalConsensus: V4NetworkId,
         OnlyChild: sts.unit(),
         PalletInstance: sts.number(),
         Parachain: sts.number(),
@@ -623,7 +623,7 @@ export const V3BodyId: sts.Type<V3BodyId> = sts.closedEnum(() => {
     }
 })
 
-export const V3NetworkId: sts.Type<V3NetworkId> = sts.closedEnum(() => {
+export const V4NetworkId: sts.Type<V4NetworkId> = sts.closedEnum(() => {
     return  {
         BitcoinCash: sts.unit(),
         BitcoinCore: sts.unit(),
@@ -637,18 +637,14 @@ export const V3NetworkId: sts.Type<V3NetworkId> = sts.closedEnum(() => {
         }),
         Kusama: sts.unit(),
         Polkadot: sts.unit(),
+        PolkadotBulletin: sts.unit(),
         Rococo: sts.unit(),
         Westend: sts.unit(),
         Wococo: sts.unit(),
     }
 })
 
-export const Void: sts.Type<Void> = sts.closedEnum(() => {
-    return  {
-    }
-})
-
-export const Type_133: sts.Type<Type_133> = sts.closedEnum(() => {
+export const Type_162: sts.Type<Type_162> = sts.closedEnum(() => {
     return  {
         Parachain: Id,
     }
@@ -672,6 +668,7 @@ export const Origin: sts.Type<Origin> = sts.closedEnum(() => {
         StakingAdmin: sts.unit(),
         Treasurer: sts.unit(),
         WhitelistedCaller: sts.unit(),
+        WishForChange: sts.unit(),
     }
 })
 

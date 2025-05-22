@@ -10,8 +10,8 @@ interface PreimageNotedData {
 }
 
 export function getPreimageNotedData(itemEvent: Event): PreimageNotedData {
-    if (noted.v9170.is(itemEvent)) {
-        const { hash } = noted.v9170.decode(itemEvent)
+    if (noted.v1001002.is(itemEvent)) {
+        const { hash } = noted.v1001002.decode(itemEvent)
         return {
             hash
         }
@@ -25,8 +25,8 @@ export interface PreimageRequestedData {
 }
 
 export function getPreimageRequestedData(itemEvent: Event): PreimageRequestedData {
-    if (requested.v9170.is(itemEvent)) {
-        const {hash} = requested.v9170.decode(itemEvent)
+    if (requested.v1001002.is(itemEvent)) {
+        const { hash } = requested.v1001002.decode(itemEvent)
         return {
             hash
         }
@@ -40,8 +40,8 @@ export interface PreimageClearedData {
 }
 
 export function getPreimageClearedData(itemEvent: Event): PreimageRequestedData {
-    if (cleared.v9170.is(itemEvent)) {
-        const {hash} = cleared.v9170.decode(itemEvent)
+    if (cleared.v1001002.is(itemEvent)) {
+        const { hash } = cleared.v1001002.decode(itemEvent)
         return {
             hash
         }
