@@ -3,7 +3,7 @@ import { lookupArchive } from "@subsquid/archive-registry"
 const config: any = {
     chain: {
         name: 'paseo',
-        prefix: 'paseo',
+        prefix: 0,
     },
     dataSource: {
         archive: 'https://v2.archive.subsquid.io/network/paseo',
