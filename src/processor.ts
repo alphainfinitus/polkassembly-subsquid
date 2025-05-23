@@ -7,28 +7,28 @@ import assert from 'assert'
 //@ts-ignore ts(2589)
 const processor = new SubstrateBatchProcessor()
     .setDataSource({
-        chain: 'wss://kilt-rpc.dwellir.com',
-        archive: lookupArchive('kilt',  {type: 'Substrate', release: 'ArrowSquid' }),
+        chain: 'wss://kilt.ibp.network',
+        archive: lookupArchive('kilt', { type: 'Substrate', release: 'ArrowSquid' }),
     })
-    .setBlockRange({ from: 0})
-    .setFields({event: {}, call: { origin: true, success: true, error: true }, extrinsic: { hash: true, fee: true, tip: true }, block: { timestamp: true } })
+    .setBlockRange({ from: 0 })
+    .setFields({ event: {}, call: { origin: true, success: true, error: true }, extrinsic: { hash: true, fee: true, tip: true }, block: { timestamp: true } })
     .addCall({
-        name: [ 'ConvictionVoting.vote', 'ConvictionVoting.delegate', 'ConvictionVoting.undelegate', 'ConvictionVoting.remove_vote', 'ConvictionVoting.remove_other_vote', 'Democracy.vote',
-        'Democracy.remove_vote', 'Democracy.remove_other_vote', 'Democracy.delegate', 'Democracy.undelegate', 'Treasury.accept_curator', 'Treasury.unassign_curator', 'Bounties.accept_curator',
-        'Bounties.unassign_curator', 'Bounties.propose_curator', 'ChildBounties.propose_curator', 'ChildBounties.accept_curator', 'ChildBounties.unassign_curator', 'Tips.tip', 'Treasury.tip'
-    ]
+        name: ['ConvictionVoting.vote', 'ConvictionVoting.delegate', 'ConvictionVoting.undelegate', 'ConvictionVoting.remove_vote', 'ConvictionVoting.remove_other_vote', 'Democracy.vote',
+            'Democracy.remove_vote', 'Democracy.remove_other_vote', 'Democracy.delegate', 'Democracy.undelegate', 'Treasury.accept_curator', 'Treasury.unassign_curator', 'Bounties.accept_curator',
+            'Bounties.unassign_curator', 'Bounties.propose_curator', 'ChildBounties.propose_curator', 'ChildBounties.accept_curator', 'ChildBounties.unassign_curator', 'Tips.tip', 'Treasury.tip'
+        ]
     })
     .addEvent({
-        name: [ 'Referenda.Submitted', 'Referenda.DecisionDepositPlaced', 'Referenda.Rejected', 'Referenda.MetadataSet', 'Referenda.MetadataCleared',  'Referenda.TimedOut', 'Referenda.Approved', 'Referenda.DecisionStarted', 'Referenda.ConfirmStarted', 
-        'Referenda.ConfirmAborted', 'Referenda.Killed', 'Referenda.Confirmed', 'Preimage.Requested', 'Preimage.Noted', 'Preimage.Cleared', 'Preimage.Cleared', 'Referenda.ConfirmStarted', 
-        'Referenda.ConfirmAborted', 'Democracy.Proposed', 'Democracy.Tabled', 'Democracy.Started', 'Democracy.Passed', 'Democracy.NotPassed', 'Democracy.Cancelled', 'Democracy.Executed', 
-        'Democracy.PreimageNoted', 'Democracy.PreimageUsed', 'Democracy.PreimageInvalid', 'Democracy.PreimageMissing', 'Democracy.PreimageReaped', 'DemocracySeconded', 'Treasury.Proposed', 
-        'Treasury.Awarded', 'Treasury.Rejected', 'Treasury.SpendApproved', 'Scheduler.Dispatched', 'Council.Proposed', 'Council.Approved', 'Council.Disapproved', 'Council.Closed', 'Council.Voted',
-        'Council.Executed', 'TechnicalCommittee.Proposed', 'TechnicalCommittee.Approved', 'TechnicalCommittee.Disapproved', 'TechnicalCommittee.Closed', 'TechnicalCommittee.Voted', 'TechnicalCommittee.Executed',
-        'Treasury.NewTip', 'Treasury.TipClosed', 'Treasury.TipRetracted', 'Treasury.BountyProposed', 'Treasury.BountyRejected', 'Treasury.BountyBecameActive', 'Treasury.BountyAwarded', 'Treasury.BountyClaimed',
-        'Treasury.BountyCanceled', 'Treasury.BountyExtended', 'Tips.NewTip', 'Tips.TipClosed', 'Tips.TipRetracted', 'Tips.TipSlashed', 'Bounties.BountyProposed', 'Bounties.BountyRejected', 'Bounties.BountyBecameActive',
-        'Bounties.BountyAwarded', 'Bounties.BountyClaimed', 'Bounties.BountyCanceled', 'Bounties.BountyExtended', 'ChildBounties.Added', 'ChildBounties.Awarded', 'ChildBounties.Claimed', 'ChildBounties.Canceled'
-    ],
+        name: ['Referenda.Submitted', 'Referenda.DecisionDepositPlaced', 'Referenda.Rejected', 'Referenda.MetadataSet', 'Referenda.MetadataCleared', 'Referenda.TimedOut', 'Referenda.Approved', 'Referenda.DecisionStarted', 'Referenda.ConfirmStarted',
+            'Referenda.ConfirmAborted', 'Referenda.Killed', 'Referenda.Confirmed', 'Preimage.Requested', 'Preimage.Noted', 'Preimage.Cleared', 'Preimage.Cleared', 'Referenda.ConfirmStarted',
+            'Referenda.ConfirmAborted', 'Democracy.Proposed', 'Democracy.Tabled', 'Democracy.Started', 'Democracy.Passed', 'Democracy.NotPassed', 'Democracy.Cancelled', 'Democracy.Executed',
+            'Democracy.PreimageNoted', 'Democracy.PreimageUsed', 'Democracy.PreimageInvalid', 'Democracy.PreimageMissing', 'Democracy.PreimageReaped', 'DemocracySeconded', 'Treasury.Proposed',
+            'Treasury.Awarded', 'Treasury.Rejected', 'Treasury.SpendApproved', 'Scheduler.Dispatched', 'Council.Proposed', 'Council.Approved', 'Council.Disapproved', 'Council.Closed', 'Council.Voted',
+            'Council.Executed', 'TechnicalCommittee.Proposed', 'TechnicalCommittee.Approved', 'TechnicalCommittee.Disapproved', 'TechnicalCommittee.Closed', 'TechnicalCommittee.Voted', 'TechnicalCommittee.Executed',
+            'Treasury.NewTip', 'Treasury.TipClosed', 'Treasury.TipRetracted', 'Treasury.BountyProposed', 'Treasury.BountyRejected', 'Treasury.BountyBecameActive', 'Treasury.BountyAwarded', 'Treasury.BountyClaimed',
+            'Treasury.BountyCanceled', 'Treasury.BountyExtended', 'Tips.NewTip', 'Tips.TipClosed', 'Tips.TipRetracted', 'Tips.TipSlashed', 'Bounties.BountyProposed', 'Bounties.BountyRejected', 'Bounties.BountyBecameActive',
+            'Bounties.BountyAwarded', 'Bounties.BountyClaimed', 'Bounties.BountyCanceled', 'Bounties.BountyExtended', 'ChildBounties.Added', 'ChildBounties.Awarded', 'ChildBounties.Claimed', 'ChildBounties.Canceled'
+        ],
         call: true,
         extrinsic: true
     })
@@ -82,117 +82,117 @@ processor.run(new TypeormDatabase(), async (ctx: any) => {
             if (item.name == 'Democracy.undelegate') {
                 await modules.democracy.extrinsics.handleUndelegate(ctx, item, block.header)
             }
-            if (item.name == 'Tips.tip'){
+            if (item.name == 'Tips.tip') {
                 await modules.tips.extrinsics.handleNewTipValue(ctx, item, block.header)
             }
         }
         for (let item of block.events) {
-            if (item.name == 'Democracy.Proposed'){
+            if (item.name == 'Democracy.Proposed') {
                 await modules.democracy.events.handleProposed(ctx, item, block.header)
             }
-            if (item.name == 'Democracy.Tabled'){
+            if (item.name == 'Democracy.Tabled') {
                 await modules.democracy.events.handleTabled(ctx, item, block.header)
             }
-            if (item.name == 'Democracy.Started'){
+            if (item.name == 'Democracy.Started') {
                 await modules.democracy.events.handleStarted(ctx, item, block.header)
             }
-            if (item.name == 'Democracy.Passed'){
+            if (item.name == 'Democracy.Passed') {
                 await modules.democracy.events.handlePassed(ctx, item, block.header)
             }
-            if (item.name == 'Democracy.NotPassed'){
+            if (item.name == 'Democracy.NotPassed') {
                 await modules.democracy.events.handleNotPassed(ctx, item, block.header)
             }
-            if (item.name == 'Democracy.Cancelled'){
+            if (item.name == 'Democracy.Cancelled') {
                 await modules.democracy.events.handleCancelled(ctx, item, block.header)
             }
-            if (item.name == 'Democracy.Executed'){
+            if (item.name == 'Democracy.Executed') {
                 await modules.democracy.events.handleExecuted(ctx, item, block.header)
             }
-            if (item.name == 'Democracy.Seconded'){
+            if (item.name == 'Democracy.Seconded') {
                 await modules.democracy.events.handleDemocracySeconds(ctx, item, block.header)
             }
-            if (item.name == 'Democracy.PreimageNoted'){
+            if (item.name == 'Democracy.PreimageNoted') {
                 await modules.democracy.events.handlePreimageNoted(ctx, item, block.header)
             }
-            if (item.name == 'Democracy.PreimageUsed'){
+            if (item.name == 'Democracy.PreimageUsed') {
                 await modules.democracy.events.handlePreimageUsed(ctx, item, block.header)
             }
-            if (item.name == 'Democracy.PreimageInvalid'){
+            if (item.name == 'Democracy.PreimageInvalid') {
                 await modules.democracy.events.handlePreimageInvalid(ctx, item, block.header)
             }
-            if (item.name == 'Democracy.PreimageMissing'){
+            if (item.name == 'Democracy.PreimageMissing') {
                 await modules.democracy.events.handlePreimageMissing(ctx, item, block.header)
             }
-            if (item.name == 'Democracy.PreimageReaped'){
+            if (item.name == 'Democracy.PreimageReaped') {
                 await modules.democracy.events.handlePreimageReaped(ctx, item, block.header)
             }
-            if (item.name == 'Council.Proposed'){
+            if (item.name == 'Council.Proposed') {
                 await modules.council.events.handleProposed(ctx, item, block.header)
             }
-            if (item.name == 'Council.Voted'){
+            if (item.name == 'Council.Voted') {
                 await modules.council.events.handleVoted(ctx, item, block.header)
             }
-            if (item.name == 'Council.Closed'){
+            if (item.name == 'Council.Closed') {
                 await modules.council.events.handleClosed(ctx, item, block.header)
             }
-            if (item.name == 'Council.Disapproved'){
+            if (item.name == 'Council.Disapproved') {
                 await modules.council.events.handleDisapproved(ctx, item, block.header)
             }
-            if (item.name == 'Council.Executed'){
+            if (item.name == 'Council.Executed') {
                 await modules.council.events.handleExecuted(ctx, item, block.header)
             }
-            if (item.name == 'Council.Approved'){
+            if (item.name == 'Council.Approved') {
                 await modules.council.events.handleApproved(ctx, item, block.header)
             }
-            if (item.name == 'TechnicalCommittee.Proposed'){
+            if (item.name == 'TechnicalCommittee.Proposed') {
                 await modules.techComittee.events.handleProposed(ctx, item, block.header)
             }
-            if (item.name == 'TechnicalCommittee.Approved'){
+            if (item.name == 'TechnicalCommittee.Approved') {
                 await modules.techComittee.events.handleApproved(ctx, item, block.header)
             }
-            if (item.name == 'TechnicalCommittee.Disapproved'){
+            if (item.name == 'TechnicalCommittee.Disapproved') {
                 await modules.techComittee.events.handleDisapproved(ctx, item, block.header)
             }
-            if (item.name == 'TechnicalCommittee.Closed'){
+            if (item.name == 'TechnicalCommittee.Closed') {
                 await modules.techComittee.events.handleClosed(ctx, item, block.header)
             }
-            if (item.name == 'TechnicalCommittee.Voted'){
+            if (item.name == 'TechnicalCommittee.Voted') {
                 await modules.techComittee.events.handleVoted(ctx, item, block.header)
             }
-            if (item.name == 'TechnicalCommittee.Executed'){
+            if (item.name == 'TechnicalCommittee.Executed') {
                 await modules.techComittee.events.handleExecuted(ctx, item, block.header)
             }
-            if (item.name == 'Treasury.Proposed'){
+            if (item.name == 'Treasury.Proposed') {
                 await modules.treasury.events.handleProposed(ctx, item, block.header)
             }
-            if (item.name == 'Treasury.Awarded'){
+            if (item.name == 'Treasury.Awarded') {
                 await modules.treasury.events.handleAwarded(ctx, item, block.header)
             }
-            if (item.name == 'Treasury.Rejected'){
+            if (item.name == 'Treasury.Rejected') {
                 await modules.treasury.events.handleRejected(ctx, item, block.header)
             }
-            if (item.name == 'Treasury.SpendApproved'){
+            if (item.name == 'Treasury.SpendApproved') {
                 await modules.treasury.events.handleSpendApproved(ctx, item, block.header)
             }
-            if (item.name == 'Tips.TipClosed'){
+            if (item.name == 'Tips.TipClosed') {
                 await modules.tips.events.handleClosed(ctx, item, block.header)
             }
-            if (item.name == 'Tips.NewTip'){
+            if (item.name == 'Tips.NewTip') {
                 await modules.tips.events.handleNewTip(ctx, item, block.header)
             }
-            if (item.name == 'Tips.TipRetracted'){
+            if (item.name == 'Tips.TipRetracted') {
                 await modules.tips.events.handleRetracted(ctx, item, block.header)
             }
-            if (item.name == 'Tips.TipSlashed'){
+            if (item.name == 'Tips.TipSlashed') {
                 await modules.tips.events.handleSlashed(ctx, item, block.header)
             }
-            if (item.name == 'Preimage.Noted'){
+            if (item.name == 'Preimage.Noted') {
                 await modules.preimageV2.events.handlePreimageV2Noted(ctx, item, block.header)
             }
-            if (item.name == 'Preimage.Cleared'){
+            if (item.name == 'Preimage.Cleared') {
                 await modules.preimageV2.events.handlePreimageV2Cleared(ctx, item, block.header)
             }
-            if (item.name == 'Preimage.Requested'){
+            if (item.name == 'Preimage.Requested') {
                 await modules.preimageV2.events.handlePreimageV2Requested(ctx, item, block.header)
             }
         }
