@@ -1,4 +1,4 @@
-import {lookupArchive} from "@subsquid/archive-registry"
+import { lookupArchive } from "@subsquid/archive-registry"
 
 const config: any = {
     chain: {
@@ -6,8 +6,8 @@ const config: any = {
         prefix: 38,
     },
     dataSource: {
-        chain: 'wss://kilt-rpc.dwellir.com',
-        archive: lookupArchive('kilt',  {type: 'Substrate', release: 'ArrowSquid' }),
+        chain: 'wss://kilt.ibp.network',
+        archive: lookupArchive('kilt', { type: 'Substrate', release: 'ArrowSquid' }),
     },
     typesBundle: 'kilt',
     batchSize: 500,
