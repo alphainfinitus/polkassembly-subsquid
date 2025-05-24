@@ -1,6 +1,6 @@
 import { Store } from "@subsquid/typeorm-store";
 import { UnknownVersionError } from "../../common/errors";
-import { proposals } from "../../types/treasury/storage";
+import { proposals } from "../../types/community-treasury/storage";
 import { ProcessorContext } from "../../processor";
 
 interface CommunityTreasuryProposalStorageData {
@@ -15,8 +15,8 @@ async function getStorageData(
   index: number,
   block: any
 ): Promise<CommunityTreasuryProposalStorageData | undefined> {
-  if (proposals.v63.is(block)) {
-    return await proposals.v63.get(block, index);
+  if (proposals.v133.is(block)) {
+    return await proposals.v133.get(block, index);
   } else {
     throw new UnknownVersionError("CommunityTreasury.Proposals");
   }
