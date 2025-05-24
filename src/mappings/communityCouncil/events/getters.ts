@@ -31,6 +31,12 @@ export function getDisapprovedData(itemEvent: Event): string {
 export function getExecutedData(itemEvent: Event): string {
   if (executed.v63.is(itemEvent)) {
     return executed.v63.decode(itemEvent).proposalHash;
+  } else if (executed.v83.is(itemEvent)) {
+    return executed.v83.decode(itemEvent).proposalHash;
+  } else if (executed.v105.is(itemEvent)) {
+    return executed.v105.decode(itemEvent).proposalHash;
+  } else if (executed.v1500.is(itemEvent)) {
+    return executed.v1500.decode(itemEvent).proposalHash;
   } else {
     throw new UnknownVersionError(itemEvent.name);
   }

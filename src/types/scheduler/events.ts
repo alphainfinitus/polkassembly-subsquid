@@ -2,6 +2,7 @@ import {sts, Block, Bytes, Option, Result, EventType, RuntimeCtx} from '../suppo
 import * as v63 from '../v63'
 import * as v83 from '../v83'
 import * as v105 from '../v105'
+import * as v1500 from '../v1500'
 
 export const dispatched =  {
     name: 'Scheduler.Dispatched',
@@ -36,6 +37,17 @@ export const dispatched =  {
             task: sts.tuple(() => [sts.number(), sts.number()]),
             id: sts.option(() => sts.bytes()),
             result: sts.result(() => sts.unit(), () => v105.DispatchError),
+        })
+    ),
+    /**
+     * Dispatched some task.
+     */
+    v1500: new EventType(
+        'Scheduler.Dispatched',
+        sts.struct({
+            task: sts.tuple(() => [sts.number(), sts.number()]),
+            id: sts.option(() => sts.bytes()),
+            result: sts.result(() => sts.unit(), () => v1500.DispatchError),
         })
     ),
 }
