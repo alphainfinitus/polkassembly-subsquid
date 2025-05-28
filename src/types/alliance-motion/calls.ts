@@ -5,6 +5,11 @@ import * as v9370 from '../v9370'
 import * as v9420 from '../v9420'
 import * as v1000000 from '../v1000000'
 import * as v1001000 from '../v1001000'
+import * as v1002000 from '../v1002000'
+import * as v1002004 from '../v1002004'
+import * as v1003000 from '../v1003000'
+import * as v1004000 from '../v1004000'
+import * as v1005001 from '../v1005001'
 
 export const execute =  {
     name: 'AllianceMotion.execute',
@@ -103,6 +108,80 @@ export const execute =  {
         'AllianceMotion.execute',
         sts.struct({
             proposal: v1001000.Call,
+            lengthBound: sts.number(),
+        })
+    ),
+    /**
+     * See [`Pallet::execute`].
+     */
+    v1002000: new CallType(
+        'AllianceMotion.execute',
+        sts.struct({
+            proposal: v1002000.Call,
+            lengthBound: sts.number(),
+        })
+    ),
+    /**
+     * See [`Pallet::execute`].
+     */
+    v1002004: new CallType(
+        'AllianceMotion.execute',
+        sts.struct({
+            proposal: v1002004.Call,
+            lengthBound: sts.number(),
+        })
+    ),
+    /**
+     * Dispatch a proposal from a member using the `Member` origin.
+     * 
+     * Origin must be a member of the collective.
+     * 
+     * ## Complexity:
+     * - `O(B + M + P)` where:
+     * - `B` is `proposal` size in bytes (length-fee-bounded)
+     * - `M` members-count (code-bounded)
+     * - `P` complexity of dispatching `proposal`
+     */
+    v1003000: new CallType(
+        'AllianceMotion.execute',
+        sts.struct({
+            proposal: v1003000.Call,
+            lengthBound: sts.number(),
+        })
+    ),
+    /**
+     * Dispatch a proposal from a member using the `Member` origin.
+     * 
+     * Origin must be a member of the collective.
+     * 
+     * ## Complexity:
+     * - `O(B + M + P)` where:
+     * - `B` is `proposal` size in bytes (length-fee-bounded)
+     * - `M` members-count (code-bounded)
+     * - `P` complexity of dispatching `proposal`
+     */
+    v1004000: new CallType(
+        'AllianceMotion.execute',
+        sts.struct({
+            proposal: v1004000.Call,
+            lengthBound: sts.number(),
+        })
+    ),
+    /**
+     * Dispatch a proposal from a member using the `Member` origin.
+     * 
+     * Origin must be a member of the collective.
+     * 
+     * ## Complexity:
+     * - `O(B + M + P)` where:
+     * - `B` is `proposal` size in bytes (length-fee-bounded)
+     * - `M` members-count (code-bounded)
+     * - `P` complexity of dispatching `proposal`
+     */
+    v1005001: new CallType(
+        'AllianceMotion.execute',
+        sts.struct({
+            proposal: v1005001.Call,
             lengthBound: sts.number(),
         })
     ),
@@ -264,6 +343,100 @@ export const propose =  {
         sts.struct({
             threshold: sts.number(),
             proposal: v1001000.Call,
+            lengthBound: sts.number(),
+        })
+    ),
+    /**
+     * See [`Pallet::propose`].
+     */
+    v1002000: new CallType(
+        'AllianceMotion.propose',
+        sts.struct({
+            threshold: sts.number(),
+            proposal: v1002000.Call,
+            lengthBound: sts.number(),
+        })
+    ),
+    /**
+     * See [`Pallet::propose`].
+     */
+    v1002004: new CallType(
+        'AllianceMotion.propose',
+        sts.struct({
+            threshold: sts.number(),
+            proposal: v1002004.Call,
+            lengthBound: sts.number(),
+        })
+    ),
+    /**
+     * Add a new proposal to either be voted on or executed directly.
+     * 
+     * Requires the sender to be member.
+     * 
+     * `threshold` determines whether `proposal` is executed directly (`threshold < 2`)
+     * or put up for voting.
+     * 
+     * ## Complexity
+     * - `O(B + M + P1)` or `O(B + M + P2)` where:
+     *   - `B` is `proposal` size in bytes (length-fee-bounded)
+     *   - `M` is members-count (code- and governance-bounded)
+     *   - branching is influenced by `threshold` where:
+     *     - `P1` is proposal execution complexity (`threshold < 2`)
+     *     - `P2` is proposals-count (code-bounded) (`threshold >= 2`)
+     */
+    v1003000: new CallType(
+        'AllianceMotion.propose',
+        sts.struct({
+            threshold: sts.number(),
+            proposal: v1003000.Call,
+            lengthBound: sts.number(),
+        })
+    ),
+    /**
+     * Add a new proposal to either be voted on or executed directly.
+     * 
+     * Requires the sender to be member.
+     * 
+     * `threshold` determines whether `proposal` is executed directly (`threshold < 2`)
+     * or put up for voting.
+     * 
+     * ## Complexity
+     * - `O(B + M + P1)` or `O(B + M + P2)` where:
+     *   - `B` is `proposal` size in bytes (length-fee-bounded)
+     *   - `M` is members-count (code- and governance-bounded)
+     *   - branching is influenced by `threshold` where:
+     *     - `P1` is proposal execution complexity (`threshold < 2`)
+     *     - `P2` is proposals-count (code-bounded) (`threshold >= 2`)
+     */
+    v1004000: new CallType(
+        'AllianceMotion.propose',
+        sts.struct({
+            threshold: sts.number(),
+            proposal: v1004000.Call,
+            lengthBound: sts.number(),
+        })
+    ),
+    /**
+     * Add a new proposal to either be voted on or executed directly.
+     * 
+     * Requires the sender to be member.
+     * 
+     * `threshold` determines whether `proposal` is executed directly (`threshold < 2`)
+     * or put up for voting.
+     * 
+     * ## Complexity
+     * - `O(B + M + P1)` or `O(B + M + P2)` where:
+     *   - `B` is `proposal` size in bytes (length-fee-bounded)
+     *   - `M` is members-count (code- and governance-bounded)
+     *   - branching is influenced by `threshold` where:
+     *     - `P1` is proposal execution complexity (`threshold < 2`)
+     *     - `P2` is proposals-count (code-bounded) (`threshold >= 2`)
+     */
+    v1005001: new CallType(
+        'AllianceMotion.propose',
+        sts.struct({
+            threshold: sts.number(),
+            proposal: v1005001.Call,
             lengthBound: sts.number(),
         })
     ),

@@ -3,6 +3,7 @@ import * as v9290 from '../v9290'
 import * as v9360 from '../v9360'
 import * as v9420 from '../v9420'
 import * as v9430 from '../v9430'
+import * as v1005001 from '../v1005001'
 
 export const proposed =  {
     name: 'AllianceMotion.Proposed',
@@ -105,6 +106,16 @@ export const executed =  {
         sts.struct({
             proposalHash: v9430.H256,
             result: sts.result(() => sts.unit(), () => v9430.DispatchError),
+        })
+    ),
+    /**
+     * A motion was executed; result will be `Ok` if it returned without error.
+     */
+    v1005001: new EventType(
+        'AllianceMotion.Executed',
+        sts.struct({
+            proposalHash: v1005001.H256,
+            result: sts.result(() => sts.unit(), () => v1005001.DispatchError),
         })
     ),
 }
