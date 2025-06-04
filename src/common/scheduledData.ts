@@ -37,7 +37,7 @@ interface ScheduledData {
 export function getDispatchedEventData(ctx: ProcessorContext<Store>, item: Event, header: any): ScheduledData | undefined {
     if (dispatched.v40.is(item)) {
         const [[block, number], hash, result] = dispatched.v40.decode(item)
-        if(result.__kind == 'Ok'){
+        if (result.__kind == 'Ok') {
             return {
                 blockNumber: block,
                 result: result.__kind
@@ -46,7 +46,7 @@ export function getDispatchedEventData(ctx: ProcessorContext<Store>, item: Event
         return undefined
     } else if (dispatched.v900.is(item)) {
         const [[block, number], hash, result] = dispatched.v900.decode(item)
-        if(result.__kind == 'Ok'){
+        if (result.__kind == 'Ok') {
             return {
                 blockNumber: block,
                 result: result.__kind
@@ -55,7 +55,7 @@ export function getDispatchedEventData(ctx: ProcessorContext<Store>, item: Event
         return undefined
     } else if (dispatched.v1300.is(item)) {
         const { task, id, result } = dispatched.v1300.decode(item)
-        if(result.__kind == 'Ok'){
+        if (result.__kind == 'Ok') {
             return {
                 blockNumber: task[0],
                 result: result.__kind
@@ -64,7 +64,7 @@ export function getDispatchedEventData(ctx: ProcessorContext<Store>, item: Event
         return undefined
     } else if (dispatched.v1400.is(item)) {
         const { task, id, result } = dispatched.v1400.decode(item)
-        if(result.__kind == 'Ok'){
+        if (result.__kind == 'Ok') {
             return {
                 blockNumber: task[0],
                 result: result.__kind
@@ -73,7 +73,7 @@ export function getDispatchedEventData(ctx: ProcessorContext<Store>, item: Event
         return undefined
     } else if (dispatched.v1603.is(item)) {
         const { task, id, result } = dispatched.v1603.decode(item)
-        if(result.__kind == 'Ok'){
+        if (result.__kind == 'Ok') {
             return {
                 blockNumber: task[0],
                 result: result.__kind
@@ -82,7 +82,7 @@ export function getDispatchedEventData(ctx: ProcessorContext<Store>, item: Event
         return undefined
     } else if (dispatched.v2000.is(item)) {
         const { task, id, result } = dispatched.v2000.decode(item)
-        if(result.__kind == 'Ok'){
+        if (result.__kind == 'Ok') {
             return {
                 blockNumber: task[0],
                 result: result.__kind
@@ -91,7 +91,16 @@ export function getDispatchedEventData(ctx: ProcessorContext<Store>, item: Event
         return undefined
     } else if (dispatched.v2500.is(item)) {
         const { task, id, result } = dispatched.v2500.decode(item)
-        if(result.__kind == 'Ok'){
+        if (result.__kind == 'Ok') {
+            return {
+                blockNumber: task[0],
+                result: result.__kind
+            }
+        }
+        return undefined
+    } else if (dispatched.v3700.is(item)) {
+        const { task, id, result } = dispatched.v3700.decode(item)
+        if (result.__kind == 'Ok') {
             return {
                 blockNumber: task[0],
                 result: result.__kind
