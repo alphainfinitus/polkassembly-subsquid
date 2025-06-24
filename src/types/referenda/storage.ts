@@ -2,6 +2,7 @@ import {sts, Block, Bytes, Option, Result, StorageType, RuntimeCtx} from '../sup
 import * as v2403 from '../v2403'
 import * as v2801 from '../v2801'
 import * as v2901 from '../v2901'
+import * as v3701 from '../v3701'
 
 export const referendumInfoFor =  {
     /**
@@ -16,6 +17,10 @@ export const referendumInfoFor =  {
      *  Information concerning any given referendum.
      */
     v2901: new StorageType('Referenda.ReferendumInfoFor', 'Optional', [sts.number()], v2901.ReferendumInfo) as ReferendumInfoForV2901,
+    /**
+     *  Information concerning any given referendum.
+     */
+    v3701: new StorageType('Referenda.ReferendumInfoFor', 'Optional', [sts.number()], v3701.ReferendumInfo) as ReferendumInfoForV3701,
 }
 
 /**
@@ -67,4 +72,21 @@ export interface ReferendumInfoForV2901  {
     getPairs(block: Block, key: number): Promise<[k: number, v: (v2901.ReferendumInfo | undefined)][]>
     getPairsPaged(pageSize: number, block: Block): AsyncIterable<[k: number, v: (v2901.ReferendumInfo | undefined)][]>
     getPairsPaged(pageSize: number, block: Block, key: number): AsyncIterable<[k: number, v: (v2901.ReferendumInfo | undefined)][]>
+}
+
+/**
+ *  Information concerning any given referendum.
+ */
+export interface ReferendumInfoForV3701  {
+    is(block: RuntimeCtx): boolean
+    get(block: Block, key: number): Promise<(v3701.ReferendumInfo | undefined)>
+    getMany(block: Block, keys: number[]): Promise<(v3701.ReferendumInfo | undefined)[]>
+    getKeys(block: Block): Promise<number[]>
+    getKeys(block: Block, key: number): Promise<number[]>
+    getKeysPaged(pageSize: number, block: Block): AsyncIterable<number[]>
+    getKeysPaged(pageSize: number, block: Block, key: number): AsyncIterable<number[]>
+    getPairs(block: Block): Promise<[k: number, v: (v3701.ReferendumInfo | undefined)][]>
+    getPairs(block: Block, key: number): Promise<[k: number, v: (v3701.ReferendumInfo | undefined)][]>
+    getPairsPaged(pageSize: number, block: Block): AsyncIterable<[k: number, v: (v3701.ReferendumInfo | undefined)][]>
+    getPairsPaged(pageSize: number, block: Block, key: number): AsyncIterable<[k: number, v: (v3701.ReferendumInfo | undefined)][]>
 }
