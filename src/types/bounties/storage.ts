@@ -1,6 +1,7 @@
 import {sts, Block, Bytes, Option, Result, StorageType, RuntimeCtx} from '../support'
 import * as v283 from '../v283'
 import * as v295 from '../v295'
+import * as v73115 from '../v73115'
 
 export const bounties =  {
     /**
@@ -11,6 +12,10 @@ export const bounties =  {
      *  Bounties that have been made.
      */
     v295: new StorageType('Bounties.Bounties', 'Optional', [sts.number()], v295.Bounty) as BountiesV295,
+    /**
+     *  Bounties that have been made.
+     */
+    v73115: new StorageType('Bounties.Bounties', 'Optional', [sts.number()], v73115.Bounty) as BountiesV73115,
 }
 
 /**
@@ -45,6 +50,23 @@ export interface BountiesV295  {
     getPairs(block: Block, key: number): Promise<[k: number, v: (v295.Bounty | undefined)][]>
     getPairsPaged(pageSize: number, block: Block): AsyncIterable<[k: number, v: (v295.Bounty | undefined)][]>
     getPairsPaged(pageSize: number, block: Block, key: number): AsyncIterable<[k: number, v: (v295.Bounty | undefined)][]>
+}
+
+/**
+ *  Bounties that have been made.
+ */
+export interface BountiesV73115  {
+    is(block: RuntimeCtx): boolean
+    get(block: Block, key: number): Promise<(v73115.Bounty | undefined)>
+    getMany(block: Block, keys: number[]): Promise<(v73115.Bounty | undefined)[]>
+    getKeys(block: Block): Promise<number[]>
+    getKeys(block: Block, key: number): Promise<number[]>
+    getKeysPaged(pageSize: number, block: Block): AsyncIterable<number[]>
+    getKeysPaged(pageSize: number, block: Block, key: number): AsyncIterable<number[]>
+    getPairs(block: Block): Promise<[k: number, v: (v73115.Bounty | undefined)][]>
+    getPairs(block: Block, key: number): Promise<[k: number, v: (v73115.Bounty | undefined)][]>
+    getPairsPaged(pageSize: number, block: Block): AsyncIterable<[k: number, v: (v73115.Bounty | undefined)][]>
+    getPairsPaged(pageSize: number, block: Block, key: number): AsyncIterable<[k: number, v: (v73115.Bounty | undefined)][]>
 }
 
 export const bountyDescriptions =  {
