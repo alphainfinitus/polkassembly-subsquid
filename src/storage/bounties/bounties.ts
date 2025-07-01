@@ -18,6 +18,8 @@ async function getBountyStorageData(ctx: ProcessorContext<Store>, index: number,
 
     if (bounties.v1001002.is(block)) {
         return await bounties.v1001002.get(block, index)
+    } else if (bounties.v1005001.is(block)) {
+        return await bounties.v1005001.get(block, index)
     } else {
         throw new UnknownVersionError("Bounty.Bounties")
     }
