@@ -3,6 +3,7 @@ import * as v1 from '../v1'
 import * as v11 from '../v11'
 import * as v44 from '../v44'
 import * as v56 from '../v56'
+import * as v154 from '../v154'
 
 export const proposed =  {
     name: 'TechnicalCommittee.Proposed',
@@ -96,6 +97,13 @@ export const executed =  {
         sts.struct({
             proposalHash: v56.H256,
             result: sts.result(() => sts.unit(), () => v56.DispatchError),
+        })
+    ),
+    v154: new EventType(
+        'TechnicalCommittee.Executed',
+        sts.struct({
+            proposalHash: v154.H256,
+            result: sts.result(() => sts.unit(), () => v154.DispatchError),
         })
     ),
 }
