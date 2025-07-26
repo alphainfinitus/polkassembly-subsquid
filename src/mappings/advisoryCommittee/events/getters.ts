@@ -60,8 +60,14 @@ export function getExecutedData(ctx: ProcessorContext<Store>, itemEvent: Event):
             proposalHash,
             result: result.__kind == "Ok" ? true : false
         }
-    } if (executed.v46.is(itemEvent)) {
+    } else if (executed.v46.is(itemEvent)) {
         const {proposalHash, result } = executed.v46.decode(itemEvent)
+        return {
+            proposalHash,
+            result: result.__kind == "Ok" ? true : false
+        }
+    } else if (executed.v56.is(itemEvent)) {
+        const {proposalHash, result } = executed.v56.decode(itemEvent)
         return {
             proposalHash,
             result: result.__kind == "Ok" ? true : false
