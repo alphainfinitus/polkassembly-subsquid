@@ -14,6 +14,13 @@ import * as v48 from '../v48'
 import * as v49 from '../v49'
 import * as v50 from '../v50'
 import * as v51 from '../v51'
+import * as v53 from '../v53'
+import * as v54 from '../v54'
+import * as v55 from '../v55'
+import * as v56 from '../v56'
+import * as v57 from '../v57'
+import * as v59 from '../v59'
+import * as v60 from '../v60'
 
 export const propose =  {
     name: 'AdvisoryCommittee.propose',
@@ -569,6 +576,161 @@ export const propose =  {
         sts.struct({
             threshold: sts.number(),
             proposal: v51.Call,
+            lengthBound: sts.number(),
+        })
+    ),
+    /**
+     * Add a new proposal to either be voted on or executed directly.
+     * 
+     * Requires the sender to be member.
+     * 
+     * `threshold` determines whether `proposal` is executed directly (`threshold < 2`)
+     * or put up for voting.
+     * 
+     * # <weight>
+     * ## Weight
+     * - `O(B + M + P1)` or `O(B + M + P2)` where:
+     *   - `B` is `proposal` size in bytes (length-fee-bounded)
+     *   - `M` is members-count (code- and governance-bounded)
+     *   - branching is influenced by `threshold` where:
+     *     - `P1` is proposal execution complexity (`threshold < 2`)
+     *     - `P2` is proposals-count (code-bounded) (`threshold >= 2`)
+     * - DB:
+     *   - 1 storage read `is_member` (codec `O(M)`)
+     *   - 1 storage read `ProposalOf::contains_key` (codec `O(1)`)
+     *   - DB accesses influenced by `threshold`:
+     *     - EITHER storage accesses done by `proposal` (`threshold < 2`)
+     *     - OR proposal insertion (`threshold <= 2`)
+     *       - 1 storage mutation `Proposals` (codec `O(P2)`)
+     *       - 1 storage mutation `ProposalCount` (codec `O(1)`)
+     *       - 1 storage write `ProposalOf` (codec `O(B)`)
+     *       - 1 storage write `Voting` (codec `O(M)`)
+     *   - 1 event
+     * # </weight>
+     */
+    v53: new CallType(
+        'AdvisoryCommittee.propose',
+        sts.struct({
+            threshold: sts.number(),
+            proposal: v53.Call,
+            lengthBound: sts.number(),
+        })
+    ),
+    /**
+     * Add a new proposal to either be voted on or executed directly.
+     * 
+     * Requires the sender to be member.
+     * 
+     * `threshold` determines whether `proposal` is executed directly (`threshold < 2`)
+     * or put up for voting.
+     * 
+     * # <weight>
+     * ## Weight
+     * - `O(B + M + P1)` or `O(B + M + P2)` where:
+     *   - `B` is `proposal` size in bytes (length-fee-bounded)
+     *   - `M` is members-count (code- and governance-bounded)
+     *   - branching is influenced by `threshold` where:
+     *     - `P1` is proposal execution complexity (`threshold < 2`)
+     *     - `P2` is proposals-count (code-bounded) (`threshold >= 2`)
+     * - DB:
+     *   - 1 storage read `is_member` (codec `O(M)`)
+     *   - 1 storage read `ProposalOf::contains_key` (codec `O(1)`)
+     *   - DB accesses influenced by `threshold`:
+     *     - EITHER storage accesses done by `proposal` (`threshold < 2`)
+     *     - OR proposal insertion (`threshold <= 2`)
+     *       - 1 storage mutation `Proposals` (codec `O(P2)`)
+     *       - 1 storage mutation `ProposalCount` (codec `O(1)`)
+     *       - 1 storage write `ProposalOf` (codec `O(B)`)
+     *       - 1 storage write `Voting` (codec `O(M)`)
+     *   - 1 event
+     * # </weight>
+     */
+    v54: new CallType(
+        'AdvisoryCommittee.propose',
+        sts.struct({
+            threshold: sts.number(),
+            proposal: v54.Call,
+            lengthBound: sts.number(),
+        })
+    ),
+    /**
+     * Add a new proposal to either be voted on or executed directly.
+     * 
+     * Requires the sender to be member.
+     * 
+     * `threshold` determines whether `proposal` is executed directly (`threshold < 2`)
+     * or put up for voting.
+     * 
+     * # <weight>
+     * ## Weight
+     * - `O(B + M + P1)` or `O(B + M + P2)` where:
+     *   - `B` is `proposal` size in bytes (length-fee-bounded)
+     *   - `M` is members-count (code- and governance-bounded)
+     *   - branching is influenced by `threshold` where:
+     *     - `P1` is proposal execution complexity (`threshold < 2`)
+     *     - `P2` is proposals-count (code-bounded) (`threshold >= 2`)
+     * - DB:
+     *   - 1 storage read `is_member` (codec `O(M)`)
+     *   - 1 storage read `ProposalOf::contains_key` (codec `O(1)`)
+     *   - DB accesses influenced by `threshold`:
+     *     - EITHER storage accesses done by `proposal` (`threshold < 2`)
+     *     - OR proposal insertion (`threshold <= 2`)
+     *       - 1 storage mutation `Proposals` (codec `O(P2)`)
+     *       - 1 storage mutation `ProposalCount` (codec `O(1)`)
+     *       - 1 storage write `ProposalOf` (codec `O(B)`)
+     *       - 1 storage write `Voting` (codec `O(M)`)
+     *   - 1 event
+     * # </weight>
+     */
+    v55: new CallType(
+        'AdvisoryCommittee.propose',
+        sts.struct({
+            threshold: sts.number(),
+            proposal: v55.Call,
+            lengthBound: sts.number(),
+        })
+    ),
+    /**
+     * See [`Pallet::propose`].
+     */
+    v56: new CallType(
+        'AdvisoryCommittee.propose',
+        sts.struct({
+            threshold: sts.number(),
+            proposal: v56.Call,
+            lengthBound: sts.number(),
+        })
+    ),
+    /**
+     * See [`Pallet::propose`].
+     */
+    v57: new CallType(
+        'AdvisoryCommittee.propose',
+        sts.struct({
+            threshold: sts.number(),
+            proposal: v57.Call,
+            lengthBound: sts.number(),
+        })
+    ),
+    /**
+     * See [`Pallet::propose`].
+     */
+    v59: new CallType(
+        'AdvisoryCommittee.propose',
+        sts.struct({
+            threshold: sts.number(),
+            proposal: v59.Call,
+            lengthBound: sts.number(),
+        })
+    ),
+    /**
+     * See [`Pallet::propose`].
+     */
+    v60: new CallType(
+        'AdvisoryCommittee.propose',
+        sts.struct({
+            threshold: sts.number(),
+            proposal: v60.Call,
             lengthBound: sts.number(),
         })
     ),

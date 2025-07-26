@@ -1,4 +1,4 @@
-import {lookupArchive} from "@subsquid/archive-registry"
+import { lookupArchive } from "@subsquid/archive-registry"
 import { Store } from '@subsquid/typeorm-store'
 
 const config: any = {
@@ -7,8 +7,8 @@ const config: any = {
         prefix: 73,
     },
     dataSource: {
-        chain: 'wss://zeitgeist-rpc.dwellir.com',
-        archive: lookupArchive('zeitgeist', {type: "Substrate", release: "ArrowSquid"}),
+        chain: 'wss://zeitgeist.api.onfinality.io/public-ws',
+        archive: lookupArchive('zeitgeist', { type: "Substrate", release: "ArrowSquid" }),
     },
     typesBundle: 'zeitgeist',
     batchSize: 500,

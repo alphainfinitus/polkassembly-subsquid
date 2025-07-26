@@ -3,6 +3,7 @@ import * as v34 from '../v34'
 import * as v35 from '../v35'
 import * as v36 from '../v36'
 import * as v46 from '../v46'
+import * as v56 from '../v56'
 
 export const proposed =  {
     name: 'Council.Proposed',
@@ -105,6 +106,16 @@ export const executed =  {
         sts.struct({
             proposalHash: v46.H256,
             result: sts.result(() => sts.unit(), () => v46.DispatchError),
+        })
+    ),
+    /**
+     * A motion was executed; result will be `Ok` if it returned without error.
+     */
+    v56: new EventType(
+        'Council.Executed',
+        sts.struct({
+            proposalHash: v56.H256,
+            result: sts.result(() => sts.unit(), () => v56.DispatchError),
         })
     ),
 }
