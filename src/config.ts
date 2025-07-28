@@ -1,4 +1,4 @@
-import {lookupArchive} from "@subsquid/archive-registry"
+import { lookupArchive } from "@subsquid/archive-registry"
 // import { ProcessorConfig } from './common/processorConfig'
 // import { Store } from '@subsquid/typeorm-store'
 
@@ -8,8 +8,8 @@ const config: any = {
         prefix: 42,
     },
     dataSource: {
-        archive: lookupArchive('moonriver', {type: 'Substrate', release: 'ArrowSquid' }),
-        chain: 'wss://wss.moonriver.moonbeam.network',
+        archive: lookupArchive('moonriver', { type: 'Substrate', release: 'ArrowSquid' }),
+        chain: 'wss://wss.api.moonriver.moonbeam.network',
     },
     typesBundle: 'moonriver',
     batchSize: 500,
