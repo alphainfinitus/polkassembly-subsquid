@@ -1,19 +1,20 @@
 export const referendumV2EnactmentBlocks: Record<string, number> = {
-    "Root": 7200,
-    "WhitelistedCaller": 150,
+    "Root": 14400,
+    "WhitelistedCaller": 300,
     "StakingAdmin": 100,
     "Treasurer": 14400,
     "LeaseAdmin": 100,
     "FellowshipAdmin": 100,
-    "GeneralAdmin": 7200,
+    "GeneralAdmin": 14400,
     "AuctionAdmin": 100,
-    "ReferendumCanceller": 50,
-    "ReferendumKiller": 50,
+    "ReferendumCanceller": 100,
+    "ReferendumKiller": 100,
     "SmallTipper": 10,
     "BigTipper": 100,
     "SmallSpender": 14400,
     "MediumSpender": 14400,
-    "BigSpender": 14400
+    "BigSpender": 14400,
+    "FastGeneralAdmin": 100
 }
 
 export const fellowshipEnactmentBlocks: Record<number, number> = {
