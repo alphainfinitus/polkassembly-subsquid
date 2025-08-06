@@ -1,6 +1,6 @@
 manifestVersion: subsquid.io/v0.1
 name: collectives-polkassembly
-version: 2
+version: 3
 description: |-
   Collective's governance proposals
 
