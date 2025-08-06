@@ -6,6 +6,7 @@ import { getFellowshipVoteData } from './getters'
 import { Store } from '@subsquid/typeorm-store'
 import { createActivity, createTally } from '../../utils/proposals'
 import { ProcessorContext, Event, Block } from '../../../processor'
+import { updateCurveData } from '../../../common/curveData'
 
 export async function handleFellowshipVotes(ctx: ProcessorContext<Store>,
     item: Event,
@@ -23,6 +24,7 @@ export async function handleFellowshipVotes(ctx: ProcessorContext<Store>,
     //const count = await getVotesCount(ctx, proposal.id)
     proposal.tally = createTally(tally)
     await ctx.store.save(proposal)
+
     const vote = new Vote({
         id: randomUUID(),
         voter: ss58codec.encode(accountId),
@@ -46,4 +48,6 @@ export async function handleFellowshipVotes(ctx: ProcessorContext<Store>,
         vote
 
     })
+
+    await updateCurveData(ctx, header, proposal)
 }
