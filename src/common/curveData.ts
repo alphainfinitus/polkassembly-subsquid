@@ -20,8 +20,18 @@ export async function updateCurveData(ctx: ProcessorContext<Store>, header: any,
         const totalIssuance = await getTotalIssuanceStorageData(ctx, header)
         const inactiveIssuance = await getTotalInactiveIssuanceStorageData(ctx, header)
         const activeIssuance = totalIssuance - inactiveIssuance;
-        approvalPercent = Number(tally.ayes) / (Number(tally.ayes) + Number(tally.nays)) * 100
-        supportPercent = Number(tally.support || 0) / Number(activeIssuance) * 100
+
+        // Fellowship referendum tally structure: { bareAyes, ayes, nays }
+        // - ayes: votes in favor with conviction
+        // - nays: votes against with conviction  
+        // - bareAyes: total raw votes in favor (without conviction multiplier)
+
+        // Calculate approval percentage: ayes vs nays (with conviction)
+        const totalVotes = Number(tally.ayes) + Number(tally.nays)
+        approvalPercent = totalVotes > 0 ? (Number(tally.ayes) / totalVotes) * 100 : 0
+
+        // Calculate support percentage: bareAyes (raw support) vs active issuance
+        supportPercent = Number(tally.bareAyes || 0) / Number(activeIssuance) * 100
 
         await ctx.store.insert(
             new CurveData({
