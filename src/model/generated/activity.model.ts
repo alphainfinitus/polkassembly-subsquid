@@ -1,4 +1,4 @@
-import {Entity as Entity_, Column as Column_, PrimaryColumn as PrimaryColumn_, Index as Index_, ManyToOne as ManyToOne_} from "typeorm"
+import {Entity as Entity_, Column as Column_, PrimaryColumn as PrimaryColumn_, Index as Index_, StringColumn as StringColumn_, ManyToOne as ManyToOne_, DateTimeColumn as DateTimeColumn_, IntColumn as IntColumn_} from "@subsquid/typeorm-store"
 import {ActivityType} from "./_activityType"
 import {Proposal} from "./proposal.model"
 import {Announcements} from "./announcements.model"
@@ -21,7 +21,7 @@ export class Activity {
     type!: ActivityType
 
     @Index_()
-    @Column_("text", {nullable: true})
+    @StringColumn_({nullable: true})
     who!: string | undefined | null
 
     @Index_()
@@ -48,9 +48,9 @@ export class Activity {
     @ManyToOne_(() => Vote, {nullable: true})
     vote!: Vote | undefined | null
 
-    @Column_("timestamp with time zone", {nullable: false})
+    @DateTimeColumn_({nullable: false})
     createdAt!: Date
 
-    @Column_("int4", {nullable: false})
+    @IntColumn_({nullable: false})
     createdAtBlock!: number
 }

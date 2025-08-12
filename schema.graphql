@@ -325,7 +325,7 @@ type Vote @entity {
 type CurveData @entity {
   id: ID!
   block: Int! @index
-  proposal: Proposal!
+  proposal: Proposal
   index: Int! @index
   extrinsicIndex: String
   timestamp: DateTime! @index

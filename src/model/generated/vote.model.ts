@@ -1,4 +1,4 @@
-import {Entity as Entity_, Column as Column_, PrimaryColumn as PrimaryColumn_, Index as Index_, ManyToOne as ManyToOne_} from "typeorm"
+import {Entity as Entity_, Column as Column_, PrimaryColumn as PrimaryColumn_, StringColumn as StringColumn_, IntColumn as IntColumn_, Index as Index_, ManyToOne as ManyToOne_, DateTimeColumn as DateTimeColumn_} from "@subsquid/typeorm-store"
 import * as marshal from "./marshal"
 import {Proposal} from "./proposal.model"
 import {VoteDecision} from "./_voteDecision"
@@ -14,14 +14,14 @@ export class Vote {
     @PrimaryColumn_()
     id!: string
 
-    @Column_("text", {nullable: true})
+    @StringColumn_({nullable: true})
     voter!: string | undefined | null
 
-    @Column_("text", {nullable: false})
+    @StringColumn_({nullable: false})
     proposalId!: string
 
     @Index_()
-    @Column_("int4", {nullable: false})
+    @IntColumn_({nullable: false})
     proposalIndex!: number
 
     @Index_()
@@ -29,11 +29,11 @@ export class Vote {
     proposal!: Proposal
 
     @Index_()
-    @Column_("int4", {nullable: false})
+    @IntColumn_({nullable: false})
     blockNumber!: number
 
     @Index_()
-    @Column_("timestamp with time zone", {nullable: false})
+    @DateTimeColumn_({nullable: false})
     timestamp!: Date
 
     @Column_("varchar", {length: 12, nullable: true})
@@ -42,10 +42,10 @@ export class Vote {
     @Column_("jsonb", {transformer: {to: obj => obj == null ? undefined : obj.toJSON(), from: obj => obj == null ? undefined : fromJsonVoteBalance(obj)}, nullable: true})
     balance!: VoteBalance | undefined | null
 
-    @Column_("text", {nullable: true})
+    @StringColumn_({nullable: true})
     extrinsicIndex!: string | undefined | null
 
-    @Column_("int4", {nullable: true})
+    @IntColumn_({nullable: true})
     lockPeriod!: number | undefined | null
 
     @Column_("varchar", {length: 14, nullable: true})

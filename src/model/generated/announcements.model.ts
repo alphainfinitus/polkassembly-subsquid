@@ -1,5 +1,4 @@
-import {Entity as Entity_, Column as Column_, PrimaryColumn as PrimaryColumn_, Index as Index_, ManyToOne as ManyToOne_, OneToMany as OneToMany_} from "typeorm"
-import * as marshal from "./marshal"
+import {Entity as Entity_, Column as Column_, PrimaryColumn as PrimaryColumn_, StringColumn as StringColumn_, Index as Index_, IntColumn as IntColumn_, BigIntColumn as BigIntColumn_, JSONColumn as JSONColumn_, ManyToOne as ManyToOne_, BooleanColumn as BooleanColumn_, OneToMany as OneToMany_, DateTimeColumn as DateTimeColumn_} from "@subsquid/typeorm-store"
 import {AnnouncementType} from "./_announcementType"
 import {Proposal} from "./proposal.model"
 import {ProposalStatus} from "./_proposalStatus"
@@ -15,68 +14,68 @@ export class Announcements {
     id!: string
 
     @Index_()
-    @Column_("text", {nullable: false})
+    @StringColumn_({nullable: false})
     hash!: string
 
     @Index_()
-    @Column_("int4", {nullable: true})
+    @IntColumn_({nullable: true})
     index!: number | undefined | null
 
     @Index_()
-    @Column_("text", {nullable: true})
+    @StringColumn_({nullable: true})
     proposer!: string | undefined | null
 
     @Index_()
     @Column_("varchar", {length: 12, nullable: true})
     type!: AnnouncementType | undefined | null
 
-    @Column_("text", {nullable: true})
+    @StringColumn_({nullable: true})
     version!: string | undefined | null
 
-    @Column_("numeric", {transformer: marshal.bigintTransformer, nullable: true})
+    @BigIntColumn_({nullable: true})
     codec!: bigint | undefined | null
 
-    @Column_("jsonb", {nullable: true})
+    @JSONColumn_({nullable: true})
     announcement!: unknown | undefined | null
 
-    @Column_("text", {nullable: true})
+    @StringColumn_({nullable: true})
     digest!: string | undefined | null
 
-    @Column_("text", {nullable: true})
+    @StringColumn_({nullable: true})
     cid!: string | undefined | null
 
     @Index_()
     @ManyToOne_(() => Proposal, {nullable: true})
     proposal!: Proposal | undefined | null
 
-    @Column_("numeric", {transformer: marshal.bigintTransformer, nullable: true})
+    @BigIntColumn_({nullable: true})
     code!: bigint | undefined | null
 
-    @Column_("bool", {nullable: true})
+    @BooleanColumn_({nullable: true})
     isRemoved!: boolean | undefined | null
 
     @Column_("varchar", {length: 21, nullable: false})
     status!: ProposalStatus
 
-    @Column_("text", {nullable: true})
+    @StringColumn_({nullable: true})
     extrinsicIndex!: string | undefined | null
 
     @OneToMany_(() => StatusHistory, e => e.announcement)
     statusHistory!: StatusHistory[]
 
     @Index_()
-    @Column_("timestamp with time zone", {nullable: false})
+    @DateTimeColumn_({nullable: false})
     createdAt!: Date
 
     @Index_()
-    @Column_("int4", {nullable: false})
+    @IntColumn_({nullable: false})
     createdAtBlock!: number
 
     @Index_()
-    @Column_("timestamp with time zone", {nullable: true})
+    @DateTimeColumn_({nullable: true})
     updatedAt!: Date | undefined | null
 
     @Index_()
-    @Column_("int4", {nullable: true})
+    @IntColumn_({nullable: true})
     updatedAtBlock!: number | undefined | null
 }

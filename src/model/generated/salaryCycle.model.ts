@@ -1,5 +1,4 @@
-import {Entity as Entity_, Column as Column_, PrimaryColumn as PrimaryColumn_, Index as Index_} from "typeorm"
-import * as marshal from "./marshal"
+import {Entity as Entity_, Column as Column_, PrimaryColumn as PrimaryColumn_, IntColumn as IntColumn_, Index as Index_, DateTimeColumn as DateTimeColumn_, StringColumn as StringColumn_, BigIntColumn as BigIntColumn_} from "@subsquid/typeorm-store"
 
 @Entity_()
 export class SalaryCycle {
@@ -11,25 +10,25 @@ export class SalaryCycle {
     id!: string
 
     @Index_()
-    @Column_("int4", {nullable: false})
+    @IntColumn_({nullable: false})
     cycleIndex!: number
 
     @Index_()
-    @Column_("int4", {nullable: false})
+    @IntColumn_({nullable: false})
     cycleStart!: number
 
-    @Column_("timestamp with time zone", {nullable: true})
+    @DateTimeColumn_({nullable: true})
     cycleStartDatetime!: Date | undefined | null
 
-    @Column_("text", {nullable: true})
+    @StringColumn_({nullable: true})
     extrinsicIndex!: string | undefined | null
 
-    @Column_("numeric", {transformer: marshal.bigintTransformer, nullable: true})
+    @BigIntColumn_({nullable: true})
     totalRegistrations!: bigint | undefined | null
 
-    @Column_("numeric", {transformer: marshal.bigintTransformer, nullable: true})
+    @BigIntColumn_({nullable: true})
     budget!: bigint | undefined | null
 
-    @Column_("numeric", {transformer: marshal.bigintTransformer, nullable: true})
+    @BigIntColumn_({nullable: true})
     totalUnregisteredPaid!: bigint | undefined | null
 }

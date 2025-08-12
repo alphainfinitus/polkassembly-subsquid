@@ -1,4 +1,4 @@
-import {Entity as Entity_, Column as Column_, PrimaryColumn as PrimaryColumn_, ManyToOne as ManyToOne_, Index as Index_} from "typeorm"
+import {Entity as Entity_, Column as Column_, PrimaryColumn as PrimaryColumn_, ManyToOne as ManyToOne_, Index as Index_, IntColumn as IntColumn_, StringColumn as StringColumn_, DateTimeColumn as DateTimeColumn_} from "@subsquid/typeorm-store"
 import {Proposal} from "./proposal.model"
 import {Announcements} from "./announcements.model"
 import {ProposalStatus} from "./_proposalStatus"
@@ -24,16 +24,16 @@ export class StatusHistory {
     @Column_("varchar", {length: 21, nullable: false})
     status!: ProposalStatus
 
-    @Column_("int4", {nullable: false})
+    @IntColumn_({nullable: false})
     block!: number
 
     @Index_()
     @ManyToOne_(() => Preimage, {nullable: true})
     preimage!: Preimage | undefined | null
 
-    @Column_("text", {nullable: true})
+    @StringColumn_({nullable: true})
     extrinsicIndex!: string | undefined | null
 
-    @Column_("timestamp with time zone", {nullable: false})
+    @DateTimeColumn_({nullable: false})
     timestamp!: Date
 }

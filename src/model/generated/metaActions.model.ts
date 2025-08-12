@@ -1,4 +1,4 @@
-import {Entity as Entity_, Column as Column_, PrimaryColumn as PrimaryColumn_, Index as Index_} from "typeorm"
+import {Entity as Entity_, Column as Column_, PrimaryColumn as PrimaryColumn_, StringColumn as StringColumn_, Index as Index_, BigIntColumn as BigIntColumn_, BooleanColumn as BooleanColumn_, IntColumn as IntColumn_, DateTimeColumn as DateTimeColumn_} from "@subsquid/typeorm-store"
 import * as marshal from "./marshal"
 import {FellowshipParams} from "./_fellowshipParams"
 
@@ -12,43 +12,43 @@ export class MetaActions {
     id!: string
 
     @Index_()
-    @Column_("text", {nullable: true})
+    @StringColumn_({nullable: true})
     who!: string | undefined | null
 
-    @Column_("numeric", {transformer: marshal.bigintTransformer, nullable: true})
+    @BigIntColumn_({nullable: true})
     amount!: bigint | undefined | null
 
-    @Column_("bool", {nullable: true})
+    @BooleanColumn_({nullable: true})
     isActive!: boolean | undefined | null
 
-    @Column_("text", {nullable: true})
+    @StringColumn_({nullable: true})
     evidence!: string | undefined | null
 
-    @Column_("int4", {nullable: true})
+    @IntColumn_({nullable: true})
     rank!: number | undefined | null
 
-    @Column_("int4", {nullable: true})
+    @IntColumn_({nullable: true})
     toRank!: number | undefined | null
 
-    @Column_("bool", {nullable: true})
+    @BooleanColumn_({nullable: true})
     showClaimButton!: boolean | undefined | null
 
-    @Column_("bool", {nullable: true})
+    @BooleanColumn_({nullable: true})
     evidenceJudged!: boolean | undefined | null
 
-    @Column_("text", {nullable: true})
+    @StringColumn_({nullable: true})
     wish!: string | undefined | null
 
     @Column_("jsonb", {transformer: {to: obj => obj == null ? undefined : obj.toJSON(), from: obj => obj == null ? undefined : new FellowshipParams(undefined, obj)}, nullable: true})
     params!: FellowshipParams | undefined | null
 
     @Index_()
-    @Column_("timestamp with time zone", {nullable: true})
+    @DateTimeColumn_({nullable: true})
     createdAt!: Date | undefined | null
 
-    @Column_("int4", {nullable: true})
+    @IntColumn_({nullable: true})
     createdAtBlock!: number | undefined | null
 
-    @Column_("text", {nullable: true})
+    @StringColumn_({nullable: true})
     extrinsicIndex!: string | undefined | null
 }
