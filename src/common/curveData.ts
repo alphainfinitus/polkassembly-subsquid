@@ -30,8 +30,8 @@ export async function updateCurveData(ctx: ProcessorContext<Store>, header: any,
                 index: proposal.index,
                 proposal: proposal,
                 timestamp: new Date(header.timestamp),
-                approvalPercent: !isNaN(approvalPercent) ? Number(approvalPercent.toFixed(5)) : 0.00,
-                supportPercent: !isNaN(supportPercent) ? Number(supportPercent.toFixed(5)) : 0.00,
+                approvalPercent: !isNaN(approvalPercent) ? approvalPercent : 0.00,
+                supportPercent: !isNaN(supportPercent) ? supportPercent : 0.00,
                 block: header.height,
             })
         )
