@@ -1,7 +1,7 @@
 import { ProposalStatus, ProposalType } from '../../../model'
 import { updateProposalStatus } from '../../utils/proposals'
 import { getConfirmedData } from './getters'
-import {createTally} from '../../utils/proposals'
+import { createTally } from '../../utils/proposals'
 import { ProcessorContext, Event, Block } from '../../../processor'
 import { Store } from '@subsquid/typeorm-store'
 

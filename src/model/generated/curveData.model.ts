@@ -1,4 +1,4 @@
-import {Entity as Entity_, Column as Column_, PrimaryColumn as PrimaryColumn_, IntColumn as IntColumn_, Index as Index_, ManyToOne as ManyToOne_, StringColumn as StringColumn_, DateTimeColumn as DateTimeColumn_, FloatColumn as FloatColumn_} from "@subsquid/typeorm-store"
+import {Entity as Entity_, Column as Column_, PrimaryColumn as PrimaryColumn_, IntColumn as IntColumn_, Index as Index_, ManyToOne as ManyToOne_, StringColumn as StringColumn_, DateTimeColumn as DateTimeColumn_, FloatColumn as FloatColumn_, BooleanColumn as BooleanColumn_} from "@subsquid/typeorm-store"
 import {Proposal} from "./proposal.model"
 
 @Entity_()
@@ -36,4 +36,26 @@ export class CurveData {
     @Index_()
     @FloatColumn_({nullable: true})
     supportPercent!: number | undefined | null
+
+    @Index_()
+    @FloatColumn_({nullable: true})
+    requiredApprovalPercent!: number | undefined | null
+
+    @Index_()
+    @FloatColumn_({nullable: true})
+    requiredSupportPercent!: number | undefined | null
+
+    @Index_()
+    @BooleanColumn_({nullable: true})
+    isApprovalMet!: boolean | undefined | null
+
+    @Index_()
+    @BooleanColumn_({nullable: true})
+    isSupportMet!: boolean | undefined | null
+
+    @IntColumn_({nullable: true})
+    timeSinceDecisionStart!: number | undefined | null
+
+    @IntColumn_({nullable: true})
+    decidingEndBlock!: number | undefined | null
 }

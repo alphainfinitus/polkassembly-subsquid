@@ -331,4 +331,10 @@ type CurveData @entity {
   timestamp: DateTime! @index
   approvalPercent: Float @index
   supportPercent: Float @index
+  requiredApprovalPercent: Float @index
+  requiredSupportPercent: Float @index
+  isApprovalMet: Boolean @index
+  isSupportMet: Boolean @index
+  timeSinceDecisionStart: Int
+  decidingEndBlock: Int
 }

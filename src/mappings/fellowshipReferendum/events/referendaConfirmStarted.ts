@@ -3,6 +3,7 @@ import { createDeciding, updateProposalStatus } from '../../utils/proposals'
 import { getConfirmStartedData } from './getters'
 import { ProcessorContext, Event, Block } from '../../../processor'
 import { Store } from '@subsquid/typeorm-store'
+import { updateCurveData } from '../../../common/curveData'
 
 export async function handleConfirmStarted(ctx: ProcessorContext<Store>,
     item: Event,
@@ -11,9 +12,9 @@ export async function handleConfirmStarted(ctx: ProcessorContext<Store>,
 
     const proposal = await ctx.store.get(Proposal, {
         where: {
-                    index: index,
-                    type: ProposalType.FellowshipReferendum,
-                },
+            index: index,
+            type: ProposalType.FellowshipReferendum,
+        },
         order: {
             id: 'DESC',
         },
@@ -23,10 +24,10 @@ export async function handleConfirmStarted(ctx: ProcessorContext<Store>,
     const extrinsicIndex = `${header.height}-${item.extrinsicIndex}`
 
     if (proposal && proposal.deciding && proposal.deciding.since) {
-        deciding = createDeciding({confirming: header.height, since: proposal.deciding.since})
+        deciding = createDeciding({ confirming: header.height, since: proposal.deciding.since })
     }
     else {
-        deciding = createDeciding({confirming: header.height, since: header.height})
+        deciding = createDeciding({ confirming: header.height, since: header.height })
     }
 
     await updateProposalStatus(ctx, header, index, ProposalType.FellowshipReferendum, {
@@ -37,4 +38,9 @@ export async function handleConfirmStarted(ctx: ProcessorContext<Store>,
             deciding: deciding
         }
     })
+
+    // Update curve data for the referendum that started confirming
+    if (proposal) {
+        await updateCurveData(ctx, header, proposal)
+    }
 }
