@@ -21,6 +21,7 @@ import * as v56 from '../v56'
 import * as v57 from '../v57'
 import * as v59 from '../v59'
 import * as v60 from '../v60'
+import * as v61 from '../v61'
 
 export const propose =  {
     name: 'AdvisoryCommittee.propose',
@@ -731,6 +732,30 @@ export const propose =  {
         sts.struct({
             threshold: sts.number(),
             proposal: v60.Call,
+            lengthBound: sts.number(),
+        })
+    ),
+    /**
+     * Add a new proposal to either be voted on or executed directly.
+     * 
+     * Requires the sender to be member.
+     * 
+     * `threshold` determines whether `proposal` is executed directly (`threshold < 2`)
+     * or put up for voting.
+     * 
+     * ## Complexity
+     * - `O(B + M + P1)` or `O(B + M + P2)` where:
+     *   - `B` is `proposal` size in bytes (length-fee-bounded)
+     *   - `M` is members-count (code- and governance-bounded)
+     *   - branching is influenced by `threshold` where:
+     *     - `P1` is proposal execution complexity (`threshold < 2`)
+     *     - `P2` is proposals-count (code-bounded) (`threshold >= 2`)
+     */
+    v61: new CallType(
+        'AdvisoryCommittee.propose',
+        sts.struct({
+            threshold: sts.number(),
+            proposal: v61.Call,
             lengthBound: sts.number(),
         })
     ),

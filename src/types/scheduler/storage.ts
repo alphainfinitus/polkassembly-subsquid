@@ -11,6 +11,7 @@ import * as v42 from '../v42'
 import * as v46 from '../v46'
 import * as v48 from '../v48'
 import * as v49 from '../v49'
+import * as v61 from '../v61'
 
 export const agenda =  {
     /**
@@ -61,6 +62,10 @@ export const agenda =  {
      *  Items to be executed, indexed by the block number that they should be executed on.
      */
     v49: new StorageType('Scheduler.Agenda', 'Default', [sts.bigint()], sts.array(() => sts.option(() => v49.Scheduled))) as AgendaV49,
+    /**
+     *  Items to be executed, indexed by the block number that they should be executed on.
+     */
+    v61: new StorageType('Scheduler.Agenda', 'Default', [sts.bigint()], sts.array(() => sts.option(() => v61.Scheduled))) as AgendaV61,
 }
 
 /**
@@ -277,4 +282,22 @@ export interface AgendaV49  {
     getPairs(block: Block, key: bigint): Promise<[k: bigint, v: ((v49.Scheduled | undefined)[] | undefined)][]>
     getPairsPaged(pageSize: number, block: Block): AsyncIterable<[k: bigint, v: ((v49.Scheduled | undefined)[] | undefined)][]>
     getPairsPaged(pageSize: number, block: Block, key: bigint): AsyncIterable<[k: bigint, v: ((v49.Scheduled | undefined)[] | undefined)][]>
+}
+
+/**
+ *  Items to be executed, indexed by the block number that they should be executed on.
+ */
+export interface AgendaV61  {
+    is(block: RuntimeCtx): boolean
+    getDefault(block: Block): (v61.Scheduled | undefined)[]
+    get(block: Block, key: bigint): Promise<((v61.Scheduled | undefined)[] | undefined)>
+    getMany(block: Block, keys: bigint[]): Promise<((v61.Scheduled | undefined)[] | undefined)[]>
+    getKeys(block: Block): Promise<bigint[]>
+    getKeys(block: Block, key: bigint): Promise<bigint[]>
+    getKeysPaged(pageSize: number, block: Block): AsyncIterable<bigint[]>
+    getKeysPaged(pageSize: number, block: Block, key: bigint): AsyncIterable<bigint[]>
+    getPairs(block: Block): Promise<[k: bigint, v: ((v61.Scheduled | undefined)[] | undefined)][]>
+    getPairs(block: Block, key: bigint): Promise<[k: bigint, v: ((v61.Scheduled | undefined)[] | undefined)][]>
+    getPairsPaged(pageSize: number, block: Block): AsyncIterable<[k: bigint, v: ((v61.Scheduled | undefined)[] | undefined)][]>
+    getPairsPaged(pageSize: number, block: Block, key: bigint): AsyncIterable<[k: bigint, v: ((v61.Scheduled | undefined)[] | undefined)][]>
 }
