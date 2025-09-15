@@ -38,5 +38,7 @@ up:
 down:
 	@docker-compose down
 
+deploy:
+	@sqd deploy --org polkassembly
 
-.PHONY: build serve process migrate codegen typegen up down
+.PHONY: build serve process migrate codegen typegen up down deploy
