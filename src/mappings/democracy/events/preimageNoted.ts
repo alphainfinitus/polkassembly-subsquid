@@ -9,7 +9,7 @@ import { Store } from '@subsquid/typeorm-store'
 import {
     preimages
 } from '../../../types/democracy/storage'
-import { Block, ProcessorContext, Event} from '../../../processor'
+import { Block, ProcessorContext, Event } from '../../../processor'
 
 type ProposalCall = any
 
@@ -27,8 +27,8 @@ function decodeProposal(chain: Chain, data: Uint8Array): ProposalCall {
 
 async function getStorageData(ctx: ProcessorContext<Store>, hash: string, block: Block): Promise<PreimageStorageData | undefined> {
     // const storage = new DemocracyPreimagesStorage(ctx, block)
-    if (preimages.v21.is(block)) {
-        const storageData = await preimages.v21.get(block, hash)
+    if (preimages.integriteeParachainV21.is(block)) {
+        const storageData = await preimages.integriteeParachainV21.get(block, hash)
         if (!storageData || storageData.__kind === 'Missing') return undefined
 
         const { provider, deposit, since, data } = storageData
@@ -47,9 +47,9 @@ async function getStorageData(ctx: ProcessorContext<Store>, hash: string, block:
 export async function handlePreimageNoted(ctx: ProcessorContext<Store>,
     item: Event,
     header: Block) {
-    if(!item.call) return;
+    if (!item.call) return;
 
-    if(!item.call.args?.encodedProposal) return;
+    if (!item.call.args?.encodedProposal) return;
 
     const extrinsicIndex = `${header.height}-${item.extrinsicIndex}`
 
@@ -75,7 +75,7 @@ export async function handlePreimageNoted(ctx: ProcessorContext<Store>,
     const desc = (item.block._runtime.calls.get(`${section}.${method}`).docs as string[]).join('\n');
 
     const { __kind, ...argsValue } = args.value;
-    
+
     const decodedCall = {
         section,
         method,

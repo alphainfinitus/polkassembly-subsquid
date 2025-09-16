@@ -14,8 +14,8 @@ interface DemocracyProposalEventData {
 }
 
 function getEventData(itemEvent: Event): DemocracyProposalEventData {
-    if (proposed.v21.is(itemEvent)) {
-        const { proposalIndex: index, deposit } = proposed.v21.decode(itemEvent)
+    if (proposed.integriteeParachainV21.is(itemEvent)) {
+        const { proposalIndex: index, deposit } = proposed.integriteeParachainV21.decode(itemEvent)
         return {
             index,
             deposit,

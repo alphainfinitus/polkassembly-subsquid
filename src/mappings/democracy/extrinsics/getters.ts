@@ -1,18 +1,18 @@
-import {  UnknownVersionError } from '../../../common/errors'
+import { UnknownVersionError } from '../../../common/errors'
 import { delegate, removeOtherVote, removeVote, vote } from '../../../types/democracy/calls'
 import { convictionToLockPeriod } from './utils'
 
 type DemocracyVote =
     | {
-          type: 'Standard'
-          balance?: bigint
-          value: number
-      }
+        type: 'Standard'
+        balance?: bigint
+        value: number
+    }
     | {
-          type: 'Split'
-          aye: bigint
-          nay: bigint
-      }
+        type: 'Split'
+        aye: bigint
+        nay: bigint
+    }
 
 
 interface DemocracyVoteCallData {
@@ -21,8 +21,8 @@ interface DemocracyVoteCallData {
 }
 
 export function getVoteData(itemCall: any): DemocracyVoteCallData {
-    if (vote.v21.is(itemCall)) {
-        const { refIndex, vote: voteData } = vote.v21.decode(itemCall)
+    if (vote.integriteeParachainV21.is(itemCall)) {
+        const { refIndex, vote: voteData } = vote.integriteeParachainV21.decode(itemCall)
         if (voteData.__kind === 'Standard') {
             return {
                 index: refIndex,
@@ -42,7 +42,7 @@ export function getVoteData(itemCall: any): DemocracyVoteCallData {
                 },
             }
         }
-    }   
+    }
     else {
         throw new UnknownVersionError(itemCall.name)
     }
@@ -55,15 +55,15 @@ export interface ConvictionVoteDelegateCallData {
 }
 
 export function getDelegateData(itemCall: any): ConvictionVoteDelegateCallData {
-    if (delegate.v21.is(itemCall)) {
-        const { to, conviction, balance } = delegate.v21.decode(itemCall)
+    if (delegate.integriteeParachainV21.is(itemCall)) {
+        const { to, conviction, balance } = delegate.integriteeParachainV21.decode(itemCall)
         return {
             to: to,
             lockPeriod: convictionToLockPeriod(conviction.__kind),
             balance
         }
-    } else if (delegate.v28.is(itemCall)) {
-        const { to, conviction, balance } = delegate.v28.decode(itemCall)
+    } else if (delegate.integriteeParachainV28.is(itemCall)) {
+        const { to, conviction, balance } = delegate.integriteeParachainV28.decode(itemCall)
         return {
             to: to.__kind != "Index" ? to.value : null,
             lockPeriod: convictionToLockPeriod(conviction.__kind),
@@ -82,8 +82,8 @@ export interface ConvictionVotingRemoveVoteCallData {
 }
 
 export function getRemoveVoteData(itemCall: any): ConvictionVotingRemoveVoteCallData {
-    if (removeVote.v21.is(itemCall)) {
-        const eventData = removeVote.v21.decode(itemCall)
+    if (removeVote.integriteeParachainV21.is(itemCall)) {
+        const eventData = removeVote.integriteeParachainV21.decode(itemCall)
         return {
             index: eventData.index,
         }
@@ -98,19 +98,19 @@ export interface ConvictionVotingRemoveOtherVoteCallData {
 }
 
 export function getRemoveOtherVoteData(itemCall: any): ConvictionVotingRemoveOtherVoteCallData {
-    if (removeOtherVote.v21.is(itemCall)) {
-        const { target, index } = removeOtherVote.v21.decode(itemCall)
+    if (removeOtherVote.integriteeParachainV21.is(itemCall)) {
+        const { target, index } = removeOtherVote.integriteeParachainV21.decode(itemCall)
         return {
             target,
             index
         }
-    } else if (removeOtherVote.v28.is(itemCall)) {
-        const { target, index } = removeOtherVote.v28.decode(itemCall)
+    } else if (removeOtherVote.integriteeParachainV28.is(itemCall)) {
+        const { target, index } = removeOtherVote.integriteeParachainV28.decode(itemCall)
         return {
-            target:target.__kind != "Index" ? target.value : null,
+            target: target.__kind != "Index" ? target.value : null,
             index
         }
-    }else {
+    } else {
         throw new UnknownVersionError(itemCall.name)
     }
 }

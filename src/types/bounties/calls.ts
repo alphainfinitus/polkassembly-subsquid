@@ -1,5 +1,5 @@
 import {sts, Block, Bytes, Option, Result, CallType, RuntimeCtx} from '../support'
-import * as v35 from '../v35'
+import * as integriteeParachainV35 from '../integriteeParachainV35'
 
 export const proposeCurator =  {
     name: 'Bounties.propose_curator',
@@ -11,11 +11,11 @@ export const proposeCurator =  {
      * ## Complexity
      * - O(1).
      */
-    v35: new CallType(
+    integriteeParachainV35: new CallType(
         'Bounties.propose_curator',
         sts.struct({
             bountyId: sts.number(),
-            curator: v35.MultiAddress,
+            curator: integriteeParachainV35.MultiAddress,
             fee: sts.bigint(),
         })
     ),
@@ -42,7 +42,7 @@ export const unassignCurator =  {
      * ## Complexity
      * - O(1).
      */
-    v35: new CallType(
+    integriteeParachainV35: new CallType(
         'Bounties.unassign_curator',
         sts.struct({
             bountyId: sts.number(),
@@ -61,7 +61,7 @@ export const acceptCurator =  {
      * ## Complexity
      * - O(1).
      */
-    v35: new CallType(
+    integriteeParachainV35: new CallType(
         'Bounties.accept_curator',
         sts.struct({
             bountyId: sts.number(),

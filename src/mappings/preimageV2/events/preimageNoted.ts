@@ -29,9 +29,9 @@ interface PreimageStorageData {
 
 async function getStorageData(ctx: ProcessorContext<Store>, hash: string, block: any): Promise<PreimageStorageData | undefined> {
     const preimageStatus: PreimageStatusStorageData | undefined = await getPreimageStatusData(ctx, hash, block)
-    if(preimageFor.v28.is(block)) {
-        if(preimageStatus && preimageStatus.len){
-            const storageData = await preimageFor.v28.get(block, [hash, preimageStatus.len])
+    if (preimageFor.integriteeParachainV28.is(block)) {
+        if (preimageStatus && preimageStatus.len) {
+            const storageData = await preimageFor.integriteeParachainV28.get(block, [hash, preimageStatus.len])
             if (!storageData) return undefined
             return {
                 data: storageData,
@@ -39,7 +39,8 @@ async function getStorageData(ctx: ProcessorContext<Store>, hash: string, block:
             }
         }
         else {
-            throw new UnknownVersionError('preimage.PreimageFor')
+            ctx.log.info(`No preimage status found for hash ${hash}`)
+            return undefined
         }
     }
     else {
@@ -47,15 +48,15 @@ async function getStorageData(ctx: ProcessorContext<Store>, hash: string, block:
     }
 }
 
-interface PreimageStatusStorageData{
+interface PreimageStatusStorageData {
     status: string
     value: number | [string, bigint] | undefined
     len?: number
 }
 
 export async function getPreimageStatusData(ctx: ProcessorContext<Store>, hash: string, block: Block): Promise<PreimageStatusStorageData | undefined> {
-    if(statusFor.v28.is(block)) {
-        const storageData = await statusFor.v28.get(block, hash)
+    if (statusFor.integriteeParachainV28.is(block)) {
+        const storageData = await statusFor.integriteeParachainV28.get(block, hash)
         if (!storageData) return undefined
         return {
             status: storageData.__kind,
@@ -71,10 +72,10 @@ export async function getPreimageStatusData(ctx: ProcessorContext<Store>, hash: 
 export async function handlePreimageV2Noted(ctx: ProcessorContext<Store>,
     item: Event,
     header: any) {
-    if(!item.call) return;
+    if (!item.call) return;
     const { hash } = getPreimageNotedData(item)
 
-    if(!item.call.args?.bytes) return;
+    if (!item.call.args?.bytes) return;
 
     const hexHash = hash
     const extrinsicIndex = `${header.height}-${item.extrinsicIndex}`
@@ -108,7 +109,7 @@ export async function handlePreimageV2Noted(ctx: ProcessorContext<Store>,
 
     const value = storageData.value as [string, bigint]
 
-    const proposer =  storageData.value ? ss58codec.encode(decodeHex(value[0])) : undefined
+    const proposer = storageData.value ? ss58codec.encode(new Uint8Array(decodeHex(value[0]))) : undefined
     const deposit = storageData.value ? value[1] : undefined
 
     await createPreimageV2(ctx, header, extrinsicIndex, {

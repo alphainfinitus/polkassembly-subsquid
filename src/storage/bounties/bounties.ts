@@ -14,20 +14,20 @@ interface BountyStorageData {
 }
 
 async function getBountyStorageData(ctx: ProcessorContext<Store>, index: number, block: any): Promise<BountyStorageData | undefined> {
-    if (bounties.v35.is(block)) {
-        return await bounties.v35.get(block, index)
-    }else {
+    if (bounties.integriteeParachainV35.is(block)) {
+        return await bounties.integriteeParachainV35.get(block, index)
+    } else {
         throw new UnknownVersionError("Bounty.Bounties")
     }
 }
 
 export async function getBounties(ctx: ProcessorContext<Store>, index: number, block: any) {
     let bountyInfo;
-    try{
+    try {
         bountyInfo = await getBountyStorageData(ctx, index, block)
-    }catch {
+    } catch {
     }
-    if(!bountyInfo) return undefined;
+    if (!bountyInfo) return undefined;
     let description = await getDescription(ctx, index, block).then((r) => r || '');
     return {
         ...bountyInfo,
@@ -36,8 +36,8 @@ export async function getBounties(ctx: ProcessorContext<Store>, index: number, b
 }
 
 async function getBountyDescriptionStorageData(ctx: ProcessorContext<Store>, index: number, block: any): Promise<string | undefined> {
-    if (bountyDescriptions.v35.is(block)) {
-        return await bountyDescriptions.v35.get(block, index).then((r) => Buffer.from(r || []).toString('utf8'))
+    if (bountyDescriptions.integriteeParachainV35.is(block)) {
+        return await bountyDescriptions.integriteeParachainV35.get(block, index).then((r) => Buffer.from(r || []).toString('utf8'))
     } else {
         throw new UnknownVersionError("Bounties.descriptions")
     }
@@ -46,6 +46,6 @@ async function getBountyDescriptionStorageData(ctx: ProcessorContext<Store>, ind
 async function getDescription(ctx: ProcessorContext<Store>, index: number, block: any) {
     try {
         return await getBountyDescriptionStorageData(ctx, index, block)
-    }catch {
+    } catch {
     }
 }

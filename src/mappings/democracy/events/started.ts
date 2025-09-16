@@ -13,8 +13,8 @@ interface ReferendumEventData {
 }
 
 function getEventData(itemEvent: Event): ReferendumEventData {
-    if (started.v21.is(itemEvent)) {
-        const { refIndex: index, threshold } =started.v21.decode(itemEvent)
+    if (started.integriteeParachainV21.is(itemEvent)) {
+        const { refIndex: index, threshold } = started.integriteeParachainV21.decode(itemEvent)
         return {
             index,
             threshold: threshold.__kind,

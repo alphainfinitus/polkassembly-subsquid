@@ -8,7 +8,7 @@ import {
     bountyProposed,
     bountyRejected
 } from '../../../types/bounties/events'
-import {Event} from '../../../processor'
+import { Event } from '../../../processor'
 
 interface BountyAwardedData {
     index: number
@@ -16,13 +16,13 @@ interface BountyAwardedData {
 }
 
 export function getBountyAwardedData(itemEvent: Event): BountyAwardedData {
-    if (bountyAwarded.v35.is(itemEvent)) {
-        const { index, beneficiary } = bountyAwarded.v35.decode(itemEvent)
+    if (bountyAwarded.integriteeParachainV35.is(itemEvent)) {
+        const { index, beneficiary } = bountyAwarded.integriteeParachainV35.decode(itemEvent)
         return {
             index,
             beneficiary,
         }
-    }  else {
+    } else {
         throw new UnknownVersionError(itemEvent.name)
     }
 }
@@ -32,8 +32,8 @@ interface BountyBacameActiveData {
 }
 
 export function getBountyBacameActiveData(itemEvent: Event): BountyBacameActiveData {
-    if (bountyBecameActive.v35.is(itemEvent)) {
-        const { index } = bountyBecameActive.v35.decode(itemEvent)
+    if (bountyBecameActive.integriteeParachainV35.is(itemEvent)) {
+        const { index } = bountyBecameActive.integriteeParachainV35.decode(itemEvent)
         return {
             index,
         }
@@ -47,8 +47,8 @@ interface BountyCanceledData {
 }
 
 export function getBountyCanceledData(itemEvent: Event): BountyCanceledData {
-    if (bountyCanceled.v35.is(itemEvent)) {
-        const { index } = bountyCanceled.v35.decode(itemEvent)
+    if (bountyCanceled.integriteeParachainV35.is(itemEvent)) {
+        const { index } = bountyCanceled.integriteeParachainV35.decode(itemEvent)
         return {
             index,
         }
@@ -64,8 +64,8 @@ interface BountyClaimedData {
 }
 
 export function getBountyClaimedData(itemEvent: Event): BountyClaimedData {
-    if (bountyClaimed.v35.is(itemEvent)) {
-        const { index, payout, beneficiary } = bountyClaimed.v35.decode(itemEvent)
+    if (bountyClaimed.integriteeParachainV35.is(itemEvent)) {
+        const { index, payout, beneficiary } = bountyClaimed.integriteeParachainV35.decode(itemEvent)
         return {
             index,
             payout,
@@ -81,8 +81,8 @@ interface BountyExtendedData {
 }
 
 export function getBountyExtendedData(itemEvent: Event): BountyExtendedData {
-    if (bountyExtended.v35.is(itemEvent)) {
-        const { index } = bountyExtended.v35.decode(itemEvent)
+    if (bountyExtended.integriteeParachainV35.is(itemEvent)) {
+        const { index } = bountyExtended.integriteeParachainV35.decode(itemEvent)
         return {
             index,
         }
@@ -96,8 +96,8 @@ interface BountyProposedData {
 }
 
 export function getBountyProposedData(itemEvent: Event): BountyProposedData {
-    if (bountyProposed.v35.is(itemEvent)) {
-        const { index } = bountyProposed.v35.decode(itemEvent)
+    if (bountyProposed.integriteeParachainV35.is(itemEvent)) {
+        const { index } = bountyProposed.integriteeParachainV35.decode(itemEvent)
         return {
             index,
         }
@@ -111,8 +111,8 @@ interface BountyRejectedData {
 }
 
 export function getBountyRejectedData(itemEvent: Event): BountyRejectedData {
-    if (bountyRejected.v35.is(itemEvent)) {
-        const { index } = bountyRejected.v35.decode(itemEvent)
+    if (bountyRejected.integriteeParachainV35.is(itemEvent)) {
+        const { index } = bountyRejected.integriteeParachainV35.decode(itemEvent)
         return {
             index,
         }

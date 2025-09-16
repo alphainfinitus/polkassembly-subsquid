@@ -1,18 +1,18 @@
 import {sts, Block, Bytes, Option, Result, StorageType, RuntimeCtx} from '../support'
-import * as v3 from '../v3'
-import * as v35 from '../v35'
+import * as integriteeParachainV3 from '../integriteeParachainV3'
+import * as integriteeParachainV35 from '../integriteeParachainV35'
 
 export const totalIssuance =  {
     /**
      *  The total units issued in the system.
      */
-    v3: new StorageType('Balances.TotalIssuance', 'Default', [], sts.bigint()) as TotalIssuanceV3,
+    integriteeParachainV3: new StorageType('Balances.TotalIssuance', 'Default', [], sts.bigint()) as TotalIssuanceIntegriteeParachainV3,
 }
 
 /**
  *  The total units issued in the system.
  */
-export interface TotalIssuanceV3  {
+export interface TotalIssuanceIntegriteeParachainV3  {
     is(block: RuntimeCtx): boolean
     getDefault(block: Block): bigint
     get(block: Block): Promise<(bigint | undefined)>
@@ -24,7 +24,7 @@ export const account =  {
      * 
      *  NOTE: This is only used in the case that this pallet is used to store balances.
      */
-    v3: new StorageType('Balances.Account', 'Default', [v3.AccountId32], v3.AccountData) as AccountV3,
+    integriteeParachainV3: new StorageType('Balances.Account', 'Default', [integriteeParachainV3.AccountId32], integriteeParachainV3.AccountData) as AccountIntegriteeParachainV3,
     /**
      *  The Balances pallet example of storing the balance of an account.
      * 
@@ -51,7 +51,7 @@ export const account =  {
      *  `Balances` pallet, which uses a `StorageMap` to store balances data only.
      *  NOTE: This is only used in the case that this pallet is used to store balances.
      */
-    v35: new StorageType('Balances.Account', 'Default', [v35.AccountId32], v35.AccountData) as AccountV35,
+    integriteeParachainV35: new StorageType('Balances.Account', 'Default', [integriteeParachainV35.AccountId32], integriteeParachainV35.AccountData) as AccountIntegriteeParachainV35,
 }
 
 /**
@@ -59,19 +59,19 @@ export const account =  {
  * 
  *  NOTE: This is only used in the case that this pallet is used to store balances.
  */
-export interface AccountV3  {
+export interface AccountIntegriteeParachainV3  {
     is(block: RuntimeCtx): boolean
-    getDefault(block: Block): v3.AccountData
-    get(block: Block, key: v3.AccountId32): Promise<(v3.AccountData | undefined)>
-    getMany(block: Block, keys: v3.AccountId32[]): Promise<(v3.AccountData | undefined)[]>
-    getKeys(block: Block): Promise<v3.AccountId32[]>
-    getKeys(block: Block, key: v3.AccountId32): Promise<v3.AccountId32[]>
-    getKeysPaged(pageSize: number, block: Block): AsyncIterable<v3.AccountId32[]>
-    getKeysPaged(pageSize: number, block: Block, key: v3.AccountId32): AsyncIterable<v3.AccountId32[]>
-    getPairs(block: Block): Promise<[k: v3.AccountId32, v: (v3.AccountData | undefined)][]>
-    getPairs(block: Block, key: v3.AccountId32): Promise<[k: v3.AccountId32, v: (v3.AccountData | undefined)][]>
-    getPairsPaged(pageSize: number, block: Block): AsyncIterable<[k: v3.AccountId32, v: (v3.AccountData | undefined)][]>
-    getPairsPaged(pageSize: number, block: Block, key: v3.AccountId32): AsyncIterable<[k: v3.AccountId32, v: (v3.AccountData | undefined)][]>
+    getDefault(block: Block): integriteeParachainV3.AccountData
+    get(block: Block, key: integriteeParachainV3.AccountId32): Promise<(integriteeParachainV3.AccountData | undefined)>
+    getMany(block: Block, keys: integriteeParachainV3.AccountId32[]): Promise<(integriteeParachainV3.AccountData | undefined)[]>
+    getKeys(block: Block): Promise<integriteeParachainV3.AccountId32[]>
+    getKeys(block: Block, key: integriteeParachainV3.AccountId32): Promise<integriteeParachainV3.AccountId32[]>
+    getKeysPaged(pageSize: number, block: Block): AsyncIterable<integriteeParachainV3.AccountId32[]>
+    getKeysPaged(pageSize: number, block: Block, key: integriteeParachainV3.AccountId32): AsyncIterable<integriteeParachainV3.AccountId32[]>
+    getPairs(block: Block): Promise<[k: integriteeParachainV3.AccountId32, v: (integriteeParachainV3.AccountData | undefined)][]>
+    getPairs(block: Block, key: integriteeParachainV3.AccountId32): Promise<[k: integriteeParachainV3.AccountId32, v: (integriteeParachainV3.AccountData | undefined)][]>
+    getPairsPaged(pageSize: number, block: Block): AsyncIterable<[k: integriteeParachainV3.AccountId32, v: (integriteeParachainV3.AccountData | undefined)][]>
+    getPairsPaged(pageSize: number, block: Block, key: integriteeParachainV3.AccountId32): AsyncIterable<[k: integriteeParachainV3.AccountId32, v: (integriteeParachainV3.AccountData | undefined)][]>
 }
 
 /**
@@ -100,32 +100,32 @@ export interface AccountV3  {
  *  `Balances` pallet, which uses a `StorageMap` to store balances data only.
  *  NOTE: This is only used in the case that this pallet is used to store balances.
  */
-export interface AccountV35  {
+export interface AccountIntegriteeParachainV35  {
     is(block: RuntimeCtx): boolean
-    getDefault(block: Block): v35.AccountData
-    get(block: Block, key: v35.AccountId32): Promise<(v35.AccountData | undefined)>
-    getMany(block: Block, keys: v35.AccountId32[]): Promise<(v35.AccountData | undefined)[]>
-    getKeys(block: Block): Promise<v35.AccountId32[]>
-    getKeys(block: Block, key: v35.AccountId32): Promise<v35.AccountId32[]>
-    getKeysPaged(pageSize: number, block: Block): AsyncIterable<v35.AccountId32[]>
-    getKeysPaged(pageSize: number, block: Block, key: v35.AccountId32): AsyncIterable<v35.AccountId32[]>
-    getPairs(block: Block): Promise<[k: v35.AccountId32, v: (v35.AccountData | undefined)][]>
-    getPairs(block: Block, key: v35.AccountId32): Promise<[k: v35.AccountId32, v: (v35.AccountData | undefined)][]>
-    getPairsPaged(pageSize: number, block: Block): AsyncIterable<[k: v35.AccountId32, v: (v35.AccountData | undefined)][]>
-    getPairsPaged(pageSize: number, block: Block, key: v35.AccountId32): AsyncIterable<[k: v35.AccountId32, v: (v35.AccountData | undefined)][]>
+    getDefault(block: Block): integriteeParachainV35.AccountData
+    get(block: Block, key: integriteeParachainV35.AccountId32): Promise<(integriteeParachainV35.AccountData | undefined)>
+    getMany(block: Block, keys: integriteeParachainV35.AccountId32[]): Promise<(integriteeParachainV35.AccountData | undefined)[]>
+    getKeys(block: Block): Promise<integriteeParachainV35.AccountId32[]>
+    getKeys(block: Block, key: integriteeParachainV35.AccountId32): Promise<integriteeParachainV35.AccountId32[]>
+    getKeysPaged(pageSize: number, block: Block): AsyncIterable<integriteeParachainV35.AccountId32[]>
+    getKeysPaged(pageSize: number, block: Block, key: integriteeParachainV35.AccountId32): AsyncIterable<integriteeParachainV35.AccountId32[]>
+    getPairs(block: Block): Promise<[k: integriteeParachainV35.AccountId32, v: (integriteeParachainV35.AccountData | undefined)][]>
+    getPairs(block: Block, key: integriteeParachainV35.AccountId32): Promise<[k: integriteeParachainV35.AccountId32, v: (integriteeParachainV35.AccountData | undefined)][]>
+    getPairsPaged(pageSize: number, block: Block): AsyncIterable<[k: integriteeParachainV35.AccountId32, v: (integriteeParachainV35.AccountData | undefined)][]>
+    getPairsPaged(pageSize: number, block: Block, key: integriteeParachainV35.AccountId32): AsyncIterable<[k: integriteeParachainV35.AccountId32, v: (integriteeParachainV35.AccountData | undefined)][]>
 }
 
 export const inactiveIssuance =  {
     /**
      *  The total units of outstanding deactivated balance in the system.
      */
-    v28: new StorageType('Balances.InactiveIssuance', 'Default', [], sts.bigint()) as InactiveIssuanceV28,
+    integriteeParachainV28: new StorageType('Balances.InactiveIssuance', 'Default', [], sts.bigint()) as InactiveIssuanceIntegriteeParachainV28,
 }
 
 /**
  *  The total units of outstanding deactivated balance in the system.
  */
-export interface InactiveIssuanceV28  {
+export interface InactiveIssuanceIntegriteeParachainV28  {
     is(block: RuntimeCtx): boolean
     getDefault(block: Block): bigint
     get(block: Block): Promise<(bigint | undefined)>

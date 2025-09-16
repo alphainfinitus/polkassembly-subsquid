@@ -12,8 +12,8 @@ interface AccepterCuratorData {
 }
 
 export function getAccepterCuratorData(itemCall: any): AccepterCuratorData {
-    if (acceptCurator.v35.is(itemCall)) {
-        const { parentBountyId, childBountyId } =acceptCurator.v35.decode(itemCall)
+    if (acceptCurator.integriteeParachainV35.is(itemCall)) {
+        const { parentBountyId, childBountyId } = acceptCurator.integriteeParachainV35.decode(itemCall)
         return {
             childBountyId,
             parentBountyId,
@@ -29,8 +29,8 @@ interface UnassingCuratorData {
 }
 
 export function getUnassingCuratorData(itemCall: any): UnassingCuratorData {
-    if (unassignCurator.v35.is(itemCall)) {
-        const {parentBountyId, childBountyId} = unassignCurator.v35.decode(itemCall)
+    if (unassignCurator.integriteeParachainV35.is(itemCall)) {
+        const { parentBountyId, childBountyId } = unassignCurator.integriteeParachainV35.decode(itemCall)
         return {
             parentBountyId,
             childBountyId,
@@ -48,8 +48,8 @@ interface ProposeCuratorData {
 }
 
 export function getProposeCuratorData(itemCall: any): ProposeCuratorData {
-    if (proposeCurator.v35.is(itemCall)) {
-        const { parentBountyId, childBountyId, curator, fee } = proposeCurator.v35.decode(itemCall)
+    if (proposeCurator.integriteeParachainV35.is(itemCall)) {
+        const { parentBountyId, childBountyId, curator, fee } = proposeCurator.integriteeParachainV35.decode(itemCall)
         return {
             parentBountyId: parentBountyId,
             childBountyId,

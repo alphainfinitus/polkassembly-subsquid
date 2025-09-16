@@ -12,38 +12,40 @@ import {
 import { Event } from '../../../processor'
 
 export function getApprovedData(itemEvent: Event): string {
-    if (approved.v21.is(itemEvent)) {
-        return approved.v21.decode(itemEvent).proposalHash
+    if (approved.integriteeParachainV21.is(itemEvent)) {
+        return approved.integriteeParachainV21.decode(itemEvent).proposalHash
     } else {
         throw new UnknownVersionError(itemEvent.name)
     }
 }
 
 export function getClosedData(itemEvent: Event): string {
-    if (closed.v21.is(itemEvent)) {
-        return closed.v21.decode(itemEvent).proposalHash
+    if (closed.integriteeParachainV21.is(itemEvent)) {
+        return closed.integriteeParachainV21.decode(itemEvent).proposalHash
     } else {
         throw new UnknownVersionError(itemEvent.name)
     }
 }
 
 export function getDisapprovedData(itemEvent: Event): string {
-    if (disapproved.v21.is(itemEvent)) {
-        return disapproved.v21.decode(itemEvent).proposalHash
+    if (disapproved.integriteeParachainV21.is(itemEvent)) {
+        return disapproved.integriteeParachainV21.decode(itemEvent).proposalHash
     } else {
         throw new UnknownVersionError(itemEvent.name)
     }
 }
 
 export function getExecutedData(itemEvent: Event): string {
-    if (executed.v21.is(itemEvent)) {
-        return executed.v21.decode(itemEvent).proposalHash
-    } else if (executed.v28.is(itemEvent)) {
-        return executed.v28.decode(itemEvent).proposalHash
-    } else if (executed.v35.is(itemEvent)) {
-        return executed.v35.decode(itemEvent).proposalHash
-    }else if (executed.v42.is(itemEvent)) {
-        return executed.v42.decode(itemEvent).proposalHash
+    if (executed.integriteeParachainV21.is(itemEvent)) {
+        return executed.integriteeParachainV21.decode(itemEvent).proposalHash
+    } else if (executed.integriteeParachainV28.is(itemEvent)) {
+        return executed.integriteeParachainV28.decode(itemEvent).proposalHash
+    } else if (executed.integriteeParachainV35.is(itemEvent)) {
+        return executed.integriteeParachainV35.decode(itemEvent).proposalHash
+    } else if (executed.integriteeParachainV42.is(itemEvent)) {
+        return executed.integriteeParachainV42.decode(itemEvent).proposalHash
+    } else if (executed.v560.is(itemEvent)) {
+        return executed.v560.decode(itemEvent).proposalHash
     } else {
         throw new UnknownVersionError(itemEvent.name)
     }
@@ -57,8 +59,8 @@ export interface ProposedData {
 }
 
 export function getProposedData(itemEvent: Event): ProposedData {
-    if (proposed.v21.is(itemEvent)) {
-        const { account, proposalIndex, proposalHash, threshold } = proposed.v21.decode(itemEvent)
+    if (proposed.integriteeParachainV21.is(itemEvent)) {
+        const { account, proposalIndex, proposalHash, threshold } = proposed.integriteeParachainV21.decode(itemEvent)
         return {
             proposer: account,
             index: proposalIndex,
@@ -77,8 +79,8 @@ export interface VotedData {
 }
 
 export function getVotedData(itemEvent: Event): VotedData {
-    if (voted.v21.is(itemEvent)) {
-        const { account, proposalHash, voted: voteData } = voted.v21.decode(itemEvent)
+    if (voted.integriteeParachainV21.is(itemEvent)) {
+        const { account, proposalHash, voted: voteData } = voted.integriteeParachainV21.decode(itemEvent)
         return {
             voter: account,
             hash: proposalHash,

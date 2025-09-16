@@ -1,8 +1,8 @@
 import { UnknownVersionError } from '../../common/errors'
 import { ProcessorContext } from '../../processor'
 import { referendumInfoOf } from '../../types/democracy/storage'
-import * as v21 from '../../types/v21'
-import * as v28 from '../../types/v28'
+import * as v21 from '../../types/integriteeParachainV21'
+import * as v28 from '../../types/integriteeParachainV28'
 import { Store } from '@subsquid/typeorm-store'
 
 type Threshold = 'SuperMajorityApprove' | 'SuperMajorityAgainst' | 'SimpleMajority'
@@ -25,8 +25,8 @@ type ReferendumStorageData = FinishedReferendumData | OngoingReferendumData
 
 // eslint-disable-next-line sonarjs/cognitive-complexity
 async function getStorageData(ctx: ProcessorContext<Store>, index: number, block: any): Promise<ReferendumStorageData | undefined> {
-    if (referendumInfoOf.v21.is(block)) {
-        const storageData = await referendumInfoOf.v21.get(block, index)
+    if (referendumInfoOf.integriteeParachainV21.is(block)) {
+        const storageData = await referendumInfoOf.integriteeParachainV21.get(block, index)
         if (!storageData) return undefined
 
         const { __kind: status } = storageData
@@ -48,18 +48,18 @@ async function getStorageData(ctx: ProcessorContext<Store>, index: number, block
             }
         }
     }
-    else if(referendumInfoOf.v28.is(block)){
-        const storageData = await referendumInfoOf.v28.get(block, index)
+    else if (referendumInfoOf.integriteeParachainV28.is(block)) {
+        const storageData = await referendumInfoOf.integriteeParachainV28.get(block, index)
         if (!storageData) return undefined
 
         const { __kind: status } = storageData
         if (status === 'Ongoing') {
             let hash
             const { proposal, end, delay, threshold } = (storageData as v28.ReferendumInfo_Ongoing).value
-            if(proposal.__kind == "Inline") {
+            if (proposal.__kind == "Inline") {
                 hash = proposal.value
             }
-            else{
+            else {
                 hash = proposal.hash
             }
             return {
@@ -79,7 +79,7 @@ async function getStorageData(ctx: ProcessorContext<Store>, index: number, block
         }
 
     }
-     else {
+    else {
         throw new UnknownVersionError("Democracy.ReferendumInfoOf")
     }
 }

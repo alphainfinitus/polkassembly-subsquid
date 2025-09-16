@@ -1,8 +1,9 @@
 import {sts, Block, Bytes, Option, Result, EventType, RuntimeCtx} from '../support'
-import * as v21 from '../v21'
-import * as v28 from '../v28'
-import * as v35 from '../v35'
-import * as v42 from '../v42'
+import * as integriteeParachainV21 from '../integriteeParachainV21'
+import * as integriteeParachainV28 from '../integriteeParachainV28'
+import * as integriteeParachainV35 from '../integriteeParachainV35'
+import * as integriteeParachainV42 from '../integriteeParachainV42'
+import * as v560 from '../v560'
 
 export const proposed =  {
     name: 'TechnicalCommittee.Proposed',
@@ -10,12 +11,12 @@ export const proposed =  {
      * A motion (given hash) has been proposed (by given account) with a threshold (given
      * `MemberCount`).
      */
-    v21: new EventType(
+    integriteeParachainV21: new EventType(
         'TechnicalCommittee.Proposed',
         sts.struct({
-            account: v21.AccountId32,
+            account: integriteeParachainV21.AccountId32,
             proposalIndex: sts.number(),
-            proposalHash: v21.H256,
+            proposalHash: integriteeParachainV21.H256,
             threshold: sts.number(),
         })
     ),
@@ -27,11 +28,11 @@ export const voted =  {
      * A motion (given hash) has been voted on by given account, leaving
      * a tally (yes votes and no votes given respectively as `MemberCount`).
      */
-    v21: new EventType(
+    integriteeParachainV21: new EventType(
         'TechnicalCommittee.Voted',
         sts.struct({
-            account: v21.AccountId32,
-            proposalHash: v21.H256,
+            account: integriteeParachainV21.AccountId32,
+            proposalHash: integriteeParachainV21.H256,
             voted: sts.boolean(),
             yes: sts.number(),
             no: sts.number(),
@@ -44,10 +45,10 @@ export const approved =  {
     /**
      * A motion was approved by the required threshold.
      */
-    v21: new EventType(
+    integriteeParachainV21: new EventType(
         'TechnicalCommittee.Approved',
         sts.struct({
-            proposalHash: v21.H256,
+            proposalHash: integriteeParachainV21.H256,
         })
     ),
 }
@@ -57,10 +58,10 @@ export const disapproved =  {
     /**
      * A motion was not approved by the required threshold.
      */
-    v21: new EventType(
+    integriteeParachainV21: new EventType(
         'TechnicalCommittee.Disapproved',
         sts.struct({
-            proposalHash: v21.H256,
+            proposalHash: integriteeParachainV21.H256,
         })
     ),
 }
@@ -70,41 +71,51 @@ export const executed =  {
     /**
      * A motion was executed; result will be `Ok` if it returned without error.
      */
-    v21: new EventType(
+    integriteeParachainV21: new EventType(
         'TechnicalCommittee.Executed',
         sts.struct({
-            proposalHash: v21.H256,
-            result: sts.result(() => sts.unit(), () => v21.DispatchError),
+            proposalHash: integriteeParachainV21.H256,
+            result: sts.result(() => sts.unit(), () => integriteeParachainV21.DispatchError),
         })
     ),
     /**
      * A motion was executed; result will be `Ok` if it returned without error.
      */
-    v28: new EventType(
+    integriteeParachainV28: new EventType(
         'TechnicalCommittee.Executed',
         sts.struct({
-            proposalHash: v28.H256,
-            result: sts.result(() => sts.unit(), () => v28.DispatchError),
+            proposalHash: integriteeParachainV28.H256,
+            result: sts.result(() => sts.unit(), () => integriteeParachainV28.DispatchError),
         })
     ),
     /**
      * A motion was executed; result will be `Ok` if it returned without error.
      */
-    v35: new EventType(
+    integriteeParachainV35: new EventType(
         'TechnicalCommittee.Executed',
         sts.struct({
-            proposalHash: v35.H256,
-            result: sts.result(() => sts.unit(), () => v35.DispatchError),
+            proposalHash: integriteeParachainV35.H256,
+            result: sts.result(() => sts.unit(), () => integriteeParachainV35.DispatchError),
         })
     ),
     /**
      * A motion was executed; result will be `Ok` if it returned without error.
      */
-    v42: new EventType(
+    integriteeParachainV42: new EventType(
         'TechnicalCommittee.Executed',
         sts.struct({
-            proposalHash: v42.H256,
-            result: sts.result(() => sts.unit(), () => v42.DispatchError),
+            proposalHash: integriteeParachainV42.H256,
+            result: sts.result(() => sts.unit(), () => integriteeParachainV42.DispatchError),
+        })
+    ),
+    /**
+     * A motion was executed; result will be `Ok` if it returned without error.
+     */
+    v560: new EventType(
+        'TechnicalCommittee.Executed',
+        sts.struct({
+            proposalHash: v560.H256,
+            result: sts.result(() => sts.unit(), () => v560.DispatchError),
         })
     ),
 }
@@ -114,10 +125,10 @@ export const closed =  {
     /**
      * A proposal was closed because its threshold was reached or after its duration was up.
      */
-    v21: new EventType(
+    integriteeParachainV21: new EventType(
         'TechnicalCommittee.Closed',
         sts.struct({
-            proposalHash: v21.H256,
+            proposalHash: integriteeParachainV21.H256,
             yes: sts.number(),
             no: sts.number(),
         })

@@ -1,6 +1,6 @@
 import {sts, Block, Bytes, Option, Result, CallType, RuntimeCtx} from '../support'
-import * as v21 from '../v21'
-import * as v28 from '../v28'
+import * as integriteeParachainV21 from '../integriteeParachainV21'
+import * as integriteeParachainV28 from '../integriteeParachainV28'
 
 export const vote =  {
     name: 'Democracy.vote',
@@ -15,11 +15,11 @@ export const vote =  {
      * 
      * Weight: `O(R)` where R is the number of referendums the voter has voted on.
      */
-    v21: new CallType(
+    integriteeParachainV21: new CallType(
         'Democracy.vote',
         sts.struct({
             refIndex: sts.number(),
-            vote: v21.AccountVote,
+            vote: integriteeParachainV21.AccountVote,
         })
     ),
 }
@@ -48,11 +48,11 @@ export const delegate =  {
      * Weight: `O(R)` where R is the number of referendums the voter delegating to has
      *   voted on. Weight is charged as if maximum votes.
      */
-    v21: new CallType(
+    integriteeParachainV21: new CallType(
         'Democracy.delegate',
         sts.struct({
-            to: v21.AccountId32,
-            conviction: v21.Conviction,
+            to: integriteeParachainV21.AccountId32,
+            conviction: integriteeParachainV21.Conviction,
             balance: sts.bigint(),
         })
     ),
@@ -78,11 +78,11 @@ export const delegate =  {
      * Weight: `O(R)` where R is the number of referendums the voter delegating to has
      *   voted on. Weight is charged as if maximum votes.
      */
-    v28: new CallType(
+    integriteeParachainV28: new CallType(
         'Democracy.delegate',
         sts.struct({
-            to: v28.MultiAddress,
-            conviction: v28.Conviction,
+            to: integriteeParachainV28.MultiAddress,
+            conviction: integriteeParachainV28.Conviction,
             balance: sts.bigint(),
         })
     ),
@@ -104,7 +104,7 @@ export const undelegate =  {
      * Weight: `O(R)` where R is the number of referendums the voter delegating to has
      *   voted on. Weight is charged as if maximum votes.
      */
-    v21: new CallType(
+    integriteeParachainV21: new CallType(
         'Democracy.undelegate',
         sts.unit()
     ),
@@ -141,7 +141,7 @@ export const removeVote =  {
      * Weight: `O(R + log R)` where R is the number of referenda that `target` has voted on.
      *   Weight is calculated for the maximum number of vote.
      */
-    v21: new CallType(
+    integriteeParachainV21: new CallType(
         'Democracy.remove_vote',
         sts.struct({
             index: sts.number(),
@@ -168,10 +168,10 @@ export const removeOtherVote =  {
      * Weight: `O(R + log R)` where R is the number of referenda that `target` has voted on.
      *   Weight is calculated for the maximum number of vote.
      */
-    v21: new CallType(
+    integriteeParachainV21: new CallType(
         'Democracy.remove_other_vote',
         sts.struct({
-            target: v21.AccountId32,
+            target: integriteeParachainV21.AccountId32,
             index: sts.number(),
         })
     ),
@@ -192,10 +192,10 @@ export const removeOtherVote =  {
      * Weight: `O(R + log R)` where R is the number of referenda that `target` has voted on.
      *   Weight is calculated for the maximum number of vote.
      */
-    v28: new CallType(
+    integriteeParachainV28: new CallType(
         'Democracy.remove_other_vote',
         sts.struct({
-            target: v28.MultiAddress,
+            target: integriteeParachainV28.MultiAddress,
             index: sts.number(),
         })
     ),

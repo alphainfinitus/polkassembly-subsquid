@@ -1,5 +1,5 @@
 import { ProcessorContext } from '../../processor'
-import { Call } from '../../types/v42'
+import { Call } from '../../types/integriteeParachainV42'
 import { Store } from '@subsquid/typeorm-store'
 
 type TechnicalCommitteeProposalStorageData = Call
@@ -42,7 +42,7 @@ export async function getProposalOf(
 ): Promise<TechnicalCommitteeProposalStorageData | undefined> {
     try {
         return await getCoucilStorageData(ctx, hash, block)
-    }catch(e){
+    } catch (e) {
         return await getInstanceStorageData(ctx, hash, block)
     }
 }

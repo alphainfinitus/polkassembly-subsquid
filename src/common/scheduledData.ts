@@ -10,32 +10,32 @@ interface ScheduledData {
 }
 
 export function getDispatchedEventData(itemEvent: Event): ScheduledData | undefined {
-    if (dispatched.v14.is(itemEvent)) {
-        const { task, id, result } = dispatched.v14.decode(itemEvent)
+    if (dispatched.integriteeParachainV14.is(itemEvent)) {
+        const { task, id, result } = dispatched.integriteeParachainV14.decode(itemEvent)
         return {
             blockNumber: task[0],
             result: result.__kind
         }
-    } else if (dispatched.v18.is(itemEvent)) {
-        const { task, id, result } = dispatched.v18.decode(itemEvent)
+    } else if (dispatched.integriteeParachainV18.is(itemEvent)) {
+        const { task, id, result } = dispatched.integriteeParachainV18.decode(itemEvent)
         return {
             blockNumber: task[0],
             result: result.__kind
         }
-    } else if (dispatched.v28.is(itemEvent)) {
-        const { task, id, result } = dispatched.v28.decode(itemEvent)
+    } else if (dispatched.integriteeParachainV28.is(itemEvent)) {
+        const { task, id, result } = dispatched.integriteeParachainV28.decode(itemEvent)
         return {
             blockNumber: task[0],
             result: result.__kind
         }
-    }  else if (dispatched.v35.is(itemEvent)) {
-        const { task, id, result } = dispatched.v35.decode(itemEvent)
+    } else if (dispatched.integriteeParachainV35.is(itemEvent)) {
+        const { task, id, result } = dispatched.integriteeParachainV35.decode(itemEvent)
         return {
             blockNumber: task[0],
             result: result.__kind
         }
-    } else if (dispatched.v42.is(itemEvent)) {
-        const { task, id, result } = dispatched.v42.decode(itemEvent)
+    } else if (dispatched.integriteeParachainV42.is(itemEvent)) {
+        const { task, id, result } = dispatched.integriteeParachainV42.decode(itemEvent)
         return {
             blockNumber: task[0],
             result: result.__kind

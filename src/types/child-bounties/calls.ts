@@ -1,5 +1,5 @@
 import {sts, Block, Bytes, Option, Result, CallType, RuntimeCtx} from '../support'
-import * as v35 from '../v35'
+import * as integriteeParachainV35 from '../integriteeParachainV35'
 
 export const proposeCurator =  {
     name: 'ChildBounties.propose_curator',
@@ -20,12 +20,12 @@ export const proposeCurator =  {
      * - `curator`: Address of child-bounty curator.
      * - `fee`: payment fee to child-bounty curator for execution.
      */
-    v35: new CallType(
+    integriteeParachainV35: new CallType(
         'ChildBounties.propose_curator',
         sts.struct({
             parentBountyId: sts.number(),
             childBountyId: sts.number(),
-            curator: v35.MultiAddress,
+            curator: integriteeParachainV35.MultiAddress,
             fee: sts.bigint(),
         })
     ),
@@ -54,7 +54,7 @@ export const acceptCurator =  {
      * - `parent_bounty_id`: Index of parent bounty.
      * - `child_bounty_id`: Index of child bounty.
      */
-    v35: new CallType(
+    integriteeParachainV35: new CallType(
         'ChildBounties.accept_curator',
         sts.struct({
             parentBountyId: sts.number(),
@@ -101,7 +101,7 @@ export const unassignCurator =  {
      * - `parent_bounty_id`: Index of parent bounty.
      * - `child_bounty_id`: Index of child bounty.
      */
-    v35: new CallType(
+    integriteeParachainV35: new CallType(
         'ChildBounties.unassign_curator',
         sts.struct({
             parentBountyId: sts.number(),

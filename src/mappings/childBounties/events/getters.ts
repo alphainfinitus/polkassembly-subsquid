@@ -15,8 +15,8 @@ interface ChildBountyAwardedData {
 }
 
 export function getChildBountyAwardedData(itemEvent: any): ChildBountyAwardedData {
-    if (awarded.v35.is(itemEvent)) {
-        const { index, childIndex, beneficiary } = awarded.v35.decode(itemEvent)
+    if (awarded.integriteeParachainV35.is(itemEvent)) {
+        const { index, childIndex, beneficiary } = awarded.integriteeParachainV35.decode(itemEvent)
         return {
             parentIndex: index,
             childIndex,
@@ -33,8 +33,8 @@ interface ChildBountyCancelledData {
 }
 
 export function getChildBountyCancelledData(itemEvent: any): ChildBountyCancelledData {
-    if (canceled.v35.is(itemEvent)) {
-        const { index, childIndex } = canceled.v35.decode(itemEvent)
+    if (canceled.integriteeParachainV35.is(itemEvent)) {
+        const { index, childIndex } = canceled.integriteeParachainV35.decode(itemEvent)
         return {
             parentIndex: index,
             childIndex
@@ -52,8 +52,8 @@ interface ChildBountyClaimedData {
 }
 
 export function getChildBountyClaimedData(itemEvent: any): ChildBountyClaimedData {
-    if (claimed.v35.is(itemEvent)) {
-        const { index, childIndex, payout, beneficiary } = claimed.v35.decode(itemEvent)
+    if (claimed.integriteeParachainV35.is(itemEvent)) {
+        const { index, childIndex, payout, beneficiary } = claimed.integriteeParachainV35.decode(itemEvent)
         return {
             parentIndex: index,
             childIndex,
@@ -71,8 +71,8 @@ interface ChildBountyAddedData {
 }
 
 export function getChildBountyAddedData(itemEvent: any): ChildBountyAddedData {
-    if (added.v35.is(itemEvent)) {
-        const { index, childIndex } = added.v35.decode(itemEvent)
+    if (added.integriteeParachainV35.is(itemEvent)) {
+        const { index, childIndex } = added.integriteeParachainV35.decode(itemEvent)
         return {
             parentIndex: index,
             childIndex

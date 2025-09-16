@@ -10,8 +10,8 @@ interface PreimageNotedData {
 }
 
 export function getPreimageNotedData(itemEvent: Event): PreimageNotedData {
-    if (noted.v28.is(itemEvent)) {
-        const { hash } = noted.v28.decode(itemEvent)
+    if (noted.integriteeParachainV28.is(itemEvent)) {
+        const { hash } = noted.integriteeParachainV28.decode(itemEvent)
         return {
             hash
         }
@@ -25,8 +25,8 @@ export interface PreimageRequestedData {
 }
 
 export function getPreimageRequestedData(itemEvent: Event): PreimageRequestedData {
-    if (requested.v28.is(itemEvent)) {
-        const {hash} = requested.v28.decode(itemEvent)
+    if (requested.integriteeParachainV28.is(itemEvent)) {
+        const { hash } = requested.integriteeParachainV28.decode(itemEvent)
         return {
             hash
         }
@@ -40,8 +40,8 @@ export interface PreimageClearedData {
 }
 
 export function getPreimageClearedData(itemEvent: Event): PreimageRequestedData {
-    if (cleared.v28.is(itemEvent)) {
-        const {hash} = cleared.v28.decode(itemEvent)
+    if (cleared.integriteeParachainV28.is(itemEvent)) {
+        const { hash } = cleared.integriteeParachainV28.decode(itemEvent)
         return {
             hash
         }

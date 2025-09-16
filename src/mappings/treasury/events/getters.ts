@@ -6,8 +6,8 @@ interface ProposedData {
 }
 
 export function getProposedData(itemEvent: Event): ProposedData {
-    if (proposed.v14.is(itemEvent)) {
-        const { proposalIndex: index } = proposed.v14.decode(itemEvent)
+    if (proposed.integriteeParachainV14.is(itemEvent)) {
+        const { proposalIndex: index } = proposed.integriteeParachainV14.decode(itemEvent)
         return {
             index,
         }
@@ -21,8 +21,8 @@ interface RejectedData {
 }
 
 export function getRejectedData(itemEvent: Event): RejectedData {
-    if (rejected.v14.is(itemEvent)) {
-        const { proposalIndex: index } = rejected.v14.decode(itemEvent)
+    if (rejected.integriteeParachainV14.is(itemEvent)) {
+        const { proposalIndex: index } = rejected.integriteeParachainV14.decode(itemEvent)
         return {
             index,
         }
@@ -36,8 +36,8 @@ interface AwarderData {
 }
 
 export function getAwarderData(itemEvent: Event): AwarderData {
-    if (awarded.v14.is(itemEvent)) {
-        const { proposalIndex: index } = awarded.v14.decode(itemEvent)
+    if (awarded.integriteeParachainV14.is(itemEvent)) {
+        const { proposalIndex: index } = awarded.integriteeParachainV14.decode(itemEvent)
         return {
             index,
         }
@@ -54,8 +54,8 @@ interface SpendApprovedData {
 }
 
 export function getSpendApprovedData(itemEvent: Event): SpendApprovedData {
-    if (spendApproved.v26.is(itemEvent)) {
-        const { proposalIndex, amount, beneficiary}= spendApproved.v26.decode(itemEvent)
+    if (spendApproved.integriteeParachainV26.is(itemEvent)) {
+        const { proposalIndex, amount, beneficiary } = spendApproved.integriteeParachainV26.decode(itemEvent)
         return {
             proposalIndex,
             amount,
