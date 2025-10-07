@@ -8,8 +8,8 @@ import { createPreimageV2 } from './mappings/utils/proposals'
 
 //@ts-ignore ts(2589)
 const processor = new SubstrateBatchProcessor()
-    .setGateway('https://v2.archive.subsquid.io/network/kusama')
-    .setRpcEndpoint('wss://kusama-rpc.dwellir.com')
+    .setGateway('https://v2.archive.subsquid.io/network/asset-hub-kusama')
+    .setRpcEndpoint('wss://asset-hub-kusama-rpc.n.dwellir.com')
     .setBlockRange({ from: 0 })
     .setFields({ event: {}, call: { origin: true, success: true, error: true }, extrinsic: { hash: true, fee: true, tip: true }, block: { timestamp: true } })
     .addCall({

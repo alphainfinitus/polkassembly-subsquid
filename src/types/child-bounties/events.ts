@@ -1,12 +1,12 @@
 import {sts, Block, Bytes, Option, Result, EventType, RuntimeCtx} from '../support'
-import * as v9190 from '../v9190'
+import * as v1009001 from '../v1009001'
 
 export const added =  {
     name: 'ChildBounties.Added',
     /**
      * A child-bounty is added.
      */
-    v9190: new EventType(
+    v1009001: new EventType(
         'ChildBounties.Added',
         sts.struct({
             index: sts.number(),
@@ -20,12 +20,12 @@ export const awarded =  {
     /**
      * A child-bounty is awarded to a beneficiary.
      */
-    v9190: new EventType(
+    v1009001: new EventType(
         'ChildBounties.Awarded',
         sts.struct({
             index: sts.number(),
             childIndex: sts.number(),
-            beneficiary: v9190.AccountId32,
+            beneficiary: v1009001.AccountId32,
         })
     ),
 }
@@ -35,13 +35,13 @@ export const claimed =  {
     /**
      * A child-bounty is claimed by beneficiary.
      */
-    v9190: new EventType(
+    v1009001: new EventType(
         'ChildBounties.Claimed',
         sts.struct({
             index: sts.number(),
             childIndex: sts.number(),
             payout: sts.bigint(),
-            beneficiary: v9190.AccountId32,
+            beneficiary: v1009001.AccountId32,
         })
     ),
 }
@@ -51,7 +51,7 @@ export const canceled =  {
     /**
      * A child-bounty is cancelled.
      */
-    v9190: new EventType(
+    v1009001: new EventType(
         'ChildBounties.Canceled',
         sts.struct({
             index: sts.number(),

@@ -1,6 +1,3 @@
-export * as democracy from './democracy/calls'
-export * as treasury from './treasury/calls'
-export * as bounties from './bounties/calls'
-export * as tips from './tips/calls'
-export * as childBounties from './child-bounties/calls'
 export * as convictionVoting from './conviction-voting/calls'
+export * as bounties from './bounties/calls'
+export * as childBounties from './child-bounties/calls'

@@ -1,6 +1,5 @@
 import {sts, Block, Bytes, Option, Result, CallType, RuntimeCtx} from '../support'
-import * as v9320 from '../v9320'
-import * as v9340 from '../v9340'
+import * as v1009001 from '../v1009001'
 
 export const vote =  {
     name: 'ConvictionVoting.vote',
@@ -15,29 +14,11 @@ export const vote =  {
      * 
      * Weight: `O(R)` where R is the number of polls the voter has voted on.
      */
-    v9320: new CallType(
+    v1009001: new CallType(
         'ConvictionVoting.vote',
         sts.struct({
             pollIndex: sts.number(),
-            vote: v9320.Type_144,
-        })
-    ),
-    /**
-     * Vote in a poll. If `vote.is_aye()`, the vote is to enact the proposal;
-     * otherwise it is a vote to keep the status quo.
-     * 
-     * The dispatch origin of this call must be _Signed_.
-     * 
-     * - `poll_index`: The index of the poll to vote for.
-     * - `vote`: The vote configuration.
-     * 
-     * Weight: `O(R)` where R is the number of polls the voter has voted on.
-     */
-    v9340: new CallType(
-        'ConvictionVoting.vote',
-        sts.struct({
-            pollIndex: sts.number(),
-            vote: v9340.Type_144,
+            vote: v1009001.AccountVote,
         })
     ),
 }
@@ -53,8 +34,8 @@ export const delegate =  {
      * 
      * The dispatch origin of this call must be _Signed_, and the signing account must either:
      *   - be delegating already; or
-     *   - have no voting activity (if there is, then it will need to be removed/consolidated
-     *     through `reap_vote` or `unvote`).
+     *   - have no voting activity (if there is, then it will need to be removed through
+     *     `remove_vote`).
      * 
      * - `to`: The account whose voting the `target` account's voting power will follow.
      * - `class`: The class of polls to delegate. To delegate multiple classes, multiple calls
@@ -69,12 +50,12 @@ export const delegate =  {
      * Weight: `O(R)` where R is the number of polls the voter delegating to has
      *   voted on. Weight is initially charged as if maximum votes, but is refunded later.
      */
-    v9320: new CallType(
+    v1009001: new CallType(
         'ConvictionVoting.delegate',
         sts.struct({
             class: sts.number(),
-            to: v9320.MultiAddress,
-            conviction: v9320.Type_146,
+            to: v1009001.MultiAddress,
+            conviction: v1009001.Conviction,
             balance: sts.bigint(),
         })
     ),
@@ -86,7 +67,7 @@ export const undelegate =  {
      * Undelegate the voting power of the sending account for a particular class of polls.
      * 
      * Tokens may be unlocked following once an amount of time consistent with the lock period
-     * of the conviction with which the delegation was issued.
+     * of the conviction with which the delegation was issued has passed.
      * 
      * The dispatch origin of this call must be _Signed_ and the signing account must be
      * currently delegating.
@@ -98,7 +79,7 @@ export const undelegate =  {
      * Weight: `O(R)` where R is the number of polls the voter delegating to has
      *   voted on. Weight is initially charged as if maximum votes, but is refunded later.
      */
-    v9320: new CallType(
+    v1009001: new CallType(
         'ConvictionVoting.undelegate',
         sts.struct({
             class: sts.number(),
@@ -139,7 +120,7 @@ export const removeVote =  {
      * Weight: `O(R + log R)` where R is the number of polls that `target` has voted on.
      *   Weight is calculated for the maximum number of vote.
      */
-    v9320: new CallType(
+    v1009001: new CallType(
         'ConvictionVoting.remove_vote',
         sts.struct({
             class: sts.option(() => sts.number()),
@@ -168,10 +149,10 @@ export const removeOtherVote =  {
      * Weight: `O(R + log R)` where R is the number of polls that `target` has voted on.
      *   Weight is calculated for the maximum number of vote.
      */
-    v9320: new CallType(
+    v1009001: new CallType(
         'ConvictionVoting.remove_other_vote',
         sts.struct({
-            target: v9320.MultiAddress,
+            target: v1009001.MultiAddress,
             class: sts.number(),
             index: sts.number(),
         })

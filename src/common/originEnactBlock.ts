@@ -13,7 +13,8 @@ export const referendumV2EnactmentBlocks: Record<string, number> = {
     "BigTipper": 100,
     "SmallSpender": 14400,
     "MediumSpender": 14400,
-    "BigSpender": 14400
+    "BigSpender": 14400,
+    "WishForChange": 100
 }
 
 export const fellowshipEnactmentBlocks: Record<number, number> = {

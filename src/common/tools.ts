@@ -40,14 +40,14 @@ export function getOriginAccountId(origin: any) {
             switch (origin.value.__kind) {
                 case 'Signed':
                     try {
-                        return ss58codec.encode(decodeHex(origin.value.value))
+                        return ss58codec.encode(new Uint8Array(decodeHex(origin.value.value)))
                     }
                     catch (e) {
                     }
                     try {
-                        return ss58codec.encode(decodeHex(origin.value.value.value))
+                        return ss58codec.encode(new Uint8Array(decodeHex(origin.value.value.value)))
                     }
-                    catch(e){
+                    catch (e) {
                         return undefined
                     }
 
@@ -60,5 +60,5 @@ export function getOriginAccountId(origin: any) {
 }
 
 export function encodeId(id: string | Uint8Array) {
-    return ss58codec.encode(typeof id === 'string' ? decodeHex(id) : id)
+    return ss58codec.encode(typeof id === 'string' ? new Uint8Array(decodeHex(id)) : id)
 }

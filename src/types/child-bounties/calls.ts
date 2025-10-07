@@ -1,5 +1,5 @@
 import {sts, Block, Bytes, Option, Result, CallType, RuntimeCtx} from '../support'
-import * as v9190 from '../v9190'
+import * as v1009001 from '../v1009001'
 
 export const proposeCurator =  {
     name: 'ChildBounties.propose_curator',
@@ -20,12 +20,12 @@ export const proposeCurator =  {
      * - `curator`: Address of child-bounty curator.
      * - `fee`: payment fee to child-bounty curator for execution.
      */
-    v9190: new CallType(
+    v1009001: new CallType(
         'ChildBounties.propose_curator',
         sts.struct({
             parentBountyId: sts.number(),
             childBountyId: sts.number(),
-            curator: v9190.MultiAddress,
+            curator: v1009001.MultiAddress,
             fee: sts.bigint(),
         })
     ),
@@ -54,7 +54,7 @@ export const acceptCurator =  {
      * - `parent_bounty_id`: Index of parent bounty.
      * - `child_bounty_id`: Index of child bounty.
      */
-    v9190: new CallType(
+    v1009001: new CallType(
         'ChildBounties.accept_curator',
         sts.struct({
             parentBountyId: sts.number(),
@@ -72,12 +72,12 @@ export const unassignCurator =  {
      * the curator of the parent bounty, or any signed origin.
      * 
      * For the origin other than T::RejectOrigin and the child-bounty
-     * curator, parent-bounty must be in active state, for this call to
+     * curator, parent bounty must be in active state, for this call to
      * work. We allow child-bounty curator and T::RejectOrigin to execute
-     * this call irrespective of the parent-bounty state.
+     * this call irrespective of the parent bounty state.
      * 
      * If this function is called by the `RejectOrigin` or the
-     * parent-bounty curator, we assume that the child-bounty curator is
+     * parent bounty curator, we assume that the child-bounty curator is
      * malicious or inactive. As a result, child-bounty curator deposit is
      * slashed.
      * 
@@ -101,7 +101,7 @@ export const unassignCurator =  {
      * - `parent_bounty_id`: Index of parent bounty.
      * - `child_bounty_id`: Index of child bounty.
      */
-    v9190: new CallType(
+    v1009001: new CallType(
         'ChildBounties.unassign_curator',
         sts.struct({
             parentBountyId: sts.number(),
