@@ -1,7 +1,7 @@
-import {sts, Block, Bytes, Option, Result, EventType, RuntimeCtx} from '../support'
+import { sts, Block, Bytes, Option, Result, EventType, RuntimeCtx } from '../support'
 import * as v1009001 from '../v1009001'
 
-export const awarded =  {
+export const awarded = {
     name: 'Treasury.Awarded',
     /**
      * Some funds have been allocated.
@@ -16,7 +16,7 @@ export const awarded =  {
     ),
 }
 
-export const spendApproved =  {
+export const spendApproved = {
     name: 'Treasury.SpendApproved',
     /**
      * A new spend proposal has been approved.

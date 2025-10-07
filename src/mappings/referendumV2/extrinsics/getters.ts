@@ -1,23 +1,23 @@
-import {  UnknownVersionError } from '../../../common/errors'
+import { UnknownVersionError } from '../../../common/errors'
 import { delegate, removeOtherVote, removeVote, undelegate, vote } from '../../../types/conviction-voting/calls'
 import { convictionToLockPeriod } from './utils'
 
 type DemocracyVote =
     | {
-          type: 'Standard'
-          balance?: bigint
-          value: number
-      }
+        type: 'Standard'
+        balance?: bigint
+        value: number
+    }
     | {
-          type: 'Split'
-          aye: bigint
-          nay: bigint
-      }
+        type: 'Split'
+        aye: bigint
+        nay: bigint
+    }
     | {
-          type: 'SplitAbstain'
-          aye: bigint
-          nay: bigint
-          abstain: bigint
+        type: 'SplitAbstain'
+        aye: bigint
+        nay: bigint
+        abstain: bigint
     }
 
 
@@ -27,8 +27,8 @@ interface DemocracyVoteCallData {
 }
 
 export function getVoteData(itemCall: any): DemocracyVoteCallData {
-    if(vote.v9320.is(itemCall)){
-        const { pollIndex, vote: voteData } = vote.v9320.decode(itemCall)
+    if (vote.v1009001.is(itemCall)) {
+        const { pollIndex, vote: voteData } = vote.v1009001.decode(itemCall)
         if (voteData.__kind === 'Standard') {
             return {
                 index: pollIndex,
@@ -49,8 +49,8 @@ export function getVoteData(itemCall: any): DemocracyVoteCallData {
                 },
             }
         }
-    } else if(vote.v9340.is(itemCall)){
-        const { pollIndex, vote: voteData } = vote.v9340.decode(itemCall)
+    } else if (vote.v1009001.is(itemCall)) {
+        const { pollIndex, vote: voteData } = vote.v1009001.decode(itemCall)
         if (voteData.__kind === 'Standard') {
             return {
                 index: pollIndex,
@@ -71,7 +71,7 @@ export function getVoteData(itemCall: any): DemocracyVoteCallData {
                 },
             }
         }
-        else{
+        else {
             return {
                 index: pollIndex,
                 vote: {
@@ -82,7 +82,7 @@ export function getVoteData(itemCall: any): DemocracyVoteCallData {
                 },
             }
         }
-    }  
+    }
     else {
         throw new UnknownVersionError(itemCall.name)
     }
@@ -95,14 +95,14 @@ export interface ConvictionVoteDelegateCallData {
     balance?: bigint
 }
 
-export function getDelegateData(itemCall: any): ConvictionVoteDelegateCallData {   
-    if (delegate.v9320.is(itemCall)) {
+export function getDelegateData(itemCall: any): ConvictionVoteDelegateCallData {
+    if (delegate.v1009001.is(itemCall)) {
         //{ class, to, conviction, balance}
-        const eventData = delegate.v9320.decode(itemCall)
+        const eventData = delegate.v1009001.decode(itemCall)
         return {
             track: eventData.class,
             to: eventData.to.__kind != "Index" ? eventData.to.value : null,
-            lockPeriod:convictionToLockPeriod(eventData.conviction.__kind),
+            lockPeriod: convictionToLockPeriod(eventData.conviction.__kind),
             balance: eventData.balance
         }
     } else {
@@ -113,9 +113,9 @@ export interface ConvictionVoteUndelegateCallData {
     track: number
 }
 
-export function getUndelegateData(itemCall: any): ConvictionVoteUndelegateCallData {   
-    if (undelegate.v9320.is(itemCall)) {
-        const eventData = undelegate.v9320.decode(itemCall)
+export function getUndelegateData(itemCall: any): ConvictionVoteUndelegateCallData {
+    if (undelegate.v1009001.is(itemCall)) {
+        const eventData = undelegate.v1009001.decode(itemCall)
         return {
             track: eventData.class
         }
@@ -130,8 +130,8 @@ export interface ConvictionVotingRemoveVoteCallData {
 }
 
 export function getRemoveVoteData(itemCall: any): ConvictionVotingRemoveVoteCallData {
-    if (removeVote.v9320.is(itemCall)) {
-        const eventData = removeVote.v9320.decode(itemCall)
+    if (removeVote.v1009001.is(itemCall)) {
+        const eventData = removeVote.v1009001.decode(itemCall)
         return {
             index: eventData.index,
             track: eventData.class
@@ -148,8 +148,8 @@ export interface ConvictionVotingRemoveOtherVoteCallData {
 }
 
 export function getRemoveOtherVoteData(itemCall: any): ConvictionVotingRemoveOtherVoteCallData {
-    if (removeOtherVote.v9320.is(itemCall)) {
-        const eventData = removeOtherVote.v9320.decode(itemCall)
+    if (removeOtherVote.v1009001.is(itemCall)) {
+        const eventData = removeOtherVote.v1009001.decode(itemCall)
         return {
             index: eventData.index,
             track: eventData.class,

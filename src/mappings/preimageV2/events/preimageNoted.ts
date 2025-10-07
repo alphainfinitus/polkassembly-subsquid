@@ -30,16 +30,9 @@ interface PreimageStorageData {
 
 async function getStorageData(ctx: ProcessorContext<Store>, hash: string, block: any): Promise<PreimageStorageData | undefined> {
     const preimageStatus: PreimageStatusStorageData | undefined = await getPreimageStatusData(ctx, hash, block)
-    if(preimageFor.v9160.is(block)) {
-        const storageData = await preimageFor.v9160.get(block, hash)
-        if (!storageData) return undefined
-        return {
-            data: storageData,
-            ...preimageStatus
-        }
-    }else if(preimageFor.v9320.is(block)) {
-        if(preimageStatus && preimageStatus.len){
-            const storageData = await preimageFor.v9320.get(block, [hash, preimageStatus.len])
+    if (preimageFor.v1009001.is(block)) {
+        if (preimageStatus && preimageStatus.len) {
+            const storageData = await preimageFor.v1009001.get(block, [hash, preimageStatus.len])
             if (!storageData) return undefined
             return {
                 data: storageData,
@@ -55,23 +48,23 @@ async function getStorageData(ctx: ProcessorContext<Store>, hash: string, block:
     }
 }
 
-interface PreimageStatusStorageData{
+interface PreimageStatusStorageData {
     status: string
     value: number | [string, bigint] | undefined
     len?: number
 }
 
 export async function getPreimageRequestStatusData(ctx: ProcessorContext<Store>, hash: string, block: Block): Promise<PreimageStatusStorageData | undefined> {
-    if(requestStatusFor.v1001000.is(block)) {
-        const storageData = await requestStatusFor.v1001000.get(block, hash)
+    if (requestStatusFor.v1009001.is(block)) {
+        const storageData = await requestStatusFor.v1009001.get(block, hash)
         if (!storageData) return undefined
-        if(storageData.__kind == 'Unrequested'){
+        if (storageData.__kind == 'Unrequested') {
             return {
                 status: storageData.__kind,
                 value: storageData.ticket,
                 len: storageData.len
             }
-        } else{
+        } else {
             return {
                 status: storageData.__kind,
                 value: storageData.maybeTicket,
@@ -85,16 +78,16 @@ export async function getPreimageRequestStatusData(ctx: ProcessorContext<Store>,
 }
 
 export async function getPreimageStatusData(ctx: ProcessorContext<Store>, hash: string, block: Block): Promise<PreimageStatusStorageData | undefined> {
-    if(statusFor.v9160.is(block)) {
-        const storageData = await statusFor.v9160.get(block, hash)
+    if (statusFor.v1009001.is(block)) {
+        const storageData = await statusFor.v1009001.get(block, hash)
         if (!storageData) return undefined
         return {
             status: storageData.__kind,
-            value: storageData.value,
+            value: storageData.__kind === 'Requested' ? storageData.deposit : storageData.__kind === 'Unrequested' ? storageData.deposit : undefined,
             len: undefined
         }
-    }else if(statusFor.v9320.is(block)) {
-        const storageData = await statusFor.v9320.get(block, hash)
+    } else if (statusFor.v1009001.is(block)) {
+        const storageData = await statusFor.v1009001.get(block, hash)
         if (!storageData) return undefined
         return {
             status: storageData.__kind,
@@ -110,10 +103,10 @@ export async function getPreimageStatusData(ctx: ProcessorContext<Store>, hash: 
 export async function handlePreimageV2Noted(ctx: ProcessorContext<Store>,
     item: Event,
     header: any) {
-    if(!item.call) return;
+    if (!item.call) return;
     const { hash } = getPreimageNotedData(item)
 
-    if(!item.call.args?.bytes) return;
+    if (!item.call.args?.bytes) return;
 
     const hexHash = hash
     const extrinsicIndex = `${header.height}-${item.index}`
@@ -147,7 +140,7 @@ export async function handlePreimageV2Noted(ctx: ProcessorContext<Store>,
 
     const value = storageData.value as [string, bigint]
 
-    const proposer =  storageData.value ? ss58codec.encode(decodeHex(value[0])) : undefined
+    const proposer = storageData.value ? ss58codec.encode(new Uint8Array(decodeHex(value[0]))) : undefined
     const deposit = storageData.value ? value[1] : undefined
 
     await createPreimageV2(ctx, header, extrinsicIndex, {

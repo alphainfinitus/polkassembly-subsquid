@@ -12,8 +12,8 @@ interface AccepterCuratorData {
 }
 
 export function getAccepterCuratorData(itemCall: any): AccepterCuratorData {
-    if (acceptCurator.v9190.is(itemCall)) {
-        const { parentBountyId, childBountyId } =acceptCurator.v9190.decode(itemCall)
+    if (acceptCurator.v1009001.is(itemCall)) {
+        const { parentBountyId, childBountyId } = acceptCurator.v1009001.decode(itemCall)
         return {
             childBountyId,
             parentBountyId,
@@ -29,8 +29,8 @@ interface UnassingCuratorData {
 }
 
 export function getUnassingCuratorData(itemCall: any): UnassingCuratorData {
-    if (unassignCurator.v9190.is(itemCall)) {
-        const {parentBountyId, childBountyId} = unassignCurator.v9190.decode(itemCall)
+    if (unassignCurator.v1009001.is(itemCall)) {
+        const { parentBountyId, childBountyId } = unassignCurator.v1009001.decode(itemCall)
         return {
             parentBountyId,
             childBountyId,
@@ -48,8 +48,8 @@ interface ProposeCuratorData {
 }
 
 export function getProposeCuratorData(itemCall: any): ProposeCuratorData {
-    if (proposeCurator.v9190.is(itemCall)) {
-        const { parentBountyId, childBountyId, curator, fee } = proposeCurator.v9190.decode(itemCall)
+    if (proposeCurator.v1009001.is(itemCall)) {
+        const { parentBountyId, childBountyId, curator, fee } = proposeCurator.v1009001.decode(itemCall)
         return {
             parentBountyId: parentBountyId,
             childBountyId,

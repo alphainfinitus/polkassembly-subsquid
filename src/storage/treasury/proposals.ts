@@ -11,8 +11,8 @@ interface TreasuryProposalStorageData {
 }
 
 async function getStorageData(ctx: ProcessorContext<Store>, index: number, block: any): Promise<TreasuryProposalStorageData | undefined> {
-    if (proposals.v1020.is(block)) {
-        return await proposals.v1020.get(block, index)
+    if (proposals.v1009001.is(block)) {
+        return await proposals.v1009001.get(block, index)
     } else {
         throw new UnknownVersionError("Treasury.Proposals")
     }
