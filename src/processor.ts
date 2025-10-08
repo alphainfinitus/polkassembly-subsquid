@@ -8,7 +8,7 @@ import { PRECOMPILES } from './consts/consts'
 //@ts-ignore ts(2589)
 const processor = new SubstrateBatchProcessor()
     .setDataSource({
-        chain: 'wss://wss.api.moonriver.moonbeam.network',
+        chain: 'wss://moonriver.api.onfinality.io/public-ws',
         archive: lookupArchive('moonriver', { type: 'Substrate', release: 'ArrowSquid' }),
     })
     .setBlockRange({ from: 0 })
