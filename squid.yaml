@@ -1,6 +1,6 @@
 manifestVersion: subsquid.io/v0.1
 name: kusama-assethub-polkassembly
-version: 2
+version: 1
 description: |-
   Kusama's governance proposals on AssetHub
 
