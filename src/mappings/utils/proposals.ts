@@ -1167,7 +1167,7 @@ export async function sendNotification(ctx: ProcessorContext<Store>, proposal: P
     let statusName = null
     // if difference between proposal update time and current time > 10 mins return
     if (proposal.updatedAt && (new Date().getTime() - proposal.updatedAt.getTime()) > 600000) {
-        ctx.log.info(`Proposal ${index || hash} updated more than 10 mins ago, skipping notification`)
+        ctx.log.debug(`Proposal ${index || hash} updated more than 10 mins ago, skipping notification`)
         return
     }
 
@@ -1224,7 +1224,7 @@ export async function sendNotification(ctx: ProcessorContext<Store>, proposal: P
         return
     }
 
-    ctx.log.info(`Sending notification with data ${JSON.stringify(notification)}`)
+    ctx.log.debug(`Sending notification with data ${JSON.stringify(notification)}`)
 
     const response = await fetch(NOTIFICATION_URL, {
         method: 'POST',
@@ -1236,7 +1236,7 @@ export async function sendNotification(ctx: ProcessorContext<Store>, proposal: P
         body: JSON.stringify(notification),
     })
 
-    ctx.log.info(`Notification response ${JSON.stringify(response)}`)
+    ctx.log.debug(`Notification response ${JSON.stringify(response)}`)
 
     if (response.status !== 200) {
         ctx.log.error(`Notification failed for proposal ${index || hash} with status ${response.status}`)
@@ -1266,7 +1266,7 @@ export async function sendGovEvent(
     if (blockTimestamp) {
         const tenMinutesAgo = new Date().getTime() - 600000 // 10 minutes in milliseconds
         if (blockTimestamp.getTime() < tenMinutesAgo) {
-            ctx.log.info(`Block from ${blockTimestamp.toISOString()} is older than 10 minutes, skipping gov event notification`)
+            ctx.log.debug(`Block from ${blockTimestamp.toISOString()} is older than 10 minutes, skipping gov event notification`)
             return
         }
     }
@@ -1294,7 +1294,7 @@ export async function sendGovEvent(
 
         if (response.status !== 200) {
             ctx.log.error(`Failed to send gov event: ${event} for proposal index: ${proposalIndex} and proposal type: ${proposalType || ''} with address ${address}`)
-            ctx.log.info(`gov event api response: ${JSON.stringify(response)}`);
+            ctx.log.debug(`gov event api response: ${JSON.stringify(response)}`);
             return;
         }
     } catch (e) {

@@ -32,7 +32,7 @@ scale:
          storage: 20Gi
          profile: medium
   processor:
-     profile: medium
+     profile: large
   api:
      profile: medium
      replicas: 1
