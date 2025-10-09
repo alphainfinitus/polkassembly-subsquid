@@ -44,5 +44,6 @@ export async function handleVoted(ctx: ProcessorContext<Store>,
         address: ss58codec.encode(voter),
         proposalIndex: proposal.index?.toString(),
         proposalType: ProposalType.TechCommitteeProposal,
+        blockTimestamp: new Date(header.timestamp)
     })
 }

@@ -15,7 +15,7 @@ import { getOriginAccountId } from '../../../common/tools'
 import { getVoteData } from './getters'
 import { Store } from '@subsquid/typeorm-store'
 import { getDelegations, removeDelegatedVotesReferendum } from './utils'
-import { addDelegatedVotesReferendumV2 }  from './utils'
+import { addDelegatedVotesReferendumV2 } from './utils'
 import { IsNull } from 'typeorm'
 import { updateCurveData } from '../../../common/curveData'
 import { randomUUID } from 'crypto'
@@ -38,17 +38,18 @@ export async function handleConvictionVote(ctx: ProcessorContext<Store>,
 
     const from = getOriginAccountId(item.origin)
 
-    if(!from){
+    if (!from) {
         ctx.log.warn('No from address found for Conviction.vote call')
         return
     }
 
-    const votes = await ctx.store.find(ConvictionVote, { where: { voter: from, proposalIndex: index, removedAtBlock: IsNull(), type: VoteType.ReferendumV2 },            
+    const votes = await ctx.store.find(ConvictionVote, {
+        where: { voter: from, proposalIndex: index, removedAtBlock: IsNull(), type: VoteType.ReferendumV2 },
         relations: {
             delegatedVotes: true
-        } 
+        }
     })
-    if(votes){
+    if (votes) {
         if (votes.length > 1) {
             ctx.log.warn(TooManyOpenVotes(header.height, index, from))
         }
@@ -58,14 +59,14 @@ export async function handleConvictionVote(ctx: ProcessorContext<Store>,
             vote.removedAtBlock = header.height
             vote.removedAt = new Date(header.timestamp)
             const flattenedVote = await ctx.store.get(FlattenedConvictionVotes, { where: { voter: from, proposalIndex: index, removedAtBlock: IsNull(), type: VoteType.ReferendumV2 } })
-            if(flattenedVote){
+            if (flattenedVote) {
                 flattenedVote.removedAtBlock = header.height
                 flattenedVote.removedAt = new Date(header.timestamp)
                 await ctx.store.save(flattenedVote)
             }
             await ctx.store.save(vote)
             const delegatedVotes = vote.delegatedVotes
-            if(delegatedVotes){
+            if (delegatedVotes) {
                 await removeDelegatedVotesReferendum(ctx, header.height, header.timestamp, delegatedVotes)
             }
         }
@@ -81,7 +82,7 @@ export async function handleConvictionVote(ctx: ProcessorContext<Store>,
         case 'Split':
             decision = VoteDecision.abstain
             break
-        
+
         case 'SplitAbstain':
             decision = VoteDecision.abstain
             break
@@ -101,9 +102,9 @@ export async function handleConvictionVote(ctx: ProcessorContext<Store>,
         })
         lockPeriod = vote.value < 128 ? vote.value : vote.value - 128
         if (lockPeriod === 0 && vote.balance) {
-            votingPower = vote.balance/BigInt(10)
+            votingPower = vote.balance / BigInt(10)
         }
-        else{
+        else {
             votingPower = lockPeriod && vote.balance ? (vote.balance) * BigInt(lockPeriod) : BigInt(0)
         }
 
@@ -156,7 +157,7 @@ export async function handleConvictionVote(ctx: ProcessorContext<Store>,
         type: VoteType.ReferendumV2,
     })
 
-    if([VoteDecision.yes, VoteDecision.no].includes(decision)) {
+    if ([VoteDecision.yes, VoteDecision.no].includes(decision)) {
         const { delegatedVotesNested, delegatedVotePower, flattenedVotesNested } = await addDelegatedVotesReferendumV2(ctx, header.height, header.timestamp, nestedDelegations, convictionVote)
         convictionVote.delegatedVotingPower = convictionVote.delegatedVotingPower ? convictionVote.delegatedVotingPower + delegatedVotePower : delegatedVotePower
         convictionVote.totalVotingPower = votingPower + convictionVote.delegatedVotingPower
@@ -174,6 +175,7 @@ export async function handleConvictionVote(ctx: ProcessorContext<Store>,
         address: item.origin ? getOriginAccountId(item.origin) : '',
         proposalIndex: index.toString(),
         proposalType: ProposalType.ReferendumV2,
+        blockTimestamp: new Date(header.timestamp)
     })
 
 }

@@ -225,7 +225,8 @@ export async function updateProposalStatus(
             {
                 event: EGovEvent.PROPOSAL_ENDED,
                 proposalIndex: proposal.index?.toString() || '',
-                proposalType: type
+                proposalType: type,
+                blockTimestamp: new Date(header.timestamp)
             }
         )
     }
@@ -237,6 +238,7 @@ export async function updateProposalStatus(
             address: options.data?.payee,
             proposalIndex: proposal.index?.toString(),
             proposalType: ProposalType.ChildBounty,
+            blockTimestamp: new Date(header.timestamp)
         })
     }
 
@@ -247,6 +249,7 @@ export async function updateProposalStatus(
             address: options.data?.decisionDeposit.who,
             proposalIndex: proposal.index?.toString(),
             proposalType: ProposalType.ReferendumV2,
+            blockTimestamp: new Date(header.timestamp)
         })
     }
 }
@@ -453,7 +456,8 @@ export async function createDemocracyProposal(
         event: EGovEvent.PROPOSAL_CREATED,
         address: proposer,
         proposalIndex: proposal.index?.toString() || '',
-        proposalType: type
+        proposalType: type,
+        blockTimestamp: new Date(header.timestamp)
     });
 
     return proposal
@@ -566,7 +570,8 @@ export async function createReferendum(ctx: ProcessorContext<Store>, header: any
         event: EGovEvent.PROPOSAL_CREATED,
         address: proposer || '',
         proposalIndex: proposal.index?.toString() || '',
-        proposalType: type
+        proposalType: type,
+        blockTimestamp: new Date(header.timestamp)
     });
 
     return proposal
@@ -776,7 +781,8 @@ export async function createTip(ctx: ProcessorContext<Store>, header: any, extri
         event: EGovEvent.PROPOSAL_CREATED,
         address: proposer,
         proposalIndex: proposal.index?.toString() || '',
-        proposalType: type
+        proposalType: type,
+        blockTimestamp: new Date(header.timestamp)
     });
 
     return proposal
@@ -827,6 +833,7 @@ export async function createBounty(ctx: ProcessorContext<Store>, header: any, ex
         address: proposer,
         proposalIndex: proposal.index?.toString(),
         proposalType: ProposalType.Bounty,
+        blockTimestamp: new Date(header.timestamp)
     })
 
     return proposal
@@ -877,6 +884,7 @@ export async function createChildBounty(ctx: ProcessorContext<Store>, header: an
         address: proposer,
         proposalIndex: proposal.index?.toString(),
         proposalType: ProposalType.ChildBounty,
+        blockTimestamp: new Date(header.timestamp)
     })
 
     return proposal
@@ -1127,7 +1135,8 @@ export async function createReferendumV2(ctx: ProcessorContext<Store>, header: a
         event: EGovEvent.PROPOSAL_CREATED,
         address: proposer,
         proposalIndex: proposal.index?.toString() || '',
-        proposalType: type
+        proposalType: type,
+        blockTimestamp: new Date(header.timestamp)
     });
 
     return proposal
@@ -1242,15 +1251,26 @@ export async function sendGovEvent(
         address = '',
         proposalIndex = '',
         proposalType,
-        addressTo = ''
+        addressTo = '',
+        blockTimestamp
     }: {
         event: EGovEvent,
         address?: string,
         proposalIndex?: string
         proposalType?: ProposalType,
         addressTo?: string
+        blockTimestamp?: Date
     }
 ) {
+    // Skip sending events for blocks older than 10 minutes (historical sync)
+    if (blockTimestamp) {
+        const tenMinutesAgo = new Date().getTime() - 600000 // 10 minutes in milliseconds
+        if (blockTimestamp.getTime() < tenMinutesAgo) {
+            ctx.log.info(`Block from ${blockTimestamp.toISOString()} is older than 10 minutes, skipping gov event notification`)
+            return
+        }
+    }
+
     if (!process.env.TOOLS_PASSPHRASE) {
         ctx.log.error(`TOOLS_PASSPHRASE enviroment variable not set`)
         return

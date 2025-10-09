@@ -46,6 +46,7 @@ export async function handleNewTipValue(ctx: ProcessorContext<Store>,
         address: origin,
         proposalIndex: proposal.index?.toString(),
         proposalType: ProposalType.Tip,
+        blockTimestamp: new Date(header.timestamp)
     })
 }
 
@@ -87,5 +88,6 @@ export async function handleNewTipValueOld(ctx: ProcessorContext<Store>,
         address: origin,
         proposalIndex: proposal.index?.toString(),
         proposalType: ProposalType.Tip,
+        blockTimestamp: new Date(header.timestamp)
     })
 }

@@ -47,5 +47,6 @@ export async function handleVoted(ctx: ProcessorContext<Store>,
         address: voterAddress,
         proposalIndex: proposal.index?.toString(),
         proposalType: ProposalType.CouncilMotion,
+        blockTimestamp: new Date(header.timestamp)
     })
 }

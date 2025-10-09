@@ -18,10 +18,10 @@ export async function handleDelegate(ctx: ProcessorContext<Store>,
     const { to, lockPeriod, balance, track } = getDelegateData(item)
     const toWallet = ss58codec.encode(to)
     let from = getOriginAccountId(item.origin)
-    if(!from){
+    if (!from) {
         from = getOriginAccountId(item?.extrinsic?.call?.origin)
     }
-    if(!from){
+    if (!from) {
         return
     }
     const delegations = await ctx.store.find(VotingDelegation, { where: { from, endedAtBlock: IsNull(), track, type: DelegationType.OpenGov } })
@@ -39,14 +39,14 @@ export async function handleDelegate(ctx: ProcessorContext<Store>,
         await ctx.store.save(delegation)
         for (let i = 0; i < ongoingReferenda.length; i++) {
             const referendum = ongoingReferenda[i]
-            if(referendum.index || referendum.index === 0){
+            if (referendum.index || referendum.index === 0) {
                 await removeVote(ctx, from, referendum.index, header.height, header.timestamp, false)
             }
         }
     }
 
     const extrinsicIndex = `${header.height}-${item.extrinsicIndex}`
-    
+
     await ctx.store.insert(
         new VotingDelegation({
             id: randomUUID(),
@@ -64,19 +64,19 @@ export async function handleDelegate(ctx: ProcessorContext<Store>,
 
     let votingPower = BigInt(0)
     const nestedDelegations = await getDelegations(ctx, from, track)
-    
+
     let delegatedVotes = [];
     let flattenedVotes = [];
     let convictionVotes = []
 
     for (let i = 0; i < ongoingReferenda.length; i++) {
         const referendum = ongoingReferenda[i]
-        if(!referendum || referendum.index === undefined || referendum.index === null){
+        if (!referendum || referendum.index === undefined || referendum.index === null) {
             continue
         }
         const votes = await ctx.store.find(ConvictionVote, { where: { voter: toWallet, proposalIndex: referendum.index, removedAtBlock: IsNull(), type: VoteType.ReferendumV2 } })
 
-        if(votes) {
+        if (votes) {
             if (votes.length > 1) {
                 ctx.log.warn(TooManyOpenVotes(header.height, referendum.index, toWallet))
                 continue
@@ -86,20 +86,20 @@ export async function handleDelegate(ctx: ProcessorContext<Store>,
                 continue
             }
             const vote = votes[0]
-            if(vote.decision != VoteDecision.abstain){
-                try{
+            if (vote.decision != VoteDecision.abstain) {
+                try {
                     const voteBalance = new StandardVoteBalance({
                         value: balance,
                     })
                     const voter = from
                     if (lockPeriod === 0 && balance) {
-                        votingPower = balance/BigInt(10)
-                    }else{
+                        votingPower = balance / BigInt(10)
+                    } else {
                         votingPower = balance ? BigInt(lockPeriod) * balance : BigInt(0)
                     }
                     const { delegatedVotesNested, delegatedVotePower, flattenedVotesNested } = await addDelegatedVotesReferendumV2(ctx, header.height, header.timestamp, nestedDelegations, vote)
                     delegatedVotes.push(
-                        new ConvictionDelegatedVotes ({
+                        new ConvictionDelegatedVotes({
                             id: randomUUID(),
                             voter,
                             createdAtBlock: header.height,
@@ -137,7 +137,7 @@ export async function handleDelegate(ctx: ProcessorContext<Store>,
 
                     convictionVotes.push(vote)
                 }
-                catch(e){
+                catch (e) {
                     ctx.log.error(`Something went wrong at block ${header.height} in convictionVoting.delegate with error: ${e}`)
                 }
             }
@@ -150,6 +150,7 @@ export async function handleDelegate(ctx: ProcessorContext<Store>,
     await sendGovEvent(ctx, {
         event: EGovEvent.DELEGATED,
         address: from,
-        addressTo: toWallet
+        addressTo: toWallet,
+        blockTimestamp: new Date(header.timestamp)
     })
 }

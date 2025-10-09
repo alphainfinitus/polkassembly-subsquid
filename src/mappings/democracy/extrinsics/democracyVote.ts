@@ -36,19 +36,20 @@ export async function handleVote(ctx: ProcessorContext<Store>,
 
     const from = getOriginAccountId(item.origin)
 
-    if(!from){
+    if (!from) {
         ctx.log.warn('No from address found for democracy.vote call')
         return
-    }    
+    }
     const extrinsicIndex = `${header.height}-${item.extrinsicIndex}`
 
 
-    const votes = await ctx.store.find(ConvictionVote, { where: { voter: from, proposalIndex: index, removedAtBlock: IsNull(), type: VoteType.Referendum },
+    const votes = await ctx.store.find(ConvictionVote, {
+        where: { voter: from, proposalIndex: index, removedAtBlock: IsNull(), type: VoteType.Referendum },
         relations: {
             delegatedVotes: true
-        } 
+        }
     })
-    if(votes){
+    if (votes) {
         if (votes.length > 1) {
             ctx.log.warn(TooManyOpenVotes(header.height, index, from))
         }
@@ -58,14 +59,14 @@ export async function handleVote(ctx: ProcessorContext<Store>,
             vote.removedAtBlock = header.height
             vote.removedAt = new Date(header.timestamp)
             const flattenedVote = await ctx.store.get(FlattenedConvictionVotes, { where: { voter: from, proposalIndex: index, removedAtBlock: IsNull(), type: VoteType.Referendum } })
-            if(flattenedVote){
+            if (flattenedVote) {
                 flattenedVote.removedAtBlock = header.height
                 flattenedVote.removedAt = new Date(header.timestamp)
                 await ctx.store.save(flattenedVote)
             }
             await ctx.store.save(vote)
             const delegatedVotes = vote.delegatedVotes
-            if(delegatedVotes){
+            if (delegatedVotes) {
                 await removeDelegatedVotesReferendum(ctx, header.height, header.timestamp, delegatedVotes)
             }
         }
@@ -97,9 +98,9 @@ export async function handleVote(ctx: ProcessorContext<Store>,
         })
         lockPeriod = vote.value < 128 ? vote.value : vote.value - 128
         if (lockPeriod === 0 && vote.balance) {
-            votingPower = vote.balance/BigInt(10)
+            votingPower = vote.balance / BigInt(10)
         }
-        else{
+        else {
             votingPower = lockPeriod && vote.balance ? (vote.balance) * BigInt(lockPeriod) : BigInt(0)
         }
 
@@ -141,13 +142,13 @@ export async function handleVote(ctx: ProcessorContext<Store>,
         type: VoteType.Referendum,
     })
 
-    if([VoteDecision.yes, VoteDecision.no].includes(decision)) {
+    if ([VoteDecision.yes, VoteDecision.no].includes(decision)) {
         const { delegatedVotesNested, delegatedVotePower, flattenedVotesNested } = await addDelegatedVotesReferendum(ctx, header.height, header.timestamp, nestedDelegations, convictionVote)
         convictionVote.delegatedVotingPower = convictionVote.delegatedVotingPower ? convictionVote.delegatedVotingPower + delegatedVotePower : delegatedVotePower
         convictionVote.totalVotingPower = votingPower + convictionVote.delegatedVotingPower
         convictionDelegatedVotes.push(...delegatedVotesNested)
         flattenedVotes.push(...flattenedVotesNested)
-    }    
+    }
 
     await ctx.store.insert(convictionVote)
     await ctx.store.insert(convictionDelegatedVotes)
@@ -158,5 +159,6 @@ export async function handleVote(ctx: ProcessorContext<Store>,
         address: item.origin ? getOriginAccountId(item.origin) : '',
         proposalIndex: proposal.index?.toString(),
         proposalType: ProposalType.DemocracyProposal,
+        blockTimestamp: new Date(header.timestamp)
     })
 }

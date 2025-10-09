@@ -1,6 +1,6 @@
 manifestVersion: subsquid.io/v0.1
 name: kusama-assethub-unified-pa
-version: 2
+version: 1
 description: |-
   Kusama's relay chain and assethub governance proposals unified
 
