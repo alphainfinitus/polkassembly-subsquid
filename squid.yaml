@@ -16,6 +16,7 @@ deploy:
   secrets:
     - NOTIFICATION_API_KEY
     - GOV_EVENT_API_KEY
+    - TOOLS_PASSPHRASE
   processor:
     cmd: [ "node", "lib/processor" ] 
   api:
