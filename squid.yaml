@@ -1,8 +1,8 @@
 manifestVersion: subsquid.io/v0.1
 name: kusama-assethub-unified-pa
-version: 1
+version: 2
 description: |-
-  Kusama's relay chain and assethub governance proposals
+  Kusama's relay chain and assethub governance proposals unified
 
 build:
 
@@ -18,7 +18,10 @@ deploy:
     - GOV_EVENT_API_KEY
     - TOOLS_PASSPHRASE
   processor:
-    cmd: [ "node", "lib/processor" ] 
+    - name: kusama-processor
+      cmd: [ "sqd", "process:prod:kusama" ]
+    - name: assethub-kusama-processor
+      cmd: [ "sqd", "process:prod:assethub" ] 
   api:
     cmd: [ "npx", "squid-graphql-server", "--subscriptions", "--sql-statement-timeout", "3000" ]
 

@@ -1,0 +1,57 @@
+{
+  "$schema": "https://cdn.subsquid.io/schemas/commands.json",
+  "commands": {
+    "clean": {
+      "description": "delete all build artifacts",
+      "cmd": ["npx", "--yes", "rimraf", "lib"]
+    },
+    "build": {
+      "description": "Build the squid project",
+      "deps": ["clean"],
+      "cmd": ["tsc"]
+    },
+    "up": {
+      "description": "Start a PG database",
+      "cmd": ["docker", "compose", "up", "-d"]
+    },
+    "down": {
+      "description": "Drop a PG database",
+      "cmd": ["docker", "compose", "down"]
+    },
+    "migration:apply": {
+      "description": "Apply the DB migrations",
+      "cmd": ["squid-typeorm-migration", "apply"]
+    },
+    "migration:generate": {
+      "description": "Generate a DB migration matching the TypeORM entities",
+      "cmd": ["squid-typeorm-migration", "generate"]
+    },
+    "migration:clean": {
+      "description": "Clean the DB migrations",
+      "cmd": ["npx", "--yes", "rimraf", "./db/migrations"]
+    },
+    "process:kusama": {
+      "description": "Load .env and start the Kusama processor",
+      "deps": ["build", "migration:apply"],
+      "cmd": ["node", "lib/main.js", "kusama"]
+    },
+    "process:assethub": {
+      "description": "Load .env and start the AssetHub-Kusama processor",
+      "deps": ["build", "migration:apply"],
+      "cmd": ["node", "lib/main.js", "assethub-kusama"]
+    },
+    "process:prod:kusama": {
+      "description": "Start the Kusama processor for production",
+      "cmd": ["node", "lib/main.js", "kusama"]
+    },
+    "process:prod:assethub": {
+      "description": "Start the AssetHub-Kusama processor for production",
+      "cmd": ["node", "lib/main.js", "assethub-kusama"]
+    },
+    "serve": {
+      "description": "Start the GraphQL API server",
+      "cmd": ["squid-graphql-server"]
+    }
+  }
+}
+
