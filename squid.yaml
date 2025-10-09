@@ -10,9 +10,9 @@ deploy:
   addons:
     postgres:
         config:
-          statement_timeout: 100000
-          max_pred_locks_per_transaction: 1024
-          max_locks_per_transaction: 1024
+          statement_timeout: 300000
+          max_pred_locks_per_transaction: 2048
+          max_locks_per_transaction: 2048
   secrets:
     - NOTIFICATION_API_KEY
     - GOV_EVENT_API_KEY
@@ -32,7 +32,7 @@ scale:
          storage: 20Gi
          profile: medium
   processor:
-     profile: large
+     profile: medium
   api:
      profile: medium
      replicas: 1
