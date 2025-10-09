@@ -6,8 +6,9 @@ import assert from 'assert'
 import { ProposalStatus } from './model'
 import { createPreimageV2 } from './mappings/utils/proposals'
 
+// Kusama main chain processor
 //@ts-ignore ts(2589)
-const processor = new SubstrateBatchProcessor()
+const kusamaProcessor = new SubstrateBatchProcessor()
     .setGateway('https://v2.archive.subsquid.io/network/kusama')
     .setRpcEndpoint('wss://kusama-rpc.dwellir.com')
     .setBlockRange({ from: 0 })
@@ -34,7 +35,33 @@ const processor = new SubstrateBatchProcessor()
         extrinsic: true
     })
 
-processor.run(new TypeormDatabase(), async (ctx: any) => {
+// AssetHub-Kusama processor
+//@ts-ignore ts(2589)
+const assetHubKusamaProcessor = new SubstrateBatchProcessor()
+    .setGateway('https://v2.archive.subsquid.io/network/asset-hub-kusama')
+    .setRpcEndpoint('wss://asset-hub-kusama-rpc.n.dwellir.com')
+    .setBlockRange({ from: 0 })
+    .setFields({ event: {}, call: { origin: true, success: true, error: true }, extrinsic: { hash: true, fee: true, tip: true }, block: { timestamp: true } })
+    .addCall({
+        name: ['ConvictionVoting.vote', 'ConvictionVoting.delegate', 'ConvictionVoting.undelegate', 'ConvictionVoting.remove_vote', 'ConvictionVoting.remove_other_vote', 'Bounties.accept_curator',
+            'Bounties.unassign_curator', 'Bounties.propose_curator', 'ChildBounties.propose_curator', 'ChildBounties.accept_curator', 'ChildBounties.unassign_curator', 'Tips.tip'
+        ]
+    })
+    .addEvent({
+        name: ['Referenda.Submitted', 'Referenda.DecisionDepositPlaced', 'Referenda.Rejected', 'Referenda.MetadataSet', 'Referenda.MetadataCleared', 'Referenda.TimedOut', 'Referenda.Approved', 'Referenda.DecisionStarted', 'Referenda.ConfirmStarted',
+            'Referenda.Cancelled', 'Referenda.Killed', 'Referenda.Confirmed', 'Preimage.Requested', 'Preimage.Noted', 'Preimage.Cleared',
+            'Referenda.ConfirmAborted', 'Treasury.Proposed',
+            'Treasury.Awarded', 'Treasury.Rejected', 'Treasury.SpendApproved', 'Scheduler.Dispatched',
+            'Treasury.NewTip', 'Treasury.TipClosed', 'Treasury.TipRetracted', 'Treasury.BountyProposed', 'Treasury.BountyRejected', 'Treasury.BountyBecameActive', 'Treasury.BountyAwarded', 'Treasury.BountyClaimed',
+            'Treasury.BountyCanceled', 'Treasury.BountyExtended', 'Tips.NewTip', 'Tips.TipClosed', 'Tips.TipRetracted', 'Tips.TipSlashed', 'Bounties.BountyProposed', 'Bounties.BountyRejected', 'Bounties.BountyBecameActive',
+            'Bounties.BountyAwarded', 'Bounties.BountyClaimed', 'Bounties.BountyCanceled', 'Bounties.BountyExtended', 'ChildBounties.Added', 'ChildBounties.Awarded', 'ChildBounties.Claimed', 'ChildBounties.Canceled'
+        ],
+        call: true,
+        extrinsic: true
+    })
+
+// Handler function for processing blocks - shared by both processors
+async function handleBlocks(ctx: any, isAssetHub: boolean = false) {
     for (let block of ctx.blocks) {
         let multisigOrigins = new Map<string, any>()
         for (let item of block.events) {
@@ -68,21 +95,26 @@ processor.run(new TypeormDatabase(), async (ctx: any) => {
             }
         }
         for (let item of block.calls) {
-            if (item.name == 'Democracy.vote') {
-                await modules.democracy.extrinsics.handleVote(ctx, item, block.header)
+            // Democracy calls - only on Kusama main chain
+            if (!isAssetHub) {
+                if (item.name == 'Democracy.vote') {
+                    await modules.democracy.extrinsics.handleVote(ctx, item, block.header)
+                }
+                if (item.name == 'Democracy.remove_vote') {
+                    await modules.democracy.extrinsics.handleRemoveVote(ctx, item, block.header)
+                }
+                if (item.name == 'Democracy.remove_other_vote') {
+                    await modules.democracy.extrinsics.handleRemoveOtherVote(ctx, item, block.header)
+                }
+                if (item.name == 'Democracy.delegate') {
+                    await modules.democracy.extrinsics.handleDelegate(ctx, item, block.header)
+                }
+                if (item.name == 'Democracy.undelegate') {
+                    await modules.democracy.extrinsics.handleUndelegate(ctx, item, block.header)
+                }
             }
-            if (item.name == 'Democracy.remove_vote') {
-                await modules.democracy.extrinsics.handleRemoveVote(ctx, item, block.header)
-            }
-            if (item.name == 'Democracy.remove_other_vote') {
-                await modules.democracy.extrinsics.handleRemoveOtherVote(ctx, item, block.header)
-            }
-            if (item.name == 'Democracy.delegate') {
-                await modules.democracy.extrinsics.handleDelegate(ctx, item, block.header)
-            }
-            if (item.name == 'Democracy.undelegate') {
-                await modules.democracy.extrinsics.handleUndelegate(ctx, item, block.header)
-            }
+
+            // ConvictionVoting calls - on both chains
             if (item.name == 'ConvictionVoting.vote') {
                 await modules.referendumV2.extrinsics.handleConvictionVote(ctx, item, block.header)
             }
@@ -98,6 +130,8 @@ processor.run(new TypeormDatabase(), async (ctx: any) => {
             if (item.name == 'ConvictionVoting.remove_other_vote') {
                 await modules.referendumV2.extrinsics.handleRemoveOtherVote(ctx, item, block.header)
             }
+
+            // Bounties calls
             if (item.name == 'Bounties.accept_curator') {
                 await modules.bounties.extrinsic.handleAcceptCurator(ctx, item, block.header)
             }
@@ -107,12 +141,18 @@ processor.run(new TypeormDatabase(), async (ctx: any) => {
             if (item.name == 'Bounties.propose_curator') {
                 await modules.bounties.extrinsic.handleProposeCurator(ctx, item, block.header)
             }
-            if (item.name == 'Treasury.accept_curator') {
-                await modules.bounties.extrinsic.handleAcceptCuratorOld(ctx, item, block.header)
+
+            // Treasury curator calls - only on Kusama main chain
+            if (!isAssetHub) {
+                if (item.name == 'Treasury.accept_curator') {
+                    await modules.bounties.extrinsic.handleAcceptCuratorOld(ctx, item, block.header)
+                }
+                if (item.name == 'Treasury.unassign_curator') {
+                    await modules.bounties.extrinsic.handleUnassignCuratorOld(ctx, item, block.header)
+                }
             }
-            if (item.name == 'Treasury.unassign_curator') {
-                await modules.bounties.extrinsic.handleUnassignCuratorOld(ctx, item, block.header)
-            }
+
+            // ChildBounties calls
             if (item.name == 'ChildBounties.accept_curator') {
                 await modules.childBounties.extrinsic.handleAcceptCurator(ctx, item, block.header)
             }
@@ -122,89 +162,100 @@ processor.run(new TypeormDatabase(), async (ctx: any) => {
             if (item.name == 'ChildBounties.unassign_curator') {
                 await modules.childBounties.extrinsic.handleUnassignCurator(ctx, item, block.header)
             }
+
+            // Tips calls
             if (item.name == 'Tips.tip') {
                 await modules.tips.extrinsics.handleNewTipValue(ctx, item, block.header)
             }
-            if (item.name == 'Treasury.tip') {
+            if (!isAssetHub && item.name == 'Treasury.tip') {
                 await modules.tips.extrinsics.handleNewTipValueOld(ctx, item, block.header)
             }
         }
         for (let item of block.events) {
-            if (item.name == 'Democracy.Proposed') {
-                await modules.democracy.events.handleProposed(ctx, item, block.header)
+            // Democracy events - only on Kusama main chain
+            if (!isAssetHub) {
+                if (item.name == 'Democracy.Proposed') {
+                    await modules.democracy.events.handleProposed(ctx, item, block.header)
+                }
+                if (item.name == 'Democracy.Tabled') {
+                    await modules.democracy.events.handleTabled(ctx, item, block.header)
+                }
+                if (item.name == 'Democracy.Started') {
+                    await modules.democracy.events.handleStarted(ctx, item, block.header)
+                }
+                if (item.name == 'Democracy.Passed') {
+                    await modules.democracy.events.handlePassed(ctx, item, block.header)
+                }
+                if (item.name == 'Democracy.NotPassed') {
+                    await modules.democracy.events.handleNotPassed(ctx, item, block.header)
+                }
+                if (item.name == 'Democracy.Cancelled') {
+                    await modules.democracy.events.handleCancelled(ctx, item, block.header)
+                }
+                if (item.name == 'Democracy.Executed') {
+                    await modules.democracy.events.handleExecuted(ctx, item, block.header)
+                }
+                if (item.name == 'Democracy.Seconded') {
+                    await modules.democracy.events.handleDemocracySeconds(ctx, item, block.header)
+                }
+                if (item.name == 'Democracy.PreimageNoted') {
+                    await modules.democracy.events.handlePreimageNoted(ctx, item, block.header)
+                }
+                if (item.name == 'Democracy.PreimageUsed') {
+                    await modules.democracy.events.handlePreimageUsed(ctx, item, block.header)
+                }
+                if (item.name == 'Democracy.PreimageInvalid') {
+                    await modules.democracy.events.handlePreimageInvalid(ctx, item, block.header)
+                }
+                if (item.name == 'Democracy.PreimageMissing') {
+                    await modules.democracy.events.handlePreimageMissing(ctx, item, block.header)
+                }
+                if (item.name == 'Democracy.PreimageReaped') {
+                    await modules.democracy.events.handlePreimageReaped(ctx, item, block.header)
+                }
+
+                // Council events - only on Kusama main chain
+                if (item.name == 'Council.Proposed') {
+                    await modules.council.events.handleProposed(ctx, item, block.header)
+                }
+                if (item.name == 'Council.Voted') {
+                    await modules.council.events.handleVoted(ctx, item, block.header)
+                }
+                if (item.name == 'Council.Closed') {
+                    await modules.council.events.handleClosed(ctx, item, block.header)
+                }
+                if (item.name == 'Council.Disapproved') {
+                    await modules.council.events.handleDisapproved(ctx, item, block.header)
+                }
+                if (item.name == 'Council.Executed') {
+                    await modules.council.events.handleExecuted(ctx, item, block.header)
+                }
+                if (item.name == 'Council.Approved') {
+                    await modules.council.events.handleApproved(ctx, item, block.header)
+                }
+
+                // TechnicalCommittee events - only on Kusama main chain
+                if (item.name == 'TechnicalCommittee.Proposed') {
+                    await modules.techComittee.events.handleProposed(ctx, item, block.header)
+                }
+                if (item.name == 'TechnicalCommittee.Approved') {
+                    await modules.techComittee.events.handleApproved(ctx, item, block.header)
+                }
+                if (item.name == 'TechnicalCommittee.Disapproved') {
+                    await modules.techComittee.events.handleDisapproved(ctx, item, block.header)
+                }
+                if (item.name == 'TechnicalCommittee.Closed') {
+                    await modules.techComittee.events.handleClosed(ctx, item, block.header)
+                }
+                if (item.name == 'TechnicalCommittee.Voted') {
+                    await modules.techComittee.events.handleVoted(ctx, item, block.header)
+                }
+                if (item.name == 'TechnicalCommittee.Executed') {
+                    await modules.techComittee.events.handleExecuted(ctx, item, block.header)
+                }
             }
-            if (item.name == 'Democracy.Tabled') {
-                await modules.democracy.events.handleTabled(ctx, item, block.header)
-            }
-            if (item.name == 'Democracy.Started') {
-                await modules.democracy.events.handleStarted(ctx, item, block.header)
-            }
-            if (item.name == 'Democracy.Passed') {
-                await modules.democracy.events.handlePassed(ctx, item, block.header)
-            }
-            if (item.name == 'Democracy.NotPassed') {
-                await modules.democracy.events.handleNotPassed(ctx, item, block.header)
-            }
-            if (item.name == 'Democracy.Cancelled') {
-                await modules.democracy.events.handleCancelled(ctx, item, block.header)
-            }
-            if (item.name == 'Democracy.Executed') {
-                await modules.democracy.events.handleExecuted(ctx, item, block.header)
-            }
-            if (item.name == 'Democracy.Seconded') {
-                await modules.democracy.events.handleDemocracySeconds(ctx, item, block.header)
-            }
-            if (item.name == 'Democracy.PreimageNoted') {
-                await modules.democracy.events.handlePreimageNoted(ctx, item, block.header)
-            }
-            if (item.name == 'Democracy.PreimageUsed') {
-                await modules.democracy.events.handlePreimageUsed(ctx, item, block.header)
-            }
-            if (item.name == 'Democracy.PreimageInvalid') {
-                await modules.democracy.events.handlePreimageInvalid(ctx, item, block.header)
-            }
-            if (item.name == 'Democracy.PreimageMissing') {
-                await modules.democracy.events.handlePreimageMissing(ctx, item, block.header)
-            }
-            if (item.name == 'Democracy.PreimageReaped') {
-                await modules.democracy.events.handlePreimageReaped(ctx, item, block.header)
-            }
-            if (item.name == 'Council.Proposed') {
-                await modules.council.events.handleProposed(ctx, item, block.header)
-            }
-            if (item.name == 'Council.Voted') {
-                await modules.council.events.handleVoted(ctx, item, block.header)
-            }
-            if (item.name == 'Council.Closed') {
-                await modules.council.events.handleClosed(ctx, item, block.header)
-            }
-            if (item.name == 'Council.Disapproved') {
-                await modules.council.events.handleDisapproved(ctx, item, block.header)
-            }
-            if (item.name == 'Council.Executed') {
-                await modules.council.events.handleExecuted(ctx, item, block.header)
-            }
-            if (item.name == 'Council.Approved') {
-                await modules.council.events.handleApproved(ctx, item, block.header)
-            }
-            if (item.name == 'TechnicalCommittee.Proposed') {
-                await modules.techComittee.events.handleProposed(ctx, item, block.header)
-            }
-            if (item.name == 'TechnicalCommittee.Approved') {
-                await modules.techComittee.events.handleApproved(ctx, item, block.header)
-            }
-            if (item.name == 'TechnicalCommittee.Disapproved') {
-                await modules.techComittee.events.handleDisapproved(ctx, item, block.header)
-            }
-            if (item.name == 'TechnicalCommittee.Closed') {
-                await modules.techComittee.events.handleClosed(ctx, item, block.header)
-            }
-            if (item.name == 'TechnicalCommittee.Voted') {
-                await modules.techComittee.events.handleVoted(ctx, item, block.header)
-            }
-            if (item.name == 'TechnicalCommittee.Executed') {
-                await modules.techComittee.events.handleExecuted(ctx, item, block.header)
-            }
+
+            // Treasury events - on both chains
             if (item.name == 'Treasury.Proposed') {
                 await modules.treasury.events.handleProposed(ctx, item, block.header)
             }
@@ -217,36 +268,42 @@ processor.run(new TypeormDatabase(), async (ctx: any) => {
             if (item.name == 'Treasury.SpendApproved') {
                 await modules.treasury.events.handleSpendApproved(ctx, item, block.header)
             }
-            if (item.name == 'Treasury.BountyProposed') {
-                await modules.bounties.events.handleProposedOld(ctx, item, block.header)
+
+            // Old Treasury bounty/tip events - only on Kusama main chain
+            if (!isAssetHub) {
+                if (item.name == 'Treasury.BountyProposed') {
+                    await modules.bounties.events.handleProposedOld(ctx, item, block.header)
+                }
+                if (item.name == 'Treasury.BountyRejected') {
+                    await modules.bounties.events.handleRejectedOld(ctx, item, block.header)
+                }
+                if (item.name == 'Treasury.BountyBecameActive') {
+                    await modules.bounties.events.handleBecameActiveOld(ctx, item, block.header)
+                }
+                if (item.name == 'Treasury.BountyAwarded') {
+                    await modules.bounties.events.handleAwardedOld(ctx, item, block.header)
+                }
+                if (item.name == 'Treasury.BountyClaimed') {
+                    await modules.bounties.events.handleClaimedOld(ctx, item, block.header)
+                }
+                if (item.name == 'Treasury.BountyCanceled') {
+                    await modules.bounties.events.handleCanceledOld(ctx, item, block.header)
+                }
+                if (item.name == 'Treasury.BountyExtended') {
+                    await modules.bounties.events.handleExtendedOld(ctx, item, block.header)
+                }
+                if (item.name == 'Treasury.NewTip') {
+                    await modules.tips.events.handleNewTipOld(ctx, item, block.header)
+                }
+                if (item.name == 'Treasury.TipRetracted') {
+                    await modules.tips.events.handleRetractedOld(ctx, item, block.header)
+                }
+                if (item.name == 'Treasury.TipClosed') {
+                    await modules.tips.events.handleClosedOld(ctx, item, block.header)
+                }
             }
-            if (item.name == 'Treasury.BountyRejected') {
-                await modules.bounties.events.handleRejectedOld(ctx, item, block.header)
-            }
-            if (item.name == 'Treasury.BountyBecameActive') {
-                await modules.bounties.events.handleBecameActiveOld(ctx, item, block.header)
-            }
-            if (item.name == 'Treasury.BountyAwarded') {
-                await modules.bounties.events.handleAwardedOld(ctx, item, block.header)
-            }
-            if (item.name == 'Treasury.BountyClaimed') {
-                await modules.bounties.events.handleClaimedOld(ctx, item, block.header)
-            }
-            if (item.name == 'Treasury.BountyCanceled') {
-                await modules.bounties.events.handleCanceledOld(ctx, item, block.header)
-            }
-            if (item.name == 'Treasury.BountyExtended') {
-                await modules.bounties.events.handleExtendedOld(ctx, item, block.header)
-            }
-            if (item.name == 'Treasury.NewTip') {
-                await modules.tips.events.handleNewTipOld(ctx, item, block.header)
-            }
-            if (item.name == 'Treasury.TipRetracted') {
-                await modules.tips.events.handleRetractedOld(ctx, item, block.header)
-            }
-            if (item.name == 'Treasury.TipClosed') {
-                await modules.tips.events.handleClosedOld(ctx, item, block.header)
-            }
+
+            // Tips events
             if (item.name == 'Tips.TipClosed') {
                 await modules.tips.events.handleClosed(ctx, item, block.header)
             }
@@ -259,6 +316,8 @@ processor.run(new TypeormDatabase(), async (ctx: any) => {
             if (item.name == 'Tips.TipSlashed') {
                 await modules.tips.events.handleSlashed(ctx, item, block.header)
             }
+
+            // Bounties events
             if (item.name == 'Bounties.BountyProposed') {
                 await modules.bounties.events.handleProposed(ctx, item, block.header)
             }
@@ -280,6 +339,8 @@ processor.run(new TypeormDatabase(), async (ctx: any) => {
             if (item.name == 'Bounties.BountyExtended') {
                 await modules.bounties.events.handleExtended(ctx, item, block.header)
             }
+
+            // ChildBounties events
             if (item.name == 'ChildBounties.Added') {
                 await modules.childBounties.events.handleProposed(ctx, item, block.header)
             }
@@ -292,6 +353,8 @@ processor.run(new TypeormDatabase(), async (ctx: any) => {
             if (item.name == 'ChildBounties.Canceled') {
                 await modules.childBounties.events.handleCancelled(ctx, item, block.header)
             }
+
+            // Preimage events
             if (item.name == 'Preimage.Noted') {
                 await modules.preimageV2.events.handlePreimageV2Noted(ctx, item, block.header)
             }
@@ -301,6 +364,8 @@ processor.run(new TypeormDatabase(), async (ctx: any) => {
             if (item.name == 'Preimage.Requested') {
                 await modules.preimageV2.events.handlePreimageV2Requested(ctx, item, block.header)
             }
+
+            // Referenda events - on both chains
             if (item.name == 'Referenda.Submitted') {
                 await modules.referendumV2.events.handleSubmitted(ctx, item, block.header)
             }
@@ -340,55 +405,83 @@ processor.run(new TypeormDatabase(), async (ctx: any) => {
             if (item.name == 'Referenda.MetadataCleared') {
                 await modules.referendumV2.events.handleMetadataCleared(ctx, item, block.header)
             }
-            if (item.name == 'FellowshipReferenda.Submitted') {
-                await modules.fellowshipReferendum.events.handleSubmitted(ctx, item, block.header)
+
+            // FellowshipReferenda events - only on Kusama main chain
+            if (!isAssetHub) {
+                if (item.name == 'FellowshipReferenda.Submitted') {
+                    await modules.fellowshipReferendum.events.handleSubmitted(ctx, item, block.header)
+                }
+                if (item.name == 'FellowshipReferenda.Approved') {
+                    await modules.fellowshipReferendum.events.handleApproved(ctx, item, block.header)
+                }
+                if (item.name == 'FellowshipReferenda.Cancelled') {
+                    await modules.fellowshipReferendum.events.handleCancelled(ctx, item, block.header)
+                }
+                if (item.name == 'FellowshipReferenda.ConfirmAborted') {
+                    await modules.fellowshipReferendum.events.handleConfirmAborted(ctx, item, block.header)
+                }
+                if (item.name == 'FellowshipReferenda.Confirmed') {
+                    await modules.fellowshipReferendum.events.handleConfirmed(ctx, item, block.header)
+                }
+                if (item.name == 'FellowshipReferenda.ConfirmStarted') {
+                    await modules.fellowshipReferendum.events.handleConfirmStarted(ctx, item, block.header)
+                }
+                if (item.name == 'FellowshipReferenda.DecisionDepositPlaced') {
+                    await modules.fellowshipReferendum.events.handleDecisionDepositPlaced(ctx, item, block.header)
+                }
+                if (item.name == 'FellowshipReferenda.DecisionStarted') {
+                    await modules.fellowshipReferendum.events.handleDecisionStarted(ctx, item, block.header)
+                }
+                if (item.name == 'FellowshipReferenda.Killed') {
+                    await modules.fellowshipReferendum.events.handleKilled(ctx, item, block.header)
+                }
+                if (item.name == 'FellowshipReferenda.Rejected') {
+                    await modules.fellowshipReferendum.events.handleRejected(ctx, item, block.header)
+                }
+                if (item.name == 'FellowshipReferenda.TimedOut') {
+                    await modules.fellowshipReferendum.events.handleTimedOut(ctx, item, block.header)
+                }
+                if (item.name == 'FellowshipReferenda.MetadataSet') {
+                    await modules.fellowshipReferendum.events.handleMetadataSet(ctx, item, block.header)
+                }
+                if (item.name == 'FellowshipReferenda.MetadataCleared') {
+                    await modules.fellowshipReferendum.events.handleMetadataCleared(ctx, item, block.header)
+                }
             }
-            if (item.name == 'FellowshipReferenda.Approved') {
-                await modules.fellowshipReferendum.events.handleApproved(ctx, item, block.header)
-            }
-            if (item.name == 'FellowshipReferenda.Cancelled') {
-                await modules.fellowshipReferendum.events.handleCancelled(ctx, item, block.header)
-            }
-            if (item.name == 'FellowshipReferenda.ConfirmAborted') {
-                await modules.fellowshipReferendum.events.handleConfirmAborted(ctx, item, block.header)
-            }
-            if (item.name == 'FellowshipReferenda.Confirmed') {
-                await modules.fellowshipReferendum.events.handleConfirmed(ctx, item, block.header)
-            }
-            if (item.name == 'FellowshipReferenda.ConfirmStarted') {
-                await modules.fellowshipReferendum.events.handleConfirmStarted(ctx, item, block.header)
-            }
-            if (item.name == 'FellowshipReferenda.DecisionDepositPlaced') {
-                await modules.fellowshipReferendum.events.handleDecisionDepositPlaced(ctx, item, block.header)
-            }
-            if (item.name == 'FellowshipReferenda.DecisionStarted') {
-                await modules.fellowshipReferendum.events.handleDecisionStarted(ctx, item, block.header)
-            }
-            if (item.name == 'FellowshipReferenda.Killed') {
-                await modules.fellowshipReferendum.events.handleKilled(ctx, item, block.header)
-            }
-            if (item.name == 'FellowshipReferenda.Rejected') {
-                await modules.fellowshipReferendum.events.handleRejected(ctx, item, block.header)
-            }
-            if (item.name == 'FellowshipReferenda.TimedOut') {
-                await modules.fellowshipReferendum.events.handleTimedOut(ctx, item, block.header)
-            }
-            if (item.name == 'FellowshipReferenda.MetadataSet') {
-                await modules.fellowshipReferendum.events.handleMetadataSet(ctx, item, block.header)
-            }
-            if (item.name == 'FellowshipReferenda.MetadataCleared') {
-                await modules.fellowshipReferendum.events.handleMetadataCleared(ctx, item, block.header)
-            }
+
+            // Scheduler events - handle differently based on chain
             if (item.name == 'Scheduler.Dispatched') {
                 await modules.referendumV2.events.handleReferendumV2Execution(ctx, item, block.header)
-                await modules.fellowshipReferendum.events.handleReferendumV2Execution(ctx, item, block.header)
+                if (!isAssetHub) {
+                    await modules.fellowshipReferendum.events.handleReferendumV2Execution(ctx, item, block.header)
+                }
             }
         }
     }
-});
+}
 
+// Run both processors concurrently with separate database instances
+async function main() {
+    await Promise.all([
+        // Kusama main chain processor with its own state schema
+        kusamaProcessor.run(new TypeormDatabase({ stateSchema: 'kusama_processor' }), async (ctx) => {
+            await handleBlocks(ctx, false)
+        }),
+        // AssetHub-Kusama processor with its own state schema
+        assetHubKusamaProcessor.run(new TypeormDatabase({ stateSchema: 'assethub_kusama_processor' }), async (ctx) => {
+            await handleBlocks(ctx, true)
+        })
+    ])
+}
 
-export type Fields = SubstrateBatchProcessorFields<typeof processor>
+// Start the processors
+main().catch(err => {
+    console.error('Error running processors:', err)
+    process.exit(1)
+})
+
+// Export types for compatibility
+export type Fields = SubstrateBatchProcessorFields<typeof kusamaProcessor>
 export type Block = BlockHeader<Fields>
 export type Event = _Event<Fields>
 export type Call = _Call<Fields>

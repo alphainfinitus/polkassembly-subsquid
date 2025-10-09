@@ -1,8 +1,8 @@
 manifestVersion: subsquid.io/v0.1
-name: kusama-polkassembly
-version: 2
+name: kusama-assethub-unified-pa
+version: 1
 description: |-
-  Kusama's governance proposals
+  Kusama's relay chain and assethub governance proposals
 
 build:
 
