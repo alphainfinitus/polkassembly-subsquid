@@ -12,6 +12,7 @@ const kusamaProcessor = new SubstrateBatchProcessor()
     .setGateway('https://v2.archive.subsquid.io/network/kusama')
     .setRpcEndpoint('wss://kusama-rpc.dwellir.com')
     .setBlockRange({ from: 0 })
+    .setPrometheusPort(3000)
     .setFields({ event: {}, call: { origin: true, success: true, error: true }, extrinsic: { hash: true, fee: true, tip: true }, block: { timestamp: true } })
     .addCall({
         name: ['ConvictionVoting.vote', 'ConvictionVoting.delegate', 'ConvictionVoting.undelegate', 'ConvictionVoting.remove_vote', 'ConvictionVoting.remove_other_vote', 'Democracy.vote',
@@ -41,6 +42,7 @@ const assetHubKusamaProcessor = new SubstrateBatchProcessor()
     .setGateway('https://v2.archive.subsquid.io/network/asset-hub-kusama')
     .setRpcEndpoint('wss://asset-hub-kusama-rpc.n.dwellir.com')
     .setBlockRange({ from: 0 })
+    .setPrometheusPort(3001)
     .setFields({ event: {}, call: { origin: true, success: true, error: true }, extrinsic: { hash: true, fee: true, tip: true }, block: { timestamp: true } })
     .addCall({
         name: ['ConvictionVoting.vote', 'ConvictionVoting.delegate', 'ConvictionVoting.undelegate', 'ConvictionVoting.remove_vote', 'ConvictionVoting.remove_other_vote', 'Bounties.accept_curator',
