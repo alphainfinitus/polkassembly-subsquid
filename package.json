@@ -10,12 +10,12 @@
     "db:create-migration": "npx squid-typeorm-migration generate",
     "processor:start": "node lib/processor.js",
     "query-node:start": "squid-graphql-server --subscriptions --max-response-size 10000 --dumb-cache in-memory --dumb-cache-ttl 1000 --dumb-cache-size 100 --dumb-cache-max-age 1000",
-    "api:bump": "npm i @subsquid/substrate-typegen@latest @subsquid/substrate-metadata-explorer@latest @subsquid/substrate-processor@latest @subsquid/typeorm-migration@latest @subsquid/typeorm-store@latest @subsquid/typeorm-codegen@latest @subsquid/archive-registry@latest @subsquid/graphql-server@latest @subsquid/ss58@latest"
+    "api:bump": "npm i @subsquid/frontier@latest @subsquid/substrate-typegen@latest @subsquid/substrate-metadata-explorer@latest @subsquid/substrate-processor@latest @subsquid/typeorm-migration@latest @subsquid/typeorm-store@latest @subsquid/typeorm-codegen@latest @subsquid/archive-registry@latest @subsquid/graphql-server@latest @subsquid/ss58@latest"
   },
   "dependencies": {
     "@ethersproject/abi": "^5.7.0",
     "@subsquid/archive-registry": "^3.3.2",
-    "@subsquid/frontier": "^4.0.1",
+    "@subsquid/frontier": "^4.0.4",
     "@subsquid/graphql-server": "^4.11.0",
     "@subsquid/ss58": "^2.0.2",
     "@subsquid/substrate-data": "^4.4.0",
