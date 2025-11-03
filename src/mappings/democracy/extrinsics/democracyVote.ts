@@ -99,9 +99,8 @@ export async function handleVote(ctx: ProcessorContext<Store>,
         lockPeriod = vote.value < 128 ? vote.value : vote.value - 128
         if (lockPeriod === 0 && vote.balance) {
             votingPower = vote.balance / BigInt(10)
-        }
-        else {
-            votingPower = lockPeriod && vote.balance ? (vote.balance) * BigInt(lockPeriod) : BigInt(0)
+        } else {
+            votingPower = lockPeriod && vote.balance ? vote.balance * BigInt(lockPeriod) : BigInt(0)
         }
 
     }
@@ -143,7 +142,7 @@ export async function handleVote(ctx: ProcessorContext<Store>,
     })
 
     if ([VoteDecision.yes, VoteDecision.no].includes(decision)) {
-        const { delegatedVotesNested, delegatedVotePower, flattenedVotesNested } = await addDelegatedVotesReferendum(ctx, header.height, header.timestamp, nestedDelegations, convictionVote, proposal)
+        const { delegatedVotesNested, delegatedVotePower, flattenedVotesNested } = await addDelegatedVotesReferendum(ctx, header.height, header.timestamp, nestedDelegations, convictionVote)
         convictionVote.delegatedVotingPower = convictionVote.delegatedVotingPower ? convictionVote.delegatedVotingPower + delegatedVotePower : delegatedVotePower
         convictionVote.totalVotingPower = votingPower + convictionVote.delegatedVotingPower
         convictionDelegatedVotes.push(...delegatedVotesNested)
@@ -159,5 +158,6 @@ export async function handleVote(ctx: ProcessorContext<Store>,
         address: item.origin ? getOriginAccountId(item.origin) : '',
         proposalIndex: proposal.index?.toString(),
         proposalType: ProposalType.DemocracyProposal,
+        blockTimestamp: new Date(header.timestamp)
     })
 }

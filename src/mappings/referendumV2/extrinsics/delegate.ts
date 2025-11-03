@@ -97,7 +97,7 @@ export async function handleDelegate(ctx: ProcessorContext<Store>,
                     } else {
                         votingPower = balance ? BigInt(lockPeriod) * balance : BigInt(0)
                     }
-                    const { delegatedVotesNested, delegatedVotePower, flattenedVotesNested } = await addDelegatedVotesReferendumV2(ctx, header.height, header.timestamp, nestedDelegations, vote, referendum)
+                    const { delegatedVotesNested, delegatedVotePower, flattenedVotesNested } = await addDelegatedVotesReferendumV2(ctx, header.height, header.timestamp, nestedDelegations, vote)
                     delegatedVotes.push(
                         new ConvictionDelegatedVotes({
                             id: randomUUID(),
@@ -150,6 +150,7 @@ export async function handleDelegate(ctx: ProcessorContext<Store>,
     await sendGovEvent(ctx, {
         event: EGovEvent.DELEGATED,
         address: from,
-        addressTo: toWallet
+        addressTo: toWallet,
+        blockTimestamp: new Date(header.timestamp)
     })
 }

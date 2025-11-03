@@ -20,7 +20,7 @@ export async function handleUndelegate(ctx: ProcessorContext<Store>,
     const { track } = getUndelegateData(item)
     let delegation = null;
     const delegations = await ctx.store.find(VotingDelegation, { where: { from, endedAtBlock: IsNull(), track, type: DelegationType.OpenGov } })
-    if(delegations != undefined && delegations != null){
+    if (delegations != undefined && delegations != null) {
         if (delegations.length > 1) {
             ctx.log.warn(TooManyOpenDelegations(header.height, track, from))
         }
@@ -37,35 +37,39 @@ export async function handleUndelegate(ctx: ProcessorContext<Store>,
     for (let i = 0; i < ongoingReferenda.length; i++) {
         const referendum = ongoingReferenda[i]
         const wallets: string[] = []
-        if(!referendum || referendum.index == undefined || referendum.index == null){
+        if (!referendum || referendum.index == undefined || referendum.index == null) {
             continue
         }
-        if(delegation && referendum){
-            const votes = await ctx.store.find(ConvictionVote, { where: { voter: delegation.to, proposalIndex: referendum.index, removedAtBlock: IsNull(), type: VoteType.ReferendumV2 }})
-            if(votes){
+        if (delegation && referendum) {
+            const votes = await ctx.store.find(ConvictionVote, { where: { voter: delegation.to, proposalIndex: referendum.index, removedAtBlock: IsNull(), type: VoteType.ReferendumV2 } })
+            if (votes) {
                 if (votes.length > 1) {
                     ctx.log.warn(TooManyOpenVotes(header.height, referendum.index, from))
                 }
-                if(votes.length > 0){
+                if (votes.length > 0) {
                     const vote = votes[0]
-                    const delegatedVotes = await ctx.store.find(ConvictionDelegatedVotes, { where: { delegatedTo: {
-                            id: vote.id
-                        }, voter: from
-                    }})
-                    if (delegatedVotes){
-                        for(let j = 0; j < delegatedVotes?.length; j++){
+                    const delegatedVotes = await ctx.store.find(ConvictionDelegatedVotes, {
+                        where: {
+                            delegatedTo: {
+                                id: vote.id
+                            },
+                            voter: from
+                        }
+                    })
+                    if (delegatedVotes) {
+                        for (let j = 0; j < delegatedVotes?.length; j++) {
                             const delegatedVote = delegatedVotes[j]
-                            if(delegatedVote){
+                            if (delegatedVote) {
                                 delegatedVote.removedAtBlock = header.height
                                 delegatedVote.removedAt = new Date(header.timestamp)
-                                if (delegatedVote.voter){
+                                if (delegatedVote.voter) {
                                     wallets.push(delegatedVote.voter)
                                 }
                                 await ctx.store.save(delegatedVote)
-                                if(delegatedVote.votingPower && vote.totalVotingPower){
+                                if (delegatedVote.votingPower && vote.totalVotingPower) {
                                     vote.totalVotingPower -= delegatedVote.votingPower
                                 }
-                                if(delegatedVote.votingPower && vote.delegatedVotingPower){
+                                if (delegatedVote.votingPower && vote.delegatedVotingPower) {
                                     vote.delegatedVotingPower -= delegatedVote.votingPower
                                 }
                                 await ctx.store.save(vote)
@@ -83,6 +87,7 @@ export async function handleUndelegate(ctx: ProcessorContext<Store>,
     await sendGovEvent(ctx, {
         event: EGovEvent.UNDELEGATED,
         address: from,
-        addressTo: delegation?.to || ''
+        addressTo: delegation?.to || '',
+        blockTimestamp: new Date(header.timestamp)
     })
 }

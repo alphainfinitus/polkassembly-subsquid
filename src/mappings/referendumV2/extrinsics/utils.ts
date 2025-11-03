@@ -2,7 +2,7 @@ import { In, IsNull } from 'typeorm'
 import { Store } from '@subsquid/typeorm-store'
 
 import { TooManyOpenVotes } from '../../../common/errors'
-import { ConvictionDelegatedVotes, ConvictionVote, StandardVoteBalance, VoteType, VotingDelegation, FlattenedConvictionVotes, DelegationType, ProposalType, Proposal } from '../../../model'
+import { ConvictionDelegatedVotes, ConvictionVote, StandardVoteBalance, VoteType, VotingDelegation, FlattenedConvictionVotes, DelegationType, ProposalType } from '../../../model'
 import { randomUUID } from 'crypto'
 import { ProcessorContext } from '../../../processor'
 import { sendGovEvent } from '../../utils/proposals'
@@ -12,7 +12,7 @@ export function convictionToLockPeriod(conviction: string): number {
     return conviction === 'None' ? 0 : Number(conviction[conviction.search(/\d/)])
 }
 
-export async function addDelegatedVotesReferendumV2(ctx: ProcessorContext<Store>, block: number, blockTime: number, nestedDelegations: VotingDelegation[], convictionVote: ConvictionVote, proposal: Proposal): Promise<{ delegatedVotesNested: ConvictionDelegatedVotes[], delegatedVotePower: bigint, flattenedVotesNested: FlattenedConvictionVotes[] }> {
+export async function addDelegatedVotesReferendumV2(ctx: ProcessorContext<Store>, block: number, blockTime: number, nestedDelegations: VotingDelegation[], convictionVote: ConvictionVote): Promise<{ delegatedVotesNested: ConvictionDelegatedVotes[], delegatedVotePower: bigint, flattenedVotesNested: FlattenedConvictionVotes[] }> {
     let votingPower = BigInt(0)
     const delegatedVotes = [];
     let delegatedVotePower = BigInt(0)
@@ -52,7 +52,7 @@ export async function addDelegatedVotesReferendumV2(ctx: ProcessorContext<Store>
                 isDelegated: true,
                 delegatedTo: delegation.to,
                 proposalIndex: convictionVote.proposalIndex,
-                proposal: proposal,
+                proposal: convictionVote.proposal,
                 createdAtBlock: block,
                 removedAtBlock: null,
                 createdAt: new Date(blockTime),
@@ -145,6 +145,7 @@ export async function removeVote(ctx: ProcessorContext<Store>, wallet: string, p
         address: wallet,
         proposalIndex: proposalIndex.toString(),
         proposalType: ProposalType.ReferendumV2,
+        blockTimestamp: new Date(blockTime)
     })
 }
 

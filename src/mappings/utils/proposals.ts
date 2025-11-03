@@ -228,7 +228,8 @@ export async function updateProposalStatus(
             {
                 event: EGovEvent.PROPOSAL_ENDED,
                 proposalIndex: proposal.index?.toString() || '',
-                proposalType: type
+                proposalType: type,
+                blockTimestamp: new Date(header.timestamp)
             }
         )
         isGovEventSent = true;
@@ -241,6 +242,7 @@ export async function updateProposalStatus(
             address: options.data?.payee,
             proposalIndex: proposal.index?.toString(),
             proposalType: ProposalType.ChildBounty,
+            blockTimestamp: new Date(header.timestamp)
         })
         isGovEventSent = true;
     }
@@ -252,6 +254,7 @@ export async function updateProposalStatus(
             address: options.data?.decisionDeposit.who,
             proposalIndex: proposal.index?.toString(),
             proposalType: ProposalType.ReferendumV2,
+            blockTimestamp: new Date(header.timestamp)
         })
         isGovEventSent = true;
     }
@@ -261,6 +264,7 @@ export async function updateProposalStatus(
             event: EGovEvent.PROPOSAL_STATUS_UPDATED,
             proposalIndex: proposal.index?.toString() || '',
             proposalType: type,
+            blockTimestamp: new Date(header.timestamp)
         })
     }
 }
@@ -467,7 +471,8 @@ export async function createDemocracyProposal(
         event: EGovEvent.PROPOSAL_CREATED,
         address: proposer,
         proposalIndex: proposal.index?.toString() || '',
-        proposalType: type
+        proposalType: type,
+        blockTimestamp: new Date(header.timestamp)
     });
 
     return proposal
@@ -580,7 +585,8 @@ export async function createReferendum(ctx: ProcessorContext<Store>, header: any
         event: EGovEvent.PROPOSAL_CREATED,
         address: proposer || '',
         proposalIndex: proposal.index?.toString() || '',
-        proposalType: type
+        proposalType: type,
+        blockTimestamp: new Date(header.timestamp)
     });
 
     return proposal
@@ -790,7 +796,8 @@ export async function createTip(ctx: ProcessorContext<Store>, header: any, extri
         event: EGovEvent.PROPOSAL_CREATED,
         address: proposer,
         proposalIndex: proposal.index?.toString() || '',
-        proposalType: type
+        proposalType: type,
+        blockTimestamp: new Date(header.timestamp)
     });
 
     return proposal
@@ -841,6 +848,7 @@ export async function createBounty(ctx: ProcessorContext<Store>, header: any, ex
         address: proposer,
         proposalIndex: proposal.index?.toString(),
         proposalType: ProposalType.Bounty,
+        blockTimestamp: new Date(header.timestamp)
     })
 
     return proposal
@@ -891,6 +899,7 @@ export async function createChildBounty(ctx: ProcessorContext<Store>, header: an
         address: proposer,
         proposalIndex: proposal.index?.toString(),
         proposalType: ProposalType.ChildBounty,
+        blockTimestamp: new Date(header.timestamp)
     })
 
     return proposal
@@ -1192,7 +1201,8 @@ export async function createReferendumV2(ctx: ProcessorContext<Store>, header: a
         event: EGovEvent.PROPOSAL_CREATED,
         address: proposer,
         proposalIndex: proposal.index?.toString() || '',
-        proposalType: type
+        proposalType: type,
+        blockTimestamp: new Date(header.timestamp)
     });
 
     return proposal
@@ -1223,7 +1233,7 @@ export async function sendNotification(ctx: ProcessorContext<Store>, proposal: P
     let statusName = null
     // if difference between proposal update time and current time > 10 mins return
     if (proposal.updatedAt && (new Date().getTime() - proposal.updatedAt.getTime()) > 600000) {
-        ctx.log.info(`Proposal ${index || hash} updated more than 10 mins ago, skipping notification`)
+        ctx.log.debug(`Proposal ${index || hash} updated more than 10 mins ago, skipping notification`)
         return
     }
 
@@ -1280,7 +1290,7 @@ export async function sendNotification(ctx: ProcessorContext<Store>, proposal: P
         return
     }
 
-    ctx.log.info(`Sending notification with data ${JSON.stringify(notification)}`)
+    ctx.log.debug(`Sending notification with data ${JSON.stringify(notification)}`)
 
     const response = await fetch(NOTIFICATION_URL, {
         method: 'POST',
@@ -1292,7 +1302,7 @@ export async function sendNotification(ctx: ProcessorContext<Store>, proposal: P
         body: JSON.stringify(notification),
     })
 
-    ctx.log.info(`Notification response ${JSON.stringify(response)}`)
+    ctx.log.debug(`Notification response ${JSON.stringify(response)}`)
 
     if (response.status !== 200) {
         ctx.log.error(`Notification failed for proposal ${index || hash} with status ${response.status}`)
@@ -1307,15 +1317,26 @@ export async function sendGovEvent(
         address = '',
         proposalIndex = '',
         proposalType,
-        addressTo = ''
+        addressTo = '',
+        blockTimestamp
     }: {
         event: EGovEvent,
         address?: string,
         proposalIndex?: string
         proposalType?: ProposalType,
         addressTo?: string
+        blockTimestamp?: Date
     }
 ) {
+    // Skip sending events for blocks older than 10 minutes (historical sync)
+    if (blockTimestamp) {
+        const tenMinutesAgo = new Date().getTime() - 600000 // 10 minutes in milliseconds
+        if (blockTimestamp.getTime() < tenMinutesAgo) {
+            ctx.log.debug(`Block from ${blockTimestamp.toISOString()} is older than 10 minutes, skipping gov event notification`)
+            return
+        }
+    }
+
     if (!process.env.TOOLS_PASSPHRASE) {
         ctx.log.error(`TOOLS_PASSPHRASE enviroment variable not set`)
         return
@@ -1339,7 +1360,7 @@ export async function sendGovEvent(
 
         if (response.status !== 200) {
             ctx.log.error(`Failed to send gov event: ${event} for proposal index: ${proposalIndex} and proposal type: ${proposalType || ''} with address ${address}`)
-            ctx.log.info(`gov event api response: ${JSON.stringify(response)}`);
+            ctx.log.debug(`gov event api response: ${JSON.stringify(response)}`);
             return;
         }
     } catch (e) {

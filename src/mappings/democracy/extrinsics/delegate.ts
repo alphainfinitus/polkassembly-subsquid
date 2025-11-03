@@ -91,7 +91,7 @@ export async function handleDelegate(ctx: ProcessorContext<Store>,
                     } else {
                         votingPower = balance ? BigInt(lockPeriod) * balance : BigInt(0)
                     }
-                    const { delegatedVotesNested, delegatedVotePower, flattenedVotesNested } = await addDelegatedVotesReferendum(ctx, header.height, header.timestamp, nestedDelegations, vote, referendum)
+                    const { delegatedVotesNested, delegatedVotePower, flattenedVotesNested } = await addDelegatedVotesReferendum(ctx, header.height, header.timestamp, nestedDelegations, vote)
                     delegatedVotes.push(
                         new ConvictionDelegatedVotes({
                             id: randomUUID(),

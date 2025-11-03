@@ -103,13 +103,11 @@ export async function handleConvictionVote(ctx: ProcessorContext<Store>,
         lockPeriod = vote.value < 128 ? vote.value : vote.value - 128
         if (lockPeriod === 0 && vote.balance) {
             votingPower = vote.balance / BigInt(10)
-        }
-        else {
-            votingPower = lockPeriod && vote.balance ? (vote.balance) * BigInt(lockPeriod) : BigInt(0)
+        } else {
+            votingPower = lockPeriod && vote.balance ? vote.balance * BigInt(lockPeriod) : BigInt(0)
         }
 
-    }
-    else if (vote.type === 'SplitAbstain') {
+    } else if (vote.type === 'SplitAbstain') {
         balance = new SplitVoteBalance({
             aye: vote.aye,
             nay: vote.nay,
@@ -158,7 +156,7 @@ export async function handleConvictionVote(ctx: ProcessorContext<Store>,
     })
 
     if ([VoteDecision.yes, VoteDecision.no].includes(decision)) {
-        const { delegatedVotesNested, delegatedVotePower, flattenedVotesNested } = await addDelegatedVotesReferendumV2(ctx, header.height, header.timestamp, nestedDelegations, convictionVote, proposal)
+        const { delegatedVotesNested, delegatedVotePower, flattenedVotesNested } = await addDelegatedVotesReferendumV2(ctx, header.height, header.timestamp, nestedDelegations, convictionVote)
         convictionVote.delegatedVotingPower = convictionVote.delegatedVotingPower ? convictionVote.delegatedVotingPower + delegatedVotePower : delegatedVotePower
         convictionVote.totalVotingPower = votingPower + convictionVote.delegatedVotingPower
         convictionDelegatedVotes.push(...delegatedVotesNested)
@@ -175,6 +173,7 @@ export async function handleConvictionVote(ctx: ProcessorContext<Store>,
         address: item.origin ? getOriginAccountId(item.origin) : '',
         proposalIndex: index.toString(),
         proposalType: ProposalType.ReferendumV2,
+        blockTimestamp: new Date(header.timestamp)
     })
 
 }
