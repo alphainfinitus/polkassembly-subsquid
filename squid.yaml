@@ -1,8 +1,8 @@
 manifestVersion: subsquid.io/v0.1
-name: polkadot-polkassembly
-version: 2
+name: polkadot-assethub-unified-pa
+version: 3
 description: |-
-  Polkadot's governance proposals
+  Polkadot relay chain and Asset Hub governance proposals unified
 
 build:
 
@@ -17,7 +17,10 @@ deploy:
     - NOTIFICATION_API_KEY
     - TOOLS_PASSPHRASE
   processor:
-    cmd: [ "node", "lib/processor" ] 
+    - name: polkadot-processor
+      cmd: [ "sqd", "process:prod:polkadot" ]
+    - name: assethub-polkadot-processor
+      cmd: [ "sqd", "process:prod:assethub" ]
   api:
     cmd: [ "npx", "squid-graphql-server", "--subscriptions" ]
 

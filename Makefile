@@ -1,5 +1,8 @@
 process: migrate
-	@node -r dotenv/config lib/processor.js
+	@node -r dotenv/config lib/main.js polkadot
+
+process-assethub: migrate
+	@node -r dotenv/config lib/main.js assethub-polkadot
 
 
 build:
@@ -39,4 +42,4 @@ down:
 	@docker-compose down
 
 
-.PHONY: build serve process migrate codegen typegen up down
+.PHONY: build serve process process-assethub migrate codegen typegen up down
