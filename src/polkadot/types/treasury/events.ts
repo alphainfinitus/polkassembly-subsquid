@@ -3,6 +3,9 @@ import * as v0 from '../v0'
 import * as v25 from '../v25'
 import * as v9170 from '../v9170'
 import * as v9250 from '../v9250'
+import * as v1001002 from '../v1001002'
+import * as v1002000 from '../v1002000'
+import * as v1005001 from '../v1005001'
 
 export const proposed =  {
     name: 'Treasury.Proposed',
@@ -188,6 +191,52 @@ export const spendApproved =  {
             proposalIndex: sts.number(),
             amount: sts.bigint(),
             beneficiary: v9250.AccountId32,
+        })
+    ),
+}
+
+export const assetSpendApproved =  {
+    name: 'Treasury.AssetSpendApproved',
+    /**
+     * A new asset spend proposal has been approved.
+     */
+    v1001002: new EventType(
+        'Treasury.AssetSpendApproved',
+        sts.struct({
+            index: sts.number(),
+            assetKind: v1001002.VersionedLocatableAsset,
+            amount: sts.bigint(),
+            beneficiary: v1001002.VersionedMultiLocation,
+            validFrom: sts.number(),
+            expireAt: sts.number(),
+        })
+    ),
+    /**
+     * A new asset spend proposal has been approved.
+     */
+    v1002000: new EventType(
+        'Treasury.AssetSpendApproved',
+        sts.struct({
+            index: sts.number(),
+            assetKind: v1002000.VersionedLocatableAsset,
+            amount: sts.bigint(),
+            beneficiary: v1002000.VersionedLocation,
+            validFrom: sts.number(),
+            expireAt: sts.number(),
+        })
+    ),
+    /**
+     * A new asset spend proposal has been approved.
+     */
+    v1005001: new EventType(
+        'Treasury.AssetSpendApproved',
+        sts.struct({
+            index: sts.number(),
+            assetKind: v1005001.VersionedLocatableAsset,
+            amount: sts.bigint(),
+            beneficiary: v1005001.VersionedLocation,
+            validFrom: sts.number(),
+            expireAt: sts.number(),
         })
     ),
 }

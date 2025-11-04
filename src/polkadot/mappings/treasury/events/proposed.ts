@@ -47,3 +47,21 @@ export async function handleSpendApproved(ctx: ProcessorContext<Store>,
         payee: ss58codec.encode(beneficiary),
     })
 }
+
+export async function handleAssetSpendApproved(ctx: ProcessorContext<Store>,
+    item: Event,
+    header: any,
+    block?: any) {
+    try {
+        const { index, assetKind, amount, beneficiary, expireAt } = getAssetSpendApprovedData(item)
+        
+        await createOrUpdateTreasurySpend(ctx, header, index, {
+            beneficiary,
+            amount,
+            expireAt,
+            assetKind
+        }, block)
+    } catch (error) {
+        ctx.log.warn(`Error handling Treasury.AssetSpendApproved at block ${header.height}: ${error}`)
+    }
+}

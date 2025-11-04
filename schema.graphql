@@ -311,6 +311,21 @@ type VotingDelegation @entity {
   endedAtBlock: Int
 }
 
+type TreasurySpend @entity {
+  id: ID!
+  index: Int! @index
+  beneficiary: String @index
+  amount: BigInt!
+  expireAt: Int
+  expiresAt: DateTime
+  assetKind: JSON
+  proposal: Proposal
+  createdAtBlock: Int! @index
+  createdAt: DateTime! @index
+  updatedAtBlock: Int
+  updatedAt: DateTime
+}
+
 type CurveData @entity {
   id: ID!
   block: Int! @index
