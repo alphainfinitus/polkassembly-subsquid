@@ -5,7 +5,10 @@
     "node": ">=16"
   },
   "scripts": {
-    "build": "rm -rf lib && tsc",
+    "build": "rm -rf lib && tsc && tsc-alias",
+    "typegen:polkadot": "npx @subsquid/substrate-typegen typegen/typegen.polkadot.json",
+    "typegen:assethub": "npx @subsquid/substrate-typegen typegen/typegen.assethub.json",
+    "typegen": "npm run typegen:polkadot && npm run typegen:assethub",
     "db:migrate": "npx squid-typeorm-migration apply",
     "db:create-migration": "npx squid-typeorm-migration generate",
     "processor:start": "node lib/main.js polkadot",
@@ -31,6 +34,7 @@
     "@subsquid/typeorm-codegen": "^2.0.2",
     "@types/node": "18.11.18",
     "@types/node-fetch": "^2.6.4",
+    "tsc-alias": "^1.8.16",
     "typescript": "4.9.4"
   }
 }

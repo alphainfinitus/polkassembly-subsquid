@@ -1,0 +1,5 @@
+export {handleVote} from '@polkadot/mappings/democracy/extrinsics/democracyVote'
+export {handleDelegate} from '@polkadot/mappings/democracy/extrinsics/delegate'
+export {handleUndelegate} from '@polkadot/mappings/democracy/extrinsics/undelegate'
+export {handleRemoveVote} from '@polkadot/mappings/democracy/extrinsics/removeVote'
+export {handleRemoveOtherVote} from '@polkadot/mappings/democracy/extrinsics/removeOtherVote'

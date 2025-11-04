@@ -4,13 +4,22 @@
     "target": "es2020",
     "outDir": "lib",
     "rootDir": "src",
+    "baseUrl": ".",
     "strict": true,
     "declaration": false,
     "sourceMap": true,
     "esModuleInterop": true,
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
-    "skipLibCheck": true
+    "skipLibCheck": true,
+    "paths": {
+      "@src/*": ["./src/*"],
+      "@shared/*": ["./src/shared/*"],
+      "@polkadot/*": ["./src/polkadot/*"],
+      "@assethub/*": ["./src/assethub/*"],
+      "@model/*": ["./src/model/*"],
+      "@consts/*": ["./src/consts/*"]
+    }
   },
   "include": ["src"],
   "exclude": [

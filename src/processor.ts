@@ -1,7 +1,8 @@
 import { BlockHeader, DataHandlerContext, SubstrateBatchProcessor, SubstrateBatchProcessorFields, Event as _Event, Call as _Call, Extrinsic as _Extrinsic } from '@subsquid/substrate-processor'
-import * as modules from './mappings'
+import * as assethubModules from '@assethub/mappings'
+import * as polkadotModules from '@polkadot/mappings'
 import assert from 'assert'
-import { ChainConfig } from './chainConfig'
+import { ChainConfig } from '@src/chainConfig'
 
 export function createProcessor(config: ChainConfig) {
     //@ts-ignore ts(2589)
@@ -202,6 +203,8 @@ export function createProcessor(config: ChainConfig) {
 }
 
 export async function handleBlocks(ctx: any, config: ChainConfig) {
+    const modules = config.name === 'polkadot' ? polkadotModules : assethubModules
+
     for (let block of ctx.blocks) {
         let multisigOrigins = new Map<string, any>()
         for (let item of block.events) {
@@ -242,21 +245,21 @@ export async function handleBlocks(ctx: any, config: ChainConfig) {
         }
 
         for (let item of block.calls) {
-            if (config.hasDemocracy) {
+            if (config.hasDemocracy && config.name === 'polkadot') {
                 if (item.name == 'Democracy.vote') {
-                    await modules.democracy.extrinsics.handleVote(ctx, item, block.header)
+                    await polkadotModules.democracy.extrinsics.handleVote(ctx, item, block.header)
                 }
                 if (item.name == 'Democracy.remove_vote') {
-                    await modules.democracy.extrinsics.handleRemoveVote(ctx, item, block.header)
+                    await polkadotModules.democracy.extrinsics.handleRemoveVote(ctx, item, block.header)
                 }
                 if (item.name == 'Democracy.remove_other_vote') {
-                    await modules.democracy.extrinsics.handleRemoveOtherVote(ctx, item, block.header)
+                    await polkadotModules.democracy.extrinsics.handleRemoveOtherVote(ctx, item, block.header)
                 }
                 if (item.name == 'Democracy.delegate') {
-                    await modules.democracy.extrinsics.handleDelegate(ctx, item, block.header)
+                    await polkadotModules.democracy.extrinsics.handleDelegate(ctx, item, block.header)
                 }
                 if (item.name == 'Democracy.undelegate') {
-                    await modules.democracy.extrinsics.handleUndelegate(ctx, item, block.header)
+                    await polkadotModules.democracy.extrinsics.handleUndelegate(ctx, item, block.header)
                 }
             }
 
@@ -290,12 +293,12 @@ export async function handleBlocks(ctx: any, config: ChainConfig) {
                 }
             }
 
-            if (config.hasTreasury && config.hasDemocracy) {
+            if (config.hasTreasury && config.hasDemocracy && config.name === 'polkadot') {
                 if (item.name == 'Treasury.accept_curator') {
-                    await modules.bounties.extrinsic.handleAcceptCuratorOld(ctx, item, block.header)
+                    await polkadotModules.bounties.extrinsic.handleAcceptCuratorOld(ctx, item, block.header)
                 }
                 if (item.name == 'Treasury.unassign_curator') {
-                    await modules.bounties.extrinsic.handleUnassignCuratorOld(ctx, item, block.header)
+                    await polkadotModules.bounties.extrinsic.handleUnassignCuratorOld(ctx, item, block.header)
                 }
             }
 
@@ -311,161 +314,161 @@ export async function handleBlocks(ctx: any, config: ChainConfig) {
                 }
             }
 
-            if (config.hasTips) {
+            if (config.hasTips && config.name === 'polkadot') {
                 if (item.name == 'Tips.tip') {
-                    await modules.tips.extrinsics.handleNewTipValue(ctx, item, block.header)
+                    await polkadotModules.tips.extrinsics.handleNewTipValue(ctx, item, block.header)
                 }
                 if (config.hasDemocracy && item.name == 'Treasury.tip') {
-                    await modules.tips.extrinsics.handleNewTipValueOld(ctx, item, block.header)
+                    await polkadotModules.tips.extrinsics.handleNewTipValueOld(ctx, item, block.header)
                 }
             }
         }
 
         for (let item of block.events) {
-            if (config.hasDemocracy) {
+            if (config.hasDemocracy && config.name === 'polkadot') {
                 if (item.name == 'Democracy.Proposed') {
-                    await modules.democracy.events.handleProposed(ctx, item, block.header)
+                    await polkadotModules.democracy.events.handleProposed(ctx, item, block.header)
                 }
                 if (item.name == 'Democracy.Tabled') {
-                    await modules.democracy.events.handleTabled(ctx, item, block.header)
+                    await polkadotModules.democracy.events.handleTabled(ctx, item, block.header)
                 }
                 if (item.name == 'Democracy.Started') {
-                    await modules.democracy.events.handleStarted(ctx, item, block.header)
+                    await polkadotModules.democracy.events.handleStarted(ctx, item, block.header)
                 }
                 if (item.name == 'Democracy.Passed') {
-                    await modules.democracy.events.handlePassed(ctx, item, block.header)
+                    await polkadotModules.democracy.events.handlePassed(ctx, item, block.header)
                 }
                 if (item.name == 'Democracy.NotPassed') {
-                    await modules.democracy.events.handleNotPassed(ctx, item, block.header)
+                    await polkadotModules.democracy.events.handleNotPassed(ctx, item, block.header)
                 }
                 if (item.name == 'Democracy.Cancelled') {
-                    await modules.democracy.events.handleCancelled(ctx, item, block.header)
+                    await polkadotModules.democracy.events.handleCancelled(ctx, item, block.header)
                 }
                 if (item.name == 'Democracy.Executed') {
-                    await modules.democracy.events.handleExecuted(ctx, item, block.header)
+                    await polkadotModules.democracy.events.handleExecuted(ctx, item, block.header)
                 }
                 if (item.name == 'Democracy.Seconded') {
-                    await modules.democracy.events.handleDemocracySeconds(ctx, item, block.header)
+                    await polkadotModules.democracy.events.handleDemocracySeconds(ctx, item, block.header)
                 }
                 if (item.name == 'Democracy.PreimageNoted') {
-                    await modules.democracy.events.handlePreimageNoted(ctx, item, block.header)
+                    await polkadotModules.democracy.events.handlePreimageNoted(ctx, item, block.header)
                 }
                 if (item.name == 'Democracy.PreimageUsed') {
-                    await modules.democracy.events.handlePreimageUsed(ctx, item, block.header)
+                    await polkadotModules.democracy.events.handlePreimageUsed(ctx, item, block.header)
                 }
                 if (item.name == 'Democracy.PreimageInvalid') {
-                    await modules.democracy.events.handlePreimageInvalid(ctx, item, block.header)
+                    await polkadotModules.democracy.events.handlePreimageInvalid(ctx, item, block.header)
                 }
                 if (item.name == 'Democracy.PreimageMissing') {
-                    await modules.democracy.events.handlePreimageMissing(ctx, item, block.header)
+                    await polkadotModules.democracy.events.handlePreimageMissing(ctx, item, block.header)
                 }
                 if (item.name == 'Democracy.PreimageReaped') {
-                    await modules.democracy.events.handlePreimageReaped(ctx, item, block.header)
+                    await polkadotModules.democracy.events.handlePreimageReaped(ctx, item, block.header)
                 }
             }
 
-            if (config.hasCouncil) {
+            if (config.hasCouncil && config.name === 'polkadot') {
                 if (item.name == 'Council.Proposed') {
-                    await modules.council.events.handleProposed(ctx, item, block.header)
+                    await polkadotModules.council.events.handleProposed(ctx, item, block.header)
                 }
                 if (item.name == 'Council.Voted') {
-                    await modules.council.events.handleVoted(ctx, item, block.header)
+                    await polkadotModules.council.events.handleVoted(ctx, item, block.header)
                 }
                 if (item.name == 'Council.Closed') {
-                    await modules.council.events.handleClosed(ctx, item, block.header)
+                    await polkadotModules.council.events.handleClosed(ctx, item, block.header)
                 }
                 if (item.name == 'Council.Disapproved') {
-                    await modules.council.events.handleDisapproved(ctx, item, block.header)
+                    await polkadotModules.council.events.handleDisapproved(ctx, item, block.header)
                 }
                 if (item.name == 'Council.Executed') {
-                    await modules.council.events.handleExecuted(ctx, item, block.header)
+                    await polkadotModules.council.events.handleExecuted(ctx, item, block.header)
                 }
                 if (item.name == 'Council.Approved') {
-                    await modules.council.events.handleApproved(ctx, item, block.header)
+                    await polkadotModules.council.events.handleApproved(ctx, item, block.header)
                 }
             }
 
-            if (config.hasTechnicalCommittee) {
+            if (config.hasTechnicalCommittee && config.name === 'polkadot') {
                 if (item.name == 'TechnicalCommittee.Proposed') {
-                    await modules.techComittee.events.handleProposed(ctx, item, block.header)
+                    await polkadotModules.techComittee.events.handleProposed(ctx, item, block.header)
                 }
                 if (item.name == 'TechnicalCommittee.Approved') {
-                    await modules.techComittee.events.handleApproved(ctx, item, block.header)
+                    await polkadotModules.techComittee.events.handleApproved(ctx, item, block.header)
                 }
                 if (item.name == 'TechnicalCommittee.Disapproved') {
-                    await modules.techComittee.events.handleDisapproved(ctx, item, block.header)
+                    await polkadotModules.techComittee.events.handleDisapproved(ctx, item, block.header)
                 }
                 if (item.name == 'TechnicalCommittee.Closed') {
-                    await modules.techComittee.events.handleClosed(ctx, item, block.header)
+                    await polkadotModules.techComittee.events.handleClosed(ctx, item, block.header)
                 }
                 if (item.name == 'TechnicalCommittee.Voted') {
-                    await modules.techComittee.events.handleVoted(ctx, item, block.header)
+                    await polkadotModules.techComittee.events.handleVoted(ctx, item, block.header)
                 }
                 if (item.name == 'TechnicalCommittee.Executed') {
-                    await modules.techComittee.events.handleExecuted(ctx, item, block.header)
+                    await polkadotModules.techComittee.events.handleExecuted(ctx, item, block.header)
                 }
             }
 
             if (config.hasTreasury) {
-                if (item.name == 'Treasury.Proposed') {
-                    await modules.treasury.events.handleProposed(ctx, item, block.header)
+                if (item.name == 'Treasury.Proposed' && config.name === 'polkadot') {
+                    await polkadotModules.treasury.events.handleProposed(ctx, item, block.header)
                 }
                 if (item.name == 'Treasury.Awarded') {
                     await modules.treasury.events.handleAwarded(ctx, item, block.header)
                 }
-                if (item.name == 'Treasury.Rejected') {
-                    await modules.treasury.events.handleRejected(ctx, item, block.header)
+                if (item.name == 'Treasury.Rejected' && config.name === 'polkadot') {
+                    await polkadotModules.treasury.events.handleRejected(ctx, item, block.header)
                 }
                 if (item.name == 'Treasury.SpendApproved') {
                     await modules.treasury.events.handleSpendApproved(ctx, item, block.header)
                 }
 
-                if (config.hasDemocracy) {
+                if (config.hasDemocracy && config.name === 'polkadot') {
                     if (item.name == 'Treasury.BountyProposed') {
-                        await modules.bounties.events.handleProposedOld(ctx, item, block.header)
+                        await polkadotModules.bounties.events.handleProposedOld(ctx, item, block.header)
                     }
                     if (item.name == 'Treasury.BountyRejected') {
-                        await modules.bounties.events.handleRejectedOld(ctx, item, block.header)
+                        await polkadotModules.bounties.events.handleRejectedOld(ctx, item, block.header)
                     }
                     if (item.name == 'Treasury.BountyBecameActive') {
-                        await modules.bounties.events.handleBecameActiveOld(ctx, item, block.header)
+                        await polkadotModules.bounties.events.handleBecameActiveOld(ctx, item, block.header)
                     }
                     if (item.name == 'Treasury.BountyAwarded') {
-                        await modules.bounties.events.handleAwardedOld(ctx, item, block.header)
+                        await polkadotModules.bounties.events.handleAwardedOld(ctx, item, block.header)
                     }
                     if (item.name == 'Treasury.BountyClaimed') {
-                        await modules.bounties.events.handleClaimedOld(ctx, item, block.header)
+                        await polkadotModules.bounties.events.handleClaimedOld(ctx, item, block.header)
                     }
                     if (item.name == 'Treasury.BountyCanceled') {
-                        await modules.bounties.events.handleCanceledOld(ctx, item, block.header)
+                        await polkadotModules.bounties.events.handleCanceledOld(ctx, item, block.header)
                     }
                     if (item.name == 'Treasury.BountyExtended') {
-                        await modules.bounties.events.handleExtendedOld(ctx, item, block.header)
+                        await polkadotModules.bounties.events.handleExtendedOld(ctx, item, block.header)
                     }
                     if (item.name == 'Treasury.NewTip') {
-                        await modules.tips.events.handleNewTipOld(ctx, item, block.header)
+                        await polkadotModules.tips.events.handleNewTipOld(ctx, item, block.header)
                     }
                     if (item.name == 'Treasury.TipRetracted') {
-                        await modules.tips.events.handleRetractedOld(ctx, item, block.header)
+                        await polkadotModules.tips.events.handleRetractedOld(ctx, item, block.header)
                     }
                     if (item.name == 'Treasury.TipClosed') {
-                        await modules.tips.events.handleClosedOld(ctx, item, block.header)
+                        await polkadotModules.tips.events.handleClosedOld(ctx, item, block.header)
                     }
                 }
             }
 
-            if (config.hasTips) {
+            if (config.hasTips && config.name === 'polkadot') {
                 if (item.name == 'Tips.TipClosed') {
-                    await modules.tips.events.handleClosed(ctx, item, block.header)
+                    await polkadotModules.tips.events.handleClosed(ctx, item, block.header)
                 }
                 if (item.name == 'Tips.NewTip') {
-                    await modules.tips.events.handleNewTip(ctx, item, block.header)
+                    await polkadotModules.tips.events.handleNewTip(ctx, item, block.header)
                 }
                 if (item.name == 'Tips.TipRetracted') {
-                    await modules.tips.events.handleRetracted(ctx, item, block.header)
+                    await polkadotModules.tips.events.handleRetracted(ctx, item, block.header)
                 }
                 if (item.name == 'Tips.TipSlashed') {
-                    await modules.tips.events.handleSlashed(ctx, item, block.header)
+                    await polkadotModules.tips.events.handleSlashed(ctx, item, block.header)
                 }
             }
 

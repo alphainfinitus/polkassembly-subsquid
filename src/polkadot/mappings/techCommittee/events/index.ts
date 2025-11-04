@@ -1,0 +1,6 @@
+export { handleProposed } from '@polkadot/mappings/techCommittee/events/proposed'
+export { handleExecuted } from '@polkadot/mappings/techCommittee/events/executed'
+export { handleApproved } from '@polkadot/mappings/techCommittee/events/approved'
+export { handleClosed } from '@polkadot/mappings/techCommittee/events/closed'
+export { handleDisapproved } from '@polkadot/mappings/techCommittee/events/disapproved'
+export { handleVoted } from '@polkadot/mappings/techCommittee/events/voted'

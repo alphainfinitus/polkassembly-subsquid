@@ -1,6 +1,6 @@
 manifestVersion: subsquid.io/v0.1
 name: polkadot-assethub-unified-pa
-version: 1
+version: 2
 description: |-
   Polkadot relay chain and Asset Hub governance proposals unified
 

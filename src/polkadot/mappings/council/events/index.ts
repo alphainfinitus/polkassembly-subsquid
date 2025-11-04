@@ -1,0 +1,6 @@
+export { handleProposed } from '@polkadot/mappings/council/events/proposed'
+export { handleExecuted } from '@polkadot/mappings/council/events/executed'
+export { handleApproved } from '@polkadot/mappings/council/events/approved'
+export { handleClosed } from '@polkadot/mappings/council/events/closed'
+export { handleDisapproved } from '@polkadot/mappings/council/events/disapproved'
+export { handleVoted } from '@polkadot/mappings/council/events/voted'

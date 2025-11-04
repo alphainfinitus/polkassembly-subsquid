@@ -1,0 +1,7 @@
+export { handleNewTip } from '@polkadot/mappings/tips/events/newTip'
+export { handleSlashed } from '@polkadot/mappings/tips/events/slashed'
+export { handleClosed } from '@polkadot/mappings/tips/events/closed'
+export { handleRetracted } from '@polkadot/mappings/tips/events/retracted'
+export { handleNewTipOld } from '@polkadot/mappings/tips/events/newTip'
+export { handleClosedOld } from '@polkadot/mappings/tips/events/closed'
+export { handleRetractedOld } from '@polkadot/mappings/tips/events/retracted'

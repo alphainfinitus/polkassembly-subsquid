@@ -8,7 +8,7 @@
     "build": {
       "description": "Build the squid project",
       "deps": ["clean"],
-      "cmd": ["tsc"]
+      "cmd": ["sh", "-c", "tsc && tsc-alias"]
     },
     "up": {
       "description": "Start a PG database",
@@ -29,6 +29,22 @@
     "migration:clean": {
       "description": "Clean the DB migrations",
       "cmd": ["npx", "--yes", "rimraf", "./db/migrations"]
+    },
+    "typegen:polkadot": {
+      "description": "Generate Polkadot runtime type definitions",
+      "cmd": ["npx", "@subsquid/substrate-typegen", "typegen/typegen.polkadot.json"]
+    },
+    "typegen:assethub": {
+      "description": "Generate AssetHub runtime type definitions",
+      "cmd": ["npx", "@subsquid/substrate-typegen", "typegen/typegen.assethub.json"]
+    },
+    "typegen": {
+      "description": "Generate type definitions for both Polkadot and AssetHub",
+      "cmd": ["npm", "run", "typegen"]
+    },
+    "codegen": {
+      "description": "Generate the code for the model",
+      "cmd": ["npx", "squid-typeorm-codegen"]
     },
     "process:polkadot": {
       "description": "Load .env and start the Polkadot processor",

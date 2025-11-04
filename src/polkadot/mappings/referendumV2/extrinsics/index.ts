@@ -1,0 +1,5 @@
+export {handleConvictionVote} from '@polkadot/mappings/referendumV2/extrinsics/convictionVoting'
+export {handleDelegate} from '@polkadot/mappings/referendumV2/extrinsics/delegate'
+export {handleUndelegate} from '@polkadot/mappings/referendumV2/extrinsics/undelegate'
+export {handleRemoveVote} from '@polkadot/mappings/referendumV2/extrinsics/removeVote'
+export {handleRemoveOtherVote} from '@polkadot/mappings/referendumV2/extrinsics/removeOtherVote'

@@ -1,6 +1,7 @@
+import 'dotenv/config'
 import { TypeormDatabase } from '@subsquid/typeorm-store'
-import { getChainConfig } from './chainConfig'
-import { createProcessor, handleBlocks } from './processor'
+import { getChainConfig } from '@src/chainConfig'
+import { createProcessor, handleBlocks } from '@src/processor'
 
 const chainName = process.argv[2]
 
