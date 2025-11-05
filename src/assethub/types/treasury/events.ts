@@ -30,3 +30,22 @@ export const spendApproved =  {
         })
     ),
 }
+
+export const assetSpendApproved =  {
+    name: 'Treasury.AssetSpendApproved',
+    /**
+     * A new asset spend proposal has been approved.
+     * Note: Types for VersionedLocatableAsset and VersionedLocation will be available after running typegen
+     */
+    v2000000: new EventType(
+        'Treasury.AssetSpendApproved',
+        sts.struct({
+            index: sts.number(),
+            assetKind: sts.any(), // Will be VersionedLocatableAsset after typegen
+            amount: sts.bigint(),
+            beneficiary: sts.any(), // Will be VersionedLocation after typegen
+            validFrom: sts.number(),
+            expireAt: sts.number(),
+        })
+    ),
+}

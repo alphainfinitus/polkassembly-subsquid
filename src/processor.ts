@@ -36,7 +36,6 @@ export function createProcessor(config: ChainConfig) {
     }
 
     if (config.hasTreasury) {
-        calls.push('Treasury.spend')
         if (config.hasDemocracy) {
             calls.push(
                 'Treasury.accept_curator',
@@ -326,16 +325,6 @@ export async function handleBlocks(ctx: any, config: ChainConfig) {
                     await polkadotModules.tips.extrinsics.handleNewTipValueOld(ctx, item, block.header)
                 }
             }
-
-            if (config.hasTreasury) {
-                if (item.name == 'Treasury.spend') {
-                    if (config.name === 'polkadot') {
-                        await polkadotModules.treasury.extrinsics.handleSpend(ctx, item, block.header)
-                    } else if (config.name === 'assethub-polkadot') {
-                        await assethubModules.treasury.extrinsics.handleSpend(ctx, item, block.header)
-                    }
-                }
-            }
         }
 
         for (let item of block.events) {
@@ -436,8 +425,12 @@ export async function handleBlocks(ctx: any, config: ChainConfig) {
                 if (item.name == 'Treasury.SpendApproved') {
                     await modules.treasury.events.handleSpendApproved(ctx, item, block.header)
                 }
-                if (item.name == 'Treasury.AssetSpendApproved' && config.name === 'polkadot') {
-                    await polkadotModules.treasury.events.handleAssetSpendApproved(ctx, item, block.header, block)
+                if (item.name == 'Treasury.AssetSpendApproved') {
+                    if (config.name === 'polkadot') {
+                        await polkadotModules.treasury.events.handleAssetSpendApproved(ctx, item, block.header, block)
+                    } else if (config.name === 'assethub-polkadot') {
+                        await modules.treasury.events.handleAssetSpendApproved(ctx, item, block.header, block)
+                    }
                 }
 
                 if (config.hasDemocracy && config.name === 'polkadot') {

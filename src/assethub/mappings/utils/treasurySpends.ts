@@ -1,7 +1,7 @@
 import { Store } from '@subsquid/typeorm-store'
 import { ProcessorContext } from '@src/processor'
-import { ss58codec } from '@polkadot/common/tools'
-import { getAwarderData } from '@polkadot/mappings/treasury/events/getters'
+import { ss58codec } from '@assethub/common/tools'
+import { getAwarderData } from '@assethub/mappings/treasury/events/getters'
 import { createOrUpdateTreasurySpend as sharedCreateOrUpdateTreasurySpend } from '@shared/treasurySpends'
 
 export async function createOrUpdateTreasurySpend(
@@ -21,3 +21,4 @@ export async function createOrUpdateTreasurySpend(
         block
     )
 }
+
