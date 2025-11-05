@@ -202,42 +202,59 @@ export async function createOrUpdateTreasurySpend(
             proposal = foundProposal || null
         }
         
-        // Strategy 2: Match by beneficiary and amount (look back further)
-        if (!proposal && beneficiary) {
-            const spendAmount = BigInt(spendData.amount || 0)
+        // Strategy 2: Match by execution block and track
+        // AssetSpendApproved events are typically triggered by Gov2 referenda execution
+        // Match proposals executed at the same block with matching track
+        if (!proposal) {
+            const executionBlock = header.height
+            const blockRange = 10 // Allow matching within 10 blocks of execution
             
-            // Find all treasury proposals with matching beneficiary
-            const allMatchingProposals = await ctx.store.find(Proposal, {
-                where: {
-                    type: ProposalType.TreasuryProposal,
-                    payee: beneficiary
-                },
+            // Query for proposals executed around the spend block
+            // First try exact block match, then expand to range
+            const allCandidates = await ctx.store.find(Proposal, {
+                where: [
+                    {
+                        type: ProposalType.ReferendumV2,
+                        executeAtBlockNumber: executionBlock
+                    },
+                    {
+                        type: ProposalType.TreasuryProposal,
+                        executeAtBlockNumber: executionBlock
+                    }
+                ],
                 order: {
-                    updatedAtBlock: 'DESC'
+                    executeAtBlockNumber: 'DESC'
                 },
-                take: 50 // Increased to search more proposals
+                take: 50
             })
             
-            // First, try to match by amount (within 1% tolerance)
-            if (spendAmount > 0) {
-                for (const candidate of allMatchingProposals) {
-                    if (candidate.reward) {
-                        const amountDiff = candidate.reward > spendAmount 
-                            ? candidate.reward - spendAmount 
-                            : spendAmount - candidate.reward
-                        const tolerance = spendAmount / BigInt(100) // 1% tolerance
-                        
-                        if (amountDiff <= tolerance) {
-                            proposal = candidate
-                            break
-                        }
-                    }
-                }
-            }
+            // Filter to proposals executed within block range
+            const candidatesInRange = allCandidates.filter(p => {
+                if (!p.executeAtBlockNumber) return false
+                const blockDiff = Math.abs(p.executeAtBlockNumber - executionBlock)
+                return blockDiff <= blockRange
+            })
             
-            // Final fallback: match by beneficiary only (most recent, regardless of amount)
-            if (!proposal && allMatchingProposals.length > 0) {
-                proposal = allMatchingProposals[0]
+            if (candidatesInRange.length > 0) {
+                // Prefer exact block match first
+                const exactMatches = candidatesInRange.filter(p => p.executeAtBlockNumber === executionBlock)
+                const candidates = exactMatches.length > 0 ? exactMatches : candidatesInRange
+                
+                // If we have beneficiary, prefer matching by beneficiary
+                if (beneficiary) {
+                    const beneficiaryMatch = candidates.find(p => p.payee === beneficiary)
+                    if (beneficiaryMatch) {
+                        proposal = beneficiaryMatch
+                    } else {
+                        // Fallback to proposal with track number (most specific)
+                        proposal = candidates.find(c => c.trackNumber !== null && c.trackNumber !== undefined)
+                            || candidates[0]
+                    }
+                } else {
+                    // No beneficiary, prefer proposal with track number
+                    proposal = candidates.find(c => c.trackNumber !== null && c.trackNumber !== undefined)
+                        || candidates[0]
+                }
             }
         }
 
