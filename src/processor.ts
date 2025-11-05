@@ -425,8 +425,8 @@ export async function handleBlocks(ctx: any, config: ChainConfig) {
                 if (item.name == 'Treasury.SpendApproved') {
                     await modules.treasury.events.handleSpendApproved(ctx, item, block.header)
                 }
-                if (item.name == 'Treasury.AssetSpendApproved') {
-                    await modules.treasury.events.handleAssetSpendApproved(ctx, item, block.header, block)
+                if (item.name == 'Treasury.AssetSpendApproved' && config.name === 'polkadot') {
+                    await polkadotModules.treasury.events.handleAssetSpendApproved(ctx, item, block.header, block)
                 }
 
                 if (config.hasDemocracy && config.name === 'polkadot') {

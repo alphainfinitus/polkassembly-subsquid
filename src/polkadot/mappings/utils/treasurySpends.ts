@@ -1,10 +1,10 @@
 import { randomUUID } from 'node:crypto'
 import { Store } from '@subsquid/typeorm-store'
-import { ProcessorContext } from '../../processor'
-import { ss58codec } from '../../common/tools'
+import { ProcessorContext } from '@src/processor'
+import { ss58codec } from '@polkadot/common/tools'
 import { decodeHex } from '@subsquid/util-internal-hex'
-import { TreasurySpend, Proposal, ProposalType } from '../../model'
-import { getAwarderData } from '../treasury/events/getters'
+import { TreasurySpend, Proposal, ProposalType } from '@model/index'
+import { getAwarderData } from '@polkadot/mappings/treasury/events/getters'
 
 function extractAccountIdFromMultiAddress(multiAddress: any): Uint8Array | null {
     if (!multiAddress || typeof multiAddress !== 'object') {

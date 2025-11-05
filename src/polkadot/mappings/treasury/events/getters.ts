@@ -1,5 +1,5 @@
 import { UnknownVersionError } from '@shared/errors'
-import { awarded, proposed, rejected, spendApproved } from '@polkadot/types/treasury/events'
+import { awarded, proposed, rejected, spendApproved, assetSpendApproved } from '@polkadot/types/treasury/events'
 import { Event } from '@src/processor'
 interface ProposedData {
     index: number
