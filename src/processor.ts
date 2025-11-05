@@ -36,6 +36,7 @@ export function createProcessor(config: ChainConfig) {
     }
 
     if (config.hasTreasury) {
+        calls.push('Treasury.spend')
         if (config.hasDemocracy) {
             calls.push(
                 'Treasury.accept_curator',
@@ -323,6 +324,16 @@ export async function handleBlocks(ctx: any, config: ChainConfig) {
                 }
                 if (config.hasDemocracy && item.name == 'Treasury.tip') {
                     await polkadotModules.tips.extrinsics.handleNewTipValueOld(ctx, item, block.header)
+                }
+            }
+
+            if (config.hasTreasury) {
+                if (item.name == 'Treasury.spend') {
+                    if (config.name === 'polkadot') {
+                        await polkadotModules.treasury.extrinsics.handleSpend(ctx, item, block.header)
+                    } else if (config.name === 'assethub-polkadot') {
+                        await assethubModules.treasury.extrinsics.handleSpend(ctx, item, block.header)
+                    }
                 }
             }
         }
