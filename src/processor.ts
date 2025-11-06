@@ -149,7 +149,10 @@ export function createProcessor(config: ChainConfig) {
             'Treasury.Awarded',
             'Treasury.Rejected',
             'Treasury.SpendApproved',
-            'Treasury.AssetSpendApproved'
+            'Treasury.AssetSpendApproved',
+            'Treasury.Paid',
+            'Treasury.AssetSpendVoided',
+            'Treasury.SpendProcessed'
         )
 
         if (config.hasDemocracy) {

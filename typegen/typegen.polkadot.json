@@ -29,7 +29,7 @@
     },
     "Treasury": {
       "events": [
-        "Proposed", "Awarded", "Rejected", "SpendApproved", "AssetSpendApproved", "NewTip", "TipClosed", "TipRetracted", "TipSlashed", "BountyProposed", "BountyRejected", "BountyBecameActive", "BountyAwarded", "BountyCanceled", "BountyClaimed",
+        "Proposed", "Awarded", "Rejected", "SpendApproved", "AssetSpendApproved", "Paid", "AssetSpendVoided", "SpendProcessed", "NewTip", "TipClosed", "TipRetracted", "TipSlashed", "BountyProposed", "BountyRejected", "BountyBecameActive", "BountyAwarded", "BountyCanceled", "BountyClaimed",
         "BountyExtended"
       ],
       "calls": ["tip", "accept_curator", "unassign_curator"],
