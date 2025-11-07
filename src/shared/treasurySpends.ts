@@ -2,7 +2,7 @@ import { randomUUID } from 'node:crypto'
 import { Store } from '@subsquid/typeorm-store'
 import { ProcessorContext } from '@src/processor'
 import { decodeHex } from '@subsquid/util-internal-hex'
-import { TreasurySpend, Proposal, ProposalType } from '@model/index'
+import { TreasurySpend, Proposal, ProposalType, ProposalStatus } from '@model/index'
 
 interface SS58Codec {
     encode(bytes: Uint8Array): string
@@ -176,85 +176,68 @@ export async function createOrUpdateTreasurySpend(
         let proposal: Proposal | null = null
         let proposalIndex: number | null = null
         
-        // Strategy 1: Look for Treasury.Awarded events in the same block
-        if (block?.events) {
-            for (const event of block.events) {
-                if (event.name === 'Treasury.Awarded') {
-                    try {
-                        const awardedData = getAwarderData(event)
-                        proposalIndex = awardedData.index
-                        break
-                    } catch {
-                        // Continue to next event if parsing fails
-                    }
+        const executionBlock = header.height
+
+        // Strategy 1: Match by execution block number
+        // AssetSpendApproved events are triggered when a ReferendumV2 proposal is executed
+        // Match proposals executed at the exact same block where AssetSpendApproved was emitted
+        // Filter by type === ReferendumV2 and status === Executed
+        const executedProposals = await ctx.store.find(Proposal, {
+            where: {
+                type: ProposalType.ReferendumV2,
+                status: ProposalStatus.Executed,
+                executeAtBlockNumber: executionBlock
+            },
+            order: {
+                index: 'DESC'
+            },
+            take: 10
+        })
+        
+        if (executedProposals.length > 0) {
+            // If multiple proposals executed at the same block (rare but possible),
+            // prefer matching by beneficiary if available, otherwise take the first one
+            if (beneficiary) {
+                const beneficiaryMatch = executedProposals.find(p => p.payee === beneficiary)
+                if (beneficiaryMatch) {
+                    proposal = beneficiaryMatch
+                } else {
+                    // Fallback to first proposal if no beneficiary match
+                    proposal = executedProposals[0]
                 }
+            } else {
+                // No beneficiary to match, take the first proposal
+                proposal = executedProposals[0]
             }
         }
         
-        // If we found a proposal index from events, use it directly
-        if (proposalIndex !== null) {
-            const foundProposal = await ctx.store.get(Proposal, {
-                where: {
-                    index: proposalIndex,
-                    type: ProposalType.TreasuryProposal
-                }
-            })
-            proposal = foundProposal || null
-        }
         
-        // Strategy 2: Match by execution block and track
-        // AssetSpendApproved events are typically triggered by Gov2 referenda execution
-        // Match proposals executed at the same block with matching track
+        
+        // Strategy 2: Look for Treasury.Awarded events in the same block
         if (!proposal) {
-            const executionBlock = header.height
-            const blockRange = 10 // Allow matching within 10 blocks of execution
-            
-            // Query for proposals executed around the spend block
-            // First try exact block match, then expand to range
-            const allCandidates = await ctx.store.find(Proposal, {
-                where: [
-                    {
-                        type: ProposalType.ReferendumV2,
-                        executeAtBlockNumber: executionBlock
-                    },
-                    {
-                        type: ProposalType.TreasuryProposal,
-                        executeAtBlockNumber: executionBlock
+            if (block?.events) {
+                for (const event of block.events) {
+                    if (event.name === 'Treasury.Awarded') {
+                        try {
+                            const awardedData = getAwarderData(event)
+                            proposalIndex = awardedData.index
+                            break
+                        } catch {
+                            // Continue to next event if parsing fails
+                        }
                     }
-                ],
-                order: {
-                    executeAtBlockNumber: 'DESC'
-                },
-                take: 50
-            })
-            
-            // Filter to proposals executed within block range
-            const candidatesInRange = allCandidates.filter(p => {
-                if (!p.executeAtBlockNumber) return false
-                const blockDiff = Math.abs(p.executeAtBlockNumber - executionBlock)
-                return blockDiff <= blockRange
-            })
-            
-            if (candidatesInRange.length > 0) {
-                // Prefer exact block match first
-                const exactMatches = candidatesInRange.filter(p => p.executeAtBlockNumber === executionBlock)
-                const candidates = exactMatches.length > 0 ? exactMatches : candidatesInRange
-                
-                // If we have beneficiary, prefer matching by beneficiary
-                if (beneficiary) {
-                    const beneficiaryMatch = candidates.find(p => p.payee === beneficiary)
-                    if (beneficiaryMatch) {
-                        proposal = beneficiaryMatch
-                    } else {
-                        // Fallback to proposal with track number (most specific)
-                        proposal = candidates.find(c => c.trackNumber !== null && c.trackNumber !== undefined)
-                            || candidates[0]
-                    }
-                } else {
-                    // No beneficiary, prefer proposal with track number
-                    proposal = candidates.find(c => c.trackNumber !== null && c.trackNumber !== undefined)
-                        || candidates[0]
                 }
+            }
+            
+            // If we found a proposal index from events, use it directly
+            if (proposalIndex !== null) {
+                const foundProposal = await ctx.store.get(Proposal, {
+                    where: {
+                        index: proposalIndex,
+                        type: ProposalType.TreasuryProposal
+                    }
+                })
+                proposal = foundProposal || null
             }
         }
 
