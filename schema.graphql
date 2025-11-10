@@ -319,6 +319,7 @@ type TreasurySpend @entity {
   expireAt: Int
   expiresAt: DateTime
   assetKind: JSON
+  assetId: BigInt @index
   proposal: Proposal
   createdAtBlock: Int! @index
   createdAt: DateTime! @index

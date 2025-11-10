@@ -31,6 +31,10 @@ export class TreasurySpend {
     assetKind!: unknown | undefined | null
 
     @Index_()
+    @BigIntColumn_({nullable: true})
+    assetId!: bigint | undefined | null
+
+    @Index_()
     @ManyToOne_(() => Proposal, {nullable: true})
     proposal!: Proposal | undefined | null
 

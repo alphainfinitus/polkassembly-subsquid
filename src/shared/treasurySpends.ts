@@ -55,6 +55,122 @@ function toUint8Array(val: any): Uint8Array {
     return new Uint8Array(val)
 }
 
+function toBigIntOrNull(value: unknown): bigint | null {
+    if (typeof value === 'bigint') {
+        return value
+    }
+    if (typeof value === 'number' && Number.isFinite(value)) {
+        return BigInt(value)
+    }
+    if (typeof value === 'string' && value.trim() !== '') {
+        try {
+            return BigInt(value)
+        } catch {
+            return null
+        }
+    }
+    return null
+}
+
+function extractGeneralIndex(junction: any): bigint | null {
+    if (junction == null) {
+        return null
+    }
+
+    if (typeof junction === 'object') {
+        const kind = junction.__kind
+
+        if (kind === 'GeneralIndex') {
+            const value = junction.value ?? junction.GeneralIndex ?? junction.index
+            return toBigIntOrNull(value)
+        }
+
+        if ('GeneralIndex' in junction) {
+            return toBigIntOrNull(junction.GeneralIndex)
+        }
+
+        if ('value' in junction && typeof junction.value === 'object' && junction.value !== null) {
+            if ('GeneralIndex' in junction.value) {
+                return toBigIntOrNull(junction.value.GeneralIndex)
+            }
+        }
+    } else {
+        return toBigIntOrNull(junction)
+    }
+
+    return null
+}
+
+function extractJunctions(interior: any): any[] {
+    if (!interior || typeof interior !== 'object') {
+        return []
+    }
+
+    if (typeof interior.__kind === 'string' && interior.__kind.startsWith('X')) {
+        const value = interior.value
+        if (Array.isArray(value)) {
+            return value
+        }
+        if (value !== undefined && value !== null) {
+            return [value]
+        }
+    }
+
+    const keys = ['X8', 'X7', 'X6', 'X5', 'X4', 'X3', 'X2', 'X1']
+    for (const key of keys) {
+        if (key in interior) {
+            const value = (interior as Record<string, any>)[key]
+            if (Array.isArray(value)) {
+                return value
+            }
+            if (value !== undefined && value !== null) {
+                return [value]
+            }
+        }
+    }
+
+    return []
+}
+
+function extractAssetIdFromAssetKind(assetKind: any): bigint | null {
+    if (!assetKind || typeof assetKind !== 'object') {
+        return null
+    }
+
+    const assetKindValue = typeof assetKind.value === 'object' && assetKind.value !== null
+        ? assetKind.value
+        : assetKind
+
+    const rawAssetId = assetKindValue.assetId
+        ?? (assetKindValue.value && typeof assetKindValue.value === 'object' ? assetKindValue.value.assetId : undefined)
+
+    const assetIdValue = rawAssetId && typeof rawAssetId.value === 'object' && rawAssetId.value !== null
+        ? rawAssetId.value
+        : rawAssetId
+
+    const directGeneralIndex = extractGeneralIndex(assetIdValue)
+    if (directGeneralIndex !== null) {
+        return directGeneralIndex
+    }
+
+    const interior = assetIdValue?.interior
+        ?? (assetIdValue && typeof assetIdValue.value === 'object' ? assetIdValue.value.interior : undefined)
+
+    const junctions = extractJunctions(interior)
+    for (const junction of junctions) {
+        const generalIndex = extractGeneralIndex(
+            junction && typeof junction.value === 'object' && junction.value !== null
+                ? junction.value
+                : junction
+        )
+        if (generalIndex !== null) {
+            return generalIndex
+        }
+    }
+
+    return null
+}
+
 function extractAccountIdFromLocation(location: any): Uint8Array | null {
     if (!location || typeof location !== 'object') {
         return null
@@ -171,6 +287,7 @@ export async function createOrUpdateTreasurySpend(
             }
             return value
         })) : null
+        const assetId = extractAssetIdFromAssetKind(spendData.assetKind)
 
         // Find associated treasury proposal using multiple strategies
         let proposal: Proposal | null = null
@@ -254,6 +371,7 @@ export async function createOrUpdateTreasurySpend(
             existingSpend.expiresAt = expiresAt
             existingSpend.assetKind = assetKindJson
             existingSpend.proposal = proposal || null
+            existingSpend.assetId = assetId
             existingSpend.updatedAtBlock = header.height
             existingSpend.updatedAt = new Date(header.timestamp)
             await ctx.store.save(existingSpend)
@@ -267,6 +385,7 @@ export async function createOrUpdateTreasurySpend(
                 expireAt,
                 expiresAt,
                 assetKind: assetKindJson,
+                assetId,
                 proposal: proposal || null,
                 createdAtBlock: header.height,
                 createdAt: new Date(header.timestamp),
