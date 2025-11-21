@@ -1,8 +1,8 @@
+import 'dotenv/config'
 import { TypeormDatabase } from '@subsquid/typeorm-store'
-import { getChainConfig } from './chainConfig'
-import { createProcessor, handleBlocks } from './processor'
+import { getChainConfig } from '@src/chainConfig'
+import { createProcessor, handleBlocks } from '@src/processor'
 
-// Get the chain name from command line arguments
 const chainName = process.argv[2]
 
 if (!chainName) {
@@ -12,7 +12,6 @@ if (!chainName) {
   process.exit(1)
 }
 
-// Get chain configuration
 const config = getChainConfig(chainName)
 
 console.log(`Starting ${config.name} processor...`)
@@ -21,14 +20,11 @@ console.log(`RPC: ${config.rpcEndpoint}`)
 console.log(`Prometheus port: ${config.prometheusPort}`)
 console.log(`State schema: ${config.stateSchema}`)
 
-// Create the processor with the chain config
 const processor = createProcessor(config)
 
-// Run the processor
 processor.run(
   new TypeormDatabase({ stateSchema: config.stateSchema }),
   async (ctx) => {
     await handleBlocks(ctx, config)
   }
 )
-

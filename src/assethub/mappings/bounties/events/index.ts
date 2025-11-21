@@ -1,0 +1,7 @@
+export { handleAwarded } from '@assethub/mappings/bounties/events/bountyAwarded'
+export { handleClaimed } from '@assethub/mappings/bounties/events/bountyClaimed'
+export { handleProposed } from '@assethub/mappings/bounties/events/bountyProposed'
+export { handleRejected } from '@assethub/mappings/bounties/events/bountyRejected'
+export { handleBecameActive } from '@assethub/mappings/bounties/events/bountyBecameActive'
+export { handleCanceled } from '@assethub/mappings/bounties/events/bountyCanceled'
+export { handleExtended } from '@assethub/mappings/bounties/events/bountyExtended'
