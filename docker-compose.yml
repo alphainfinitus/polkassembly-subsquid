@@ -3,13 +3,79 @@ version: "3"
 services:
   db:
     container_name: subsquid_db
-    image: postgres:14
+    image: postgres:15
+    restart: always
     environment:
       POSTGRES_DB: squid
       POSTGRES_PASSWORD: squid
     ports:
       - "${DB_PORT}:5432"
-      # command: ["postgres", "-c", "log_statement=all"]
-#    volumes:
-#      - ./data/db:/var/lib/postgresql/data
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d squid"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  migrator:
+    build:
+      context: .
+      target: processor
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_NAME: squid
+      DB_PASS: squid
+    command: ["npm", "run", "db:migrate"]
+
+  processor-kusama:
+    build:
+      context: .
+      target: processor
+    depends_on:
+      migrator:
+        condition: service_completed_successfully
+    environment:
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_NAME: squid
+      DB_PASS: squid
+    command: ["npm", "run", "processor:start"]
+
+  processor-assethub:
+    build:
+      context: .
+      target: processor
+    depends_on:
+      migrator:
+        condition: service_completed_successfully
+    environment:
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_NAME: squid
+      DB_PASS: squid
+    command: ["npm", "run", "processor:start:assethub"]
+
+  api:
+    build:
+      context: .
+      target: query-node
+    depends_on:
+      migrator:
+        condition: service_completed_successfully
+    environment:
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_NAME: squid
+      DB_PASS: squid
+      GQL_PORT: 4350
+    ports:
+      - "${GQL_PORT}:4350"
+
+volumes:
+  db_data:
 
