@@ -1,0 +1,11 @@
+global:
+  scrape_interval: 5s
+
+scrape_configs:
+  - job_name: 'kusama-processor'
+    static_configs:
+      - targets: ['processor-kusama:3000']
+  
+  - job_name: 'assethub-processor'
+    static_configs:
+      - targets: ['processor-assethub:3001']
