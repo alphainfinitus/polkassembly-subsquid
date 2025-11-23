@@ -44,6 +44,9 @@ services:
       DB_PORT: 5432
       DB_NAME: squid
       DB_PASS: squid
+      NOTIFICATION_API_KEY: "${NOTIFICATION_API_KEY}"
+      GOV_EVENT_API_KEY: "${GOV_EVENT_API_KEY}"
+      TOOLS_PASSPHRASE: "${TOOLS_PASSPHRASE}"
     command: ["npm", "run", "processor:start"]
 
   processor-assethub:
@@ -58,6 +61,9 @@ services:
       DB_PORT: 5432
       DB_NAME: squid
       DB_PASS: squid
+      NOTIFICATION_API_KEY: "${NOTIFICATION_API_KEY}"
+      GOV_EVENT_API_KEY: "${GOV_EVENT_API_KEY}"
+      TOOLS_PASSPHRASE: "${TOOLS_PASSPHRASE}"
     command: ["npm", "run", "processor:start:assethub"]
 
   api:
