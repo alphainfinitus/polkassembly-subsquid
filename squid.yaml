@@ -15,7 +15,6 @@ deploy:
           max_locks_per_transaction: 2048
   secrets:
     - NOTIFICATION_API_KEY
-    - GOV_EVENT_API_KEY
     - TOOLS_PASSPHRASE
   processor:
     - name: kusama-processor

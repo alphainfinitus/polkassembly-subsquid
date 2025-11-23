@@ -45,7 +45,6 @@ services:
       DB_NAME: squid
       DB_PASS: squid
       NOTIFICATION_API_KEY: "${NOTIFICATION_API_KEY}"
-      GOV_EVENT_API_KEY: "${GOV_EVENT_API_KEY}"
       TOOLS_PASSPHRASE: "${TOOLS_PASSPHRASE}"
     command: ["npm", "run", "processor:start"]
 
@@ -62,7 +61,6 @@ services:
       DB_NAME: squid
       DB_PASS: squid
       NOTIFICATION_API_KEY: "${NOTIFICATION_API_KEY}"
-      GOV_EVENT_API_KEY: "${GOV_EVENT_API_KEY}"
       TOOLS_PASSPHRASE: "${TOOLS_PASSPHRASE}"
     command: ["npm", "run", "processor:start:assethub"]
 
