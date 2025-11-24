@@ -22,7 +22,7 @@ deploy:
     - name: assethub-kusama-processor
       cmd: [ "sqd", "process:prod:assethub" ]
   api:
-    cmd: [ "npx", "squid-graphql-server", "--subscriptions", "--sql-statement-timeout", "3000" ]
+    cmd: [ "npx", "squid-graphql-server", "--subscriptions", "--sql-statement-timeout", "3000", "--max-response-size", "100000" ]
 
 scale:
   dedicated: true
