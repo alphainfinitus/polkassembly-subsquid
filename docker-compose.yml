@@ -33,6 +33,7 @@ services:
     command: ["npm", "run", "db:migrate"]
 
   processor-kusama:
+    restart: always
     build:
       context: .
       target: processor
@@ -49,6 +50,7 @@ services:
     command: ["npm", "run", "processor:start"]
 
   processor-assethub:
+    restart: always
     build:
       context: .
       target: processor
@@ -65,6 +67,7 @@ services:
     command: ["npm", "run", "processor:start:assethub"]
 
   api:
+    restart: always
     build:
       context: .
       target: query-node
