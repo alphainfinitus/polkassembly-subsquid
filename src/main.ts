@@ -23,7 +23,7 @@ console.log(`State schema: ${config.stateSchema}`)
 const processor = createProcessor(config)
 
 processor.run(
-  new TypeormDatabase({ stateSchema: config.stateSchema }),
+  new TypeormDatabase({ stateSchema: config.stateSchema, isolationLevel: 'REPEATABLE READ' }),
   async (ctx) => {
     await handleBlocks(ctx, config)
   }
