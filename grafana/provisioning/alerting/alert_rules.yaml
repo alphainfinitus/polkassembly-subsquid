@@ -1,0 +1,201 @@
+apiVersion: 1
+
+groups:
+  - orgId: 1
+    name: SubsquidAlerts
+    folder: Subsquid
+    interval: 1m
+    rules:
+      - uid: processor_down
+        title: Processor Down
+        condition: C
+        data:
+          - refId: A
+            datasourceUid: prometheus
+            relativeTimeRange:
+              from: 300
+              to: 0
+            model:
+              expr: up{job=~".*-processor"} == 0
+              refId: A
+              instant: true
+          - refId: B
+            datasourceUid: __expr__
+            model:
+              expression: A
+              reducer: last
+              refId: B
+              type: reduce
+          - refId: C
+            datasourceUid: __expr__
+            model:
+              expression: B
+              type: threshold
+              refId: C
+              conditions:
+                - evaluator:
+                    params: [0]
+                    type: gt
+        noDataState: OK
+        execErrState: Error
+        for: 1m
+        annotations:
+          summary: "Processor {{ $labels.job }} is down"
+          description: "The {{ $labels.job }} is unreachable (up=0)."
+        labels:
+          severity: critical
+
+      - uid: processor_restarting
+        title: Processor Restarting
+        condition: C
+        data:
+          - refId: A
+            datasourceUid: prometheus
+            relativeTimeRange:
+              from: 600
+              to: 0
+            model:
+              expr: changes(process_start_time_seconds[10m]) > 0
+              refId: A
+              instant: true
+          - refId: B
+            datasourceUid: __expr__
+            model:
+              expression: A
+              reducer: last
+              refId: B
+              type: reduce
+          - refId: C
+            datasourceUid: __expr__
+            model:
+              expression: B
+              type: threshold
+              refId: C
+              conditions:
+                - evaluator:
+                    params: [0]
+                    type: gt
+        noDataState: OK
+        execErrState: Error
+        for: 0s
+        annotations:
+          summary: "Processor {{ $labels.job }} is restarting"
+          description: "The {{ $labels.job }} has restarted {{ $values.B.Value | printf \"%.0f\" }} times in the last 10 minutes."
+        labels:
+          severity: warning
+
+      - uid: processor_stuck
+        title: Processor Stuck
+        condition: C
+        data:
+          - refId: A
+            datasourceUid: prometheus
+            relativeTimeRange:
+              from: 300
+              to: 0
+            model:
+              expr: changes(sqd_processor_last_block[5m]) == 0
+              refId: A
+              instant: true
+          - refId: B
+            datasourceUid: __expr__
+            model:
+              expression: A
+              reducer: last
+              refId: B
+              type: reduce
+          - refId: C
+            datasourceUid: __expr__
+            model:
+              expression: B
+              type: threshold
+              refId: C
+              conditions:
+                - evaluator:
+                    params: [1]
+                    type: gt
+        noDataState: OK
+        execErrState: Error
+        for: 5m
+        annotations:
+          summary: "Processor {{ $labels.job }} is stuck"
+          description: "The {{ $labels.job }} has not indexed any new blocks for 5 minutes. Last block: {{ $values.B.Value | printf \"%.0f\" }}"
+        labels:
+          severity: critical
+
+      - uid: processor_lagging
+        title: Processor Lagging
+        condition: C
+        data:
+          - refId: A
+            datasourceUid: prometheus
+            relativeTimeRange:
+              from: 300
+              to: 0
+            model:
+              expr: sqd_processor_chain_height - sqd_processor_last_block
+              refId: A
+              instant: true
+          - refId: B
+            datasourceUid: __expr__
+            model:
+              expression: A
+              reducer: last
+              refId: B
+              type: reduce
+          - refId: C
+            datasourceUid: __expr__
+            model:
+              expression: B
+              type: threshold
+              refId: C
+              conditions:
+                - evaluator:
+                    params: [100]
+                    type: gt
+        noDataState: OK
+        execErrState: Error
+        for: 5m
+        annotations:
+          summary: "Processor {{ $labels.job }} is lagging"
+          description: "The {{ $labels.job }} is {{ $values.B.Value | printf \"%.0f\" }} blocks behind the chain head."
+        labels:
+          severity: warning
+
+      - uid: processor_errors
+        title: Processor Errors
+        condition: C
+        data:
+          - refId: A
+            datasourceUid: loki
+            relativeTimeRange:
+              from: 300
+              to: 0
+            model:
+              expr: count_over_time({container=~".*processor-.*"} |= "error" [5m])
+              refId: A
+          - refId: B
+            datasourceUid: __expr__
+            model:
+              expression: A
+              reducer: last
+              refId: B
+              type: reduce
+          - refId: C
+            datasourceUid: __expr__
+            model:
+              expression: B
+              type: threshold
+              refId: C
+              conditions:
+                - evaluator:
+                    params: [0]
+                    type: gt
+        noDataState: OK
+        execErrState: Error
+        for: 0s
+        annotations:
+          summary: "Processor {{ $labels.container }} has errors"
+          description: "The {{ $labels.container }} container has logged {{ $values.B.Value | printf \"%.0f\" }} errors in the last 5 minutes."
+        labels:
+          severity: critical
