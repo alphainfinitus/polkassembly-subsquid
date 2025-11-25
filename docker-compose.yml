@@ -104,9 +104,10 @@ services:
       - GF_SMTP_HOST=smtp.sendgrid.net:587
       - GF_SMTP_USER=apikey
       - GF_SMTP_PASSWORD=${SENDGRID_API_KEY}
-      - GF_SMTP_FROM_ADDRESS=${ALERT_EMAIL}
+      - GF_SMTP_FROM_ADDRESS=${ALERT_EMAIL_1}
       - GF_SMTP_FROM_NAME=Subsquid Alert
-      - ALERT_EMAIL=${ALERT_EMAIL}
+      - ALERT_EMAIL_1=${ALERT_EMAIL_1}
+      - ALERT_EMAIL_2=${ALERT_EMAIL_2}
     ports:
       - "3001:3000"
     depends_on:

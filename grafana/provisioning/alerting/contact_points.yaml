@@ -7,6 +7,6 @@ contactPoints:
       - uid: email-receiver
         type: email
         settings:
-          addresses: "${ALERT_EMAIL}"
+          addresses: "${ALERT_EMAIL_1};${ALERT_EMAIL_2}"
           singleEmail: true
         disableResolveMessage: false
