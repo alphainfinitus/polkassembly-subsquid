@@ -1,4 +1,4 @@
-import { ss58codec } from '@polkadot/common/tools'
+import { ss58codec } from '@src/shared/tools'
 import { decodeHex } from '@subsquid/substrate-processor'
 
 /**

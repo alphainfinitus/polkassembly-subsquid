@@ -12,7 +12,7 @@ import { submitted,
     metadataSet,
     metadataCleared } from '@polkadot/types/referenda/events'
 import { UnknownVersionError } from '@shared/errors'
-import { TallyData } from '@polkadot/mappings/types/data'
+import { TallyData } from '@shared/types'
 import { Event } from '@src/processor'
 interface ReferendumEventData {
     index: number

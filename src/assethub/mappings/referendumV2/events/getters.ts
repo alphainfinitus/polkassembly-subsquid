@@ -14,7 +14,7 @@ import {
     metadataCleared
 } from '@assethub/types/referenda/events'
 import { UnknownVersionError } from '@shared/errors'
-import { TallyData } from '@assethub/mappings/types/data'
+import { TallyData } from '@shared/types'
 import { Event } from '@src/processor'
 interface ReferendumEventData {
     index: number

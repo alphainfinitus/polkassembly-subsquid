@@ -15,7 +15,6 @@ deploy:
           max_locks_per_transaction: 2048
   secrets:
     - NOTIFICATION_API_KEY
-    - GOV_EVENT_API_KEY
     - TOOLS_PASSPHRASE
   processor:
     - name: polkadot-processor
@@ -23,7 +22,7 @@ deploy:
     - name: assethub-polkadot-processor
       cmd: [ "sqd", "process:prod:assethub" ]
   api:
-    cmd: [ "npx", "squid-graphql-server", "--subscriptions", "--sql-statement-timeout", "3000" ]
+    cmd: [ "npx", "squid-graphql-server", "--subscriptions", "--sql-statement-timeout", "3000", "--max-response-size", "0" ]
 
 scale:
   dedicated: true

@@ -41,7 +41,7 @@ import {
     SubmissionDepositData,
     DecidingData,
     TallyData,
-} from '@assethub/mappings/types/data'
+} from '@shared/types'
 import { randomUUID } from 'crypto'
 import { chainConfigs } from '@src/chainConfig'
 import { storage } from '@assethub/storage'
