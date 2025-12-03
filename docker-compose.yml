@@ -12,8 +12,51 @@ services:
       - "${DB_PORT}:5432"
     volumes:
       - db_data:/var/lib/postgresql/data
+    command:
+      - "postgres"
+      - "-c"
+      - "shared_buffers=512MB"
+      - "-c"
+      - "effective_cache_size=1536MB"
+      - "-c"
+      - "work_mem=32MB"
+      - "-c"
+      - "maintenance_work_mem=256MB"
+      - "-c"
+      - "random_page_cost=1.1"
+      - "-c"
+      - "effective_io_concurrency=200"
+      - "-c"
+      - "max_connections=100"
+      # prevents lock exhaustion during heavy indexing
+      - "-c"
+      - "max_pred_locks_per_transaction=2048"
+      - "-c"
+      - "max_locks_per_transaction=2048"
+      # Timeout for long-running queries (5 minutes for processors)
+      - "-c"
+      - "statement_timeout=300000"
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres -d squid"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  pgbouncer:
+    image: edoburu/pgbouncer:latest
+    restart: always
+    environment:
+      DATABASE_URL: postgres://postgres:squid@db:5432/squid
+      POOL_MODE: transaction
+      MAX_CLIENT_CONN: 200
+      DEFAULT_POOL_SIZE: 50
+      MIN_POOL_SIZE: 10
+      RESERVE_POOL_SIZE: 10
+    depends_on:
+      db:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "pg_isready", "-h", "localhost", "-p", "6432"]
       interval: 5s
       timeout: 5s
       retries: 5
@@ -74,9 +117,11 @@ services:
     depends_on:
       migrator:
         condition: service_completed_successfully
+      pgbouncer:
+        condition: service_healthy
     environment:
-      DB_HOST: db
-      DB_PORT: 5432
+      DB_HOST: pgbouncer
+      DB_PORT: 6432
       DB_NAME: squid
       DB_PASS: squid
       GQL_PORT: 4350
