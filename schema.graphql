@@ -90,28 +90,28 @@ type Proposal @entity {
   type: ProposalType! @index
   hash: String @index
   index: Int @index
-  proposer: String @index
+  proposer: String
   deposit: BigInt
   threshold: Threshold
   end: Int
   delay: Int
-  curator: String @index
+  curator: String
   payee: String
   reward: BigInt
   fee: BigInt
   bond: BigInt
   curatorDeposit: BigInt
   description: String
-  parentBountyIndex: Int @index
+  parentBountyIndex: Int
   proposalArguments: ProposedCall
   proposalArgumentHash: String
   voting: [Vote!] @derivedFrom(field: "proposal")
   convictionVoting: [ConvictionVote!] @derivedFrom(field: "proposal")
   preimage: Preimage
-  status: ProposalStatus! @index
+  status: ProposalStatus!
   statusHistory: [StatusHistory!] @derivedFrom(field: "proposal")
-  trackNumber: Int @index
-  origin: String @index
+  trackNumber: Int
+  origin: String
   metadata: String
   enactmentAtBlock: Int
   enactmentAfterBlock: Int
@@ -157,10 +157,10 @@ type StatusHistory @entity {
   id: ID!
   proposal: Proposal
   preimage: Preimage
-  status: ProposalStatus! @index
+  status: ProposalStatus!
   extrinsicIndex: String
-  block: Int! @index
-  timestamp: DateTime! @index
+  block: Int!
+  timestamp: DateTime!
 }
 
 type ProposedCall {
@@ -200,16 +200,16 @@ enum VoteType {
 
 type Vote @entity {
   id: ID!
-  voter: String @index
+  voter: String
   proposalId: ID!
   proposal: Proposal!
   blockNumber: Int! @index
   timestamp: DateTime! @index
   extrinsicIndex: String
-  decision: VoteDecision @index
+  decision: VoteDecision
   balance: VoteBalance
   lockPeriod: Int
-  type: VoteType @index
+  type: VoteType
 }
 
 type Tippers @entity {
@@ -238,7 +238,7 @@ type ProposalGroup @entity {
 
 type ConvictionVote @entity {
   id: ID!
-  voter: String @index
+  voter: String
   proposalId: ID!
   proposalIndex: Int! @index
   proposal: Proposal!
@@ -277,18 +277,18 @@ type FlattenedConvictionVotes @entity {
   id: ID!
   voter: String @index
   parentVote: ConvictionVote
-  isDelegated: Boolean @index
+  isDelegated: Boolean
   delegatedTo: String @index
   proposalIndex: Int! @index
   proposal: Proposal
-  createdAtBlock: Int! @index
+  createdAtBlock: Int!
   removedAtBlock: Int @index
-  createdAt: DateTime! @index
+  createdAt: DateTime!
   removedAt: DateTime
   decision: VoteDecision! @index
   balance: VoteBalance!
   lockPeriod: Int
-  type: VoteType! @index
+  type: VoteType!
 }
 
 enum DelegationType {
@@ -302,8 +302,8 @@ type VotingDelegation @entity {
   to: String! @index
   balance: BigInt
   lockPeriod: Int!
-  track: Int @index
-  type: DelegationType! @index
+  track: Int
+  type: DelegationType!
   extrinsicIndex: String
   createdAt: DateTime!
   createdAtBlock: Int! @index

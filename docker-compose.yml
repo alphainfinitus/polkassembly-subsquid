@@ -34,6 +34,17 @@ services:
       # Timeout for long-running queries (5 minutes for processors)
       - "-c"
       - "statement_timeout=300000"
+      # Query planner optimizations
+      - "-c"
+      - "default_statistics_target=100"
+      - "-c"
+      - "checkpoint_completion_target=0.9"
+      - "-c"
+      - "wal_buffers=16MB"
+      - "-c"
+      - "min_wal_size=1GB"
+      - "-c"
+      - "max_wal_size=4GB"
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres -d squid"]
       interval: 5s
