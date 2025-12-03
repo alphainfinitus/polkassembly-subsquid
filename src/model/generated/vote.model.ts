@@ -1,4 +1,4 @@
-import {Entity as Entity_, Column as Column_, PrimaryColumn as PrimaryColumn_, StringColumn as StringColumn_, ManyToOne as ManyToOne_, Index as Index_, IntColumn as IntColumn_, DateTimeColumn as DateTimeColumn_} from "@subsquid/typeorm-store"
+import {Entity as Entity_, Column as Column_, PrimaryColumn as PrimaryColumn_, StringColumn as StringColumn_, Index as Index_, ManyToOne as ManyToOne_, IntColumn as IntColumn_, DateTimeColumn as DateTimeColumn_} from "@subsquid/typeorm-store"
 import * as marshal from "./marshal"
 import {Proposal} from "./proposal.model"
 import {VoteDecision} from "./_voteDecision"
@@ -14,6 +14,7 @@ export class Vote {
     @PrimaryColumn_()
     id!: string
 
+    @Index_()
     @StringColumn_({nullable: true})
     voter!: string | undefined | null
 
@@ -35,6 +36,7 @@ export class Vote {
     @StringColumn_({nullable: true})
     extrinsicIndex!: string | undefined | null
 
+    @Index_()
     @Column_("varchar", {length: 12, nullable: true})
     decision!: VoteDecision | undefined | null
 
@@ -44,6 +46,7 @@ export class Vote {
     @IntColumn_({nullable: true})
     lockPeriod!: number | undefined | null
 
+    @Index_()
     @Column_("varchar", {length: 17, nullable: true})
     type!: VoteType | undefined | null
 }

@@ -35,6 +35,7 @@ export class Proposal {
     @IntColumn_({nullable: true})
     index!: number | undefined | null
 
+    @Index_()
     @StringColumn_({nullable: true})
     proposer!: string | undefined | null
 
@@ -50,6 +51,7 @@ export class Proposal {
     @IntColumn_({nullable: true})
     delay!: number | undefined | null
 
+    @Index_()
     @StringColumn_({nullable: true})
     curator!: string | undefined | null
 
@@ -71,6 +73,7 @@ export class Proposal {
     @StringColumn_({nullable: true})
     description!: string | undefined | null
 
+    @Index_()
     @IntColumn_({nullable: true})
     parentBountyIndex!: number | undefined | null
 
@@ -90,15 +93,18 @@ export class Proposal {
     @ManyToOne_(() => Preimage, {nullable: true})
     preimage!: Preimage | undefined | null
 
+    @Index_()
     @Column_("varchar", {length: 21, nullable: false})
     status!: ProposalStatus
 
     @OneToMany_(() => StatusHistory, e => e.proposal)
     statusHistory!: StatusHistory[]
 
+    @Index_()
     @IntColumn_({nullable: true})
     trackNumber!: number | undefined | null
 
+    @Index_()
     @StringColumn_({nullable: true})
     origin!: string | undefined | null
 

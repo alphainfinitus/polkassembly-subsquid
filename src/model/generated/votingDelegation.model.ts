@@ -24,9 +24,11 @@ export class VotingDelegation {
     @IntColumn_({nullable: false})
     lockPeriod!: number
 
+    @Index_()
     @IntColumn_({nullable: true})
     track!: number | undefined | null
 
+    @Index_()
     @Column_("varchar", {length: 9, nullable: false})
     type!: DelegationType
 

@@ -23,6 +23,7 @@ export class FlattenedConvictionVotes {
     @ManyToOne_(() => ConvictionVote, {nullable: true})
     parentVote!: ConvictionVote | undefined | null
 
+    @Index_()
     @BooleanColumn_({nullable: true})
     isDelegated!: boolean | undefined | null
 
@@ -38,6 +39,7 @@ export class FlattenedConvictionVotes {
     @ManyToOne_(() => Proposal, {nullable: true})
     proposal!: Proposal | undefined | null
 
+    @Index_()
     @IntColumn_({nullable: false})
     createdAtBlock!: number
 
@@ -45,6 +47,7 @@ export class FlattenedConvictionVotes {
     @IntColumn_({nullable: true})
     removedAtBlock!: number | undefined | null
 
+    @Index_()
     @DateTimeColumn_({nullable: false})
     createdAt!: Date
 
@@ -61,6 +64,7 @@ export class FlattenedConvictionVotes {
     @IntColumn_({nullable: true})
     lockPeriod!: number | undefined | null
 
+    @Index_()
     @Column_("varchar", {length: 17, nullable: false})
     type!: VoteType
 }

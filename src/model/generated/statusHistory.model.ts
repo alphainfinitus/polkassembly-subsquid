@@ -20,15 +20,18 @@ export class StatusHistory {
     @ManyToOne_(() => Preimage, {nullable: true})
     preimage!: Preimage | undefined | null
 
+    @Index_()
     @Column_("varchar", {length: 21, nullable: false})
     status!: ProposalStatus
 
     @StringColumn_({nullable: true})
     extrinsicIndex!: string | undefined | null
 
+    @Index_()
     @IntColumn_({nullable: false})
     block!: number
 
+    @Index_()
     @DateTimeColumn_({nullable: false})
     timestamp!: Date
 }
