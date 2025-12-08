@@ -46,7 +46,7 @@ groups:
           severity: critical
 
       - uid: processor_restarting
-        title: Processor Restarting
+        title: Processor Restarting Frequently
         condition: C
         data:
           - refId: A
@@ -55,7 +55,7 @@ groups:
               from: 600
               to: 0
             model:
-              expr: changes(process_start_time_seconds[10m]) > 0
+              expr: changes(process_start_time_seconds[10m]) >= 3
               refId: A
               instant: true
           - refId: B
@@ -77,10 +77,10 @@ groups:
                     type: gt
         noDataState: OK
         execErrState: Error
-        for: 0s
+        for: 2m
         annotations:
-          summary: "Processor {{ $labels.job }} is restarting"
-          description: "The {{ $labels.job }} has restarted {{ $values.B.Value | printf \"%.0f\" }} times in the last 10 minutes."
+          summary: "Processor {{ $labels.job }} is restarting frequently"
+          description: "The {{ $labels.job }} has restarted 3+ times in the last 10 minutes. This indicates a potential crash loop."
         labels:
           severity: warning
 
