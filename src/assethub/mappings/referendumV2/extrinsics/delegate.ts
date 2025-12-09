@@ -4,7 +4,7 @@ import { getDelegateData } from '@assethub/mappings/referendumV2/extrinsics/gett
 import { Store } from '@subsquid/typeorm-store'
 import { TooManyOpenDelegations, TooManyOpenVotes } from '@shared/errors'
 import { IsNull } from 'typeorm'
-import { addDelegatedVotesReferendumV2, getDelegations, removeVote } from '@assethub/mappings/referendumV2/extrinsics/utils'
+import { addDelegatedVotesReferendumV2, getDelegations, removeVote, removeDelegatorFromVote, getChainStateDelegations } from '@assethub/mappings/referendumV2/extrinsics/utils'
 import { StandardVoteBalance, ConvictionVote, VoteType, VotingDelegation, Proposal, ProposalType, ConvictionDelegatedVotes, DelegationType, FlattenedConvictionVotes, VoteDecision } from '@model/index'
 import { randomUUID } from 'crypto'
 import { Call, ProcessorContext } from '@src/processor'
@@ -37,9 +37,15 @@ export async function handleDelegate(ctx: ProcessorContext<Store>,
         delegation.endedAtBlock = header.height
         delegation.endedAt = new Date(header.timestamp)
         await ctx.store.save(delegation)
+        
+        // Remove existing delegated vote entries for this delegator from all ongoing referenda
+        // This handles the case where someone re-delegates (changes delegation target or parameters)
         for (let i = 0; i < ongoingReferenda.length; i++) {
             const referendum = ongoingReferenda[i]
-            if (referendum.index || referendum.index === 0) {
+            if (referendum.index !== undefined && referendum.index !== null) {
+                // Remove the delegator's ConvictionDelegatedVotes entries and update delegate's voting power
+                await removeDelegatorFromVote(ctx, from, referendum.index, header.height, header.timestamp)
+                // Also remove any direct votes (shouldn't exist, but for safety)
                 await removeVote(ctx, from, referendum.index, header.height, header.timestamp, false)
             }
         }
@@ -132,8 +138,16 @@ export async function handleDelegate(ctx: ProcessorContext<Store>,
                             type: VoteType.ReferendumV2,
                         }), ...flattenedVotesNested
                     )
-                    vote.delegatedVotingPower = vote.delegatedVotingPower ? delegatedVotePower + votingPower + vote.delegatedVotingPower : delegatedVotePower + votingPower
-                    vote.totalVotingPower = vote.selfVotingPower ? vote.delegatedVotingPower + vote.selfVotingPower : delegatedVotePower
+                    // Try to get the actual delegated voting power from chain state (source of truth)
+                    const chainStateDelegations = await getChainStateDelegations(header, toWallet, track)
+                    if (chainStateDelegations) {
+                        vote.delegatedVotingPower = chainStateDelegations.votes
+                        vote.totalVotingPower = vote.selfVotingPower ? vote.selfVotingPower + chainStateDelegations.votes : chainStateDelegations.votes
+                    } else {
+                        // Fall back to calculated value
+                        vote.delegatedVotingPower = vote.delegatedVotingPower ? delegatedVotePower + votingPower + vote.delegatedVotingPower : delegatedVotePower + votingPower
+                        vote.totalVotingPower = vote.selfVotingPower ? vote.delegatedVotingPower + vote.selfVotingPower : delegatedVotePower
+                    }
 
                     convictionVotes.push(vote)
                 }
