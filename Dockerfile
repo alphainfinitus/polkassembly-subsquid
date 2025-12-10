@@ -19,6 +19,8 @@ ADD package-lock.json .
 RUN npm ci --production
 
 FROM node AS squid
+# Install bash and postgresql-client for the wait script
+RUN apk add --no-cache bash postgresql-client bc
 WORKDIR /squid
 COPY --from=deps /squid/package.json .
 COPY --from=deps /squid/package-lock.json .
@@ -27,6 +29,7 @@ COPY --from=builder /squid/lib lib
 RUN echo -e "loglevel=silent\nupdate-notifier=false" > /squid/.npmrc
 ADD db db
 ADD assets assets
+ADD scripts scripts
 ADD schema.graphql .
 # TODO: use shorter PROMETHEUS_PORT
 ENV PROCESSOR_PROMETHEUS_PORT 3000

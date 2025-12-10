@@ -14,7 +14,7 @@ import {
 import { getOriginAccountId } from '@polkadot/common/tools'
 import { getVoteData } from '@polkadot/mappings/referendumV2/extrinsics/getters'
 import { Store } from '@subsquid/typeorm-store'
-import { getDelegations, removeDelegatedVotesReferendum, getChainStateDelegations } from '@polkadot/mappings/referendumV2/extrinsics/utils'
+import { getDelegations, removeDelegatedVotesReferendum, getChainStateDelegations, getOrCreateReferendumV2 } from '@polkadot/mappings/referendumV2/extrinsics/utils'
 import { addDelegatedVotesReferendumV2 } from '@polkadot/mappings/referendumV2/extrinsics/utils'
 import { IsNull } from 'typeorm'
 import { updateCurveData } from '@polkadot/common/curveData'
@@ -30,7 +30,7 @@ export async function handleConvictionVote(ctx: ProcessorContext<Store>,
 
     const { index, vote } = getVoteData(item)
 
-    const proposal = await ctx.store.get(Proposal, { where: { index, type: ProposalType.ReferendumV2 } })
+    const proposal = await getOrCreateReferendumV2(ctx, index, header)
     if (!proposal || proposal.trackNumber === undefined || proposal.trackNumber === null) {
         ctx.log.warn(MissingProposalRecordWarn(ProposalType.ReferendumV2, index))
         return

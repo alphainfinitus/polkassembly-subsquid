@@ -2,13 +2,14 @@ import { In, IsNull } from 'typeorm'
 import { Store } from '@subsquid/typeorm-store'
 
 import { TooManyOpenVotes } from '@shared/errors'
-import { ConvictionDelegatedVotes, ConvictionVote, StandardVoteBalance, VoteType, VotingDelegation, FlattenedConvictionVotes, DelegationType, ProposalType } from '@model/index'
+import { ConvictionDelegatedVotes, ConvictionVote, StandardVoteBalance, VoteType, VotingDelegation, FlattenedConvictionVotes, DelegationType, ProposalType, Proposal, ProposalStatus } from '@model/index'
 import { randomUUID } from 'crypto'
 import { ProcessorContext } from '@src/processor'
-import { sendGovEvent } from '@assethub/mappings/utils/proposals'
+import { sendGovEvent, createReferendumV2 } from '@assethub/mappings/utils/proposals'
 import { EGovEvent } from '@shared/types'
 import * as storage from '@assethub/types/storage'
 import { ss58codec } from '@assethub/common/tools'
+import * as referendaStorage from '@assethub/types/referenda/storage'
 
 /**
  * Convert an ss58 address to hex format for storage queries.
@@ -281,5 +282,158 @@ export async function removeFlattenedVotes(ctx: ProcessorContext<Store>, wallet:
         vote.removedAtBlock = block
         vote.removedAt = new Date(blockTime)
         await ctx.store.save(vote)
+    }
+}
+
+// Interface for referendum storage data
+interface ReferendumStorageInfo {
+    index: number
+    trackNumber: number
+    origin: string
+    enactmentAt?: number
+    enactmentAfter?: number
+    submittedAt: number
+    submissionDeposit: { who: Uint8Array, amount: bigint }
+    decisionDeposit: { who: Uint8Array, amount: bigint } | undefined
+    deciding: { since: number, confirming: number | undefined } | undefined
+    tally: { ayes: bigint, nays: bigint, support: bigint }
+    hash?: string
+}
+
+/**
+ * Attempt to fetch referendum data from chain storage
+ * This is used for lazy-loading referenda that may have been migrated
+ */
+async function getReferendumFromStorage(ctx: ProcessorContext<Store>, index: number, block: any): Promise<ReferendumStorageInfo | undefined> {
+    try {
+        let referendumInfo: any = undefined
+
+        // AssetHub storage version
+        if (referendaStorage.referendumInfoFor.v2000000?.is(block)) {
+            referendumInfo = await referendaStorage.referendumInfoFor.v2000000.get(block, index)
+        }
+
+        if (!referendumInfo) {
+            return undefined
+        }
+
+        // Only handle Ongoing referenda - we can only create from storage for active referenda
+        if (referendumInfo.__kind !== 'Ongoing') {
+            return undefined
+        }
+
+        const ongoing = referendumInfo.value
+
+        // Extract origin string
+        let originStr = 'Unknown'
+        if (ongoing.origin) {
+            if (ongoing.origin.__kind) {
+                originStr = ongoing.origin.__kind
+                if (ongoing.origin.value && typeof ongoing.origin.value === 'string') {
+                    originStr = ongoing.origin.value
+                } else if (ongoing.origin.value?.__kind) {
+                    originStr = ongoing.origin.value.__kind
+                }
+            }
+        }
+
+        // Extract hash from proposal if available
+        let hash: string | undefined
+        if (ongoing.proposal) {
+            if (ongoing.proposal.__kind === 'Lookup' && ongoing.proposal.hash) {
+                hash = ongoing.proposal.hash
+            } else if (ongoing.proposal.__kind === 'Inline') {
+                // For inline proposals, we might not have a hash
+                hash = undefined
+            }
+        }
+
+        return {
+            index,
+            trackNumber: ongoing.track,
+            origin: originStr,
+            enactmentAt: ongoing.enactment?.__kind === 'At' ? ongoing.enactment.value : undefined,
+            enactmentAfter: ongoing.enactment?.__kind === 'After' ? ongoing.enactment.value : undefined,
+            submittedAt: ongoing.submitted,
+            submissionDeposit: {
+                who: ongoing.submissionDeposit.who,
+                amount: ongoing.submissionDeposit.amount
+            },
+            decisionDeposit: ongoing.decisionDeposit ? {
+                who: ongoing.decisionDeposit.who,
+                amount: ongoing.decisionDeposit.amount
+            } : undefined,
+            deciding: ongoing.deciding ? {
+                since: ongoing.deciding.since,
+                confirming: ongoing.deciding.confirming
+            } : undefined,
+            tally: {
+                ayes: ongoing.tally.ayes,
+                nays: ongoing.tally.nays,
+                support: ongoing.tally.support
+            },
+            hash
+        }
+    } catch (e) {
+        ctx.log.error(`Error fetching referendum ${index} from storage: ${e}`)
+        return undefined
+    }
+}
+
+/**
+ * Get an existing ReferendumV2 proposal or create it from chain storage if missing.
+ * This handles the case where votes/events reference a referendum that hasn't been
+ * indexed yet (e.g., due to migration or race conditions between processors).
+ */
+export async function getOrCreateReferendumV2(
+    ctx: ProcessorContext<Store>,
+    index: number,
+    header: any
+): Promise<Proposal | null> {
+    // First, try to get from database
+    const existingProposal = await ctx.store.get(Proposal, {
+        where: { index, type: ProposalType.ReferendumV2 }
+    })
+
+    if (existingProposal) {
+        return existingProposal
+    }
+
+    // Not in database, try to fetch from chain storage
+    ctx.log.info(`Referendum ${index} not found in database, attempting to fetch from chain storage...`)
+
+    const storageData = await getReferendumFromStorage(ctx, index, header)
+
+    if (!storageData) {
+        ctx.log.warn(`Referendum ${index} not found in chain storage at block ${header.height}`)
+        return null
+    }
+
+    ctx.log.info(`Creating referendum ${index} from chain storage (migrated referendum)`)
+
+    // Create the referendum from storage data
+    const extrinsicIndex = `${header.height}-migration-backfill`
+
+    try {
+        const proposal = await createReferendumV2(ctx, header, extrinsicIndex, {
+            index: storageData.index,
+            status: ProposalStatus.Deciding,
+            hash: storageData.hash || '',
+            proposer: ss58codec.encode(storageData.submissionDeposit.who),
+            submissionDeposit: storageData.submissionDeposit,
+            decisionDeposit: storageData.decisionDeposit,
+            deciding: storageData.deciding,
+            tally: storageData.tally,
+            trackNumber: storageData.trackNumber,
+            origin: storageData.origin,
+            submittedAt: storageData.submittedAt,
+            enactmentAt: storageData.enactmentAt,
+            enactmentAfter: storageData.enactmentAfter,
+        }, ProposalType.ReferendumV2)
+
+        return proposal
+    } catch (e) {
+        ctx.log.error(`Failed to create referendum ${index} from storage: ${e}`)
+        return null
     }
 }

@@ -1,5 +1,10 @@
 export type ChainName = 'polkadot' | 'assethub-polkadot'
 
+// Migration block constants - when Referenda/ConvictionVoting/etc moved from relay chain to AssetHub
+// See https://migration.paritytech.io/#/polkadot for details
+export const POLKADOT_MIGRATION_BLOCK = 28_495_696  // Polkadot relay chain block
+export const ASSETHUB_POLKADOT_MIGRATION_BLOCK = 8_500_000  // Approximate AssetHub block
+
 export interface ChainConfig {
   name: ChainName
   prefix: string

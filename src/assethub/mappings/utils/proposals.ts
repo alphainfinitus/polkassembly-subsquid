@@ -48,6 +48,7 @@ import { storage } from '@assethub/storage'
 import referendumV2 from '@assethub/mappings/referendumV2'
 import { ProcessorContext } from '@src/processor'
 import { EGovEvent } from '@shared/types'
+import * as preimageStorage from '@assethub/types/preimage/storage'
 
 type ProposalUpdateData = Partial<
     Omit<
@@ -95,6 +96,41 @@ export async function updatePreimageStatus(
     await ctx.store.save(proposal)
 }
 
+// Helper function to get preimage status data from chain storage
+async function getPreimageStatusData(ctx: ProcessorContext<Store>, hash: string, header: any): Promise<any | undefined> {
+    try {
+        if (preimageStorage.statusFor.v2000000?.is(header)) {
+            return await preimageStorage.statusFor.v2000000.get(header, hash as any)
+        }
+        return undefined
+    } catch (e) {
+        ctx.log.debug(`Error fetching preimage status from storage: ${e}`)
+        return undefined
+    }
+}
+
+// Helper function to get preimage request status data from chain storage (newer storage version)
+async function getPreimageRequestStatusData(ctx: ProcessorContext<Store>, hash: string, header: any): Promise<any | undefined> {
+    try {
+        if (preimageStorage.requestStatusFor?.v2000000?.is(header)) {
+            return await preimageStorage.requestStatusFor.v2000000.get(header, hash as any)
+        }
+        return undefined
+    } catch (e) {
+        ctx.log.debug(`Error fetching preimage request status from storage: ${e}`)
+        return undefined
+    }
+}
+
+// Helper function to encode address
+function encodeAddress(accountId: Uint8Array): string {
+    try {
+        return ss58codec.encode(accountId)
+    } catch {
+        return ''
+    }
+}
+
 export async function updatePreimageStatusV2(
     ctx: ProcessorContext<Store>,
     header: any,
@@ -106,11 +142,65 @@ export async function updatePreimageStatusV2(
         data?: ProposalUpdateData
     }
 ) {
-    const proposal = await ctx.store.get(Preimage, { where: { hash: hash }, order: { createdAtBlock: 'DESC' } })
+    let proposal = await ctx.store.get(Preimage, { where: { hash: hash }, order: { createdAtBlock: 'DESC' } })
 
     if (!proposal) {
         ctx.log.warn(MissingProposalRecordWarn('PreimageV2', `with hash ${hash} not found`,))
-        return
+        
+        // Attempt to create a minimal preimage record from storage
+        const storageData = await getPreimageStatusData(ctx, hash, header) || await getPreimageRequestStatusData(ctx, hash, header)
+        
+        if (storageData) {
+            ctx.log.info(`Creating minimal PreimageV2 record for hash ${hash} from chain storage.`)
+            
+            let proposer: string | undefined
+            let deposit: bigint | undefined
+            let length: number | undefined
+
+            // Handle different storage formats
+            if (storageData.__kind === 'Unrequested') {
+                if (storageData.value && Array.isArray(storageData.value)) {
+                    proposer = encodeAddress(storageData.value[0])
+                    deposit = storageData.value[1]
+                } else if (storageData.value?.ticket) {
+                    proposer = encodeAddress(storageData.value.ticket[0])
+                    deposit = storageData.value.ticket[1]
+                    length = storageData.value.len
+                } else if (storageData.value?.deposit) {
+                    proposer = encodeAddress(storageData.value.deposit[0])
+                    deposit = storageData.value.deposit[1]
+                    length = storageData.value.len
+                }
+            } else if (storageData.__kind === 'Requested') {
+                if (storageData.value?.maybeTicket) {
+                    proposer = encodeAddress(storageData.value.maybeTicket[0])
+                    deposit = storageData.value.maybeTicket[1]
+                    length = storageData.value.maybeLen
+                } else if (storageData.value?.deposit) {
+                    proposer = encodeAddress(storageData.value.deposit[0])
+                    deposit = storageData.value.deposit[1]
+                    length = storageData.value.len
+                }
+            }
+
+            // Create minimal preimage record
+            const id = await getPreimageId(ctx.store)
+            proposal = new Preimage({
+                id,
+                hash,
+                proposer,
+                deposit,
+                length,
+                status: options.status,
+                createdAtBlock: header.height,
+                createdAt: new Date(header.timestamp),
+                updatedAt: new Date(header.timestamp),
+            })
+            await ctx.store.insert(proposal)
+        } else {
+            ctx.log.warn(`PreimageV2 with hash ${hash} not found in chain storage at block ${header.height}. Cannot create record.`)
+            return
+        }
     }
 
     Object.assign(proposal, options.data)

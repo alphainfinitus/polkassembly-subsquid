@@ -3,7 +3,7 @@ import { Store } from '@subsquid/typeorm-store'
 import { ss58codec } from '@assethub/common/tools'
 import { getRemoveOtherVoteData } from '@assethub/mappings/referendumV2/extrinsics/getters'
 import { MissingProposalRecordWarn } from '@shared/errors'
-import { removeVote } from '@assethub/mappings/referendumV2/extrinsics/utils'
+import { removeVote, getOrCreateReferendumV2 } from '@assethub/mappings/referendumV2/extrinsics/utils'
 import { updateCurveData } from '@assethub/common/curveData'
 import { Call, ProcessorContext } from '@src/processor'
 
@@ -12,7 +12,7 @@ export async function handleRemoveOtherVote(ctx: ProcessorContext<Store>,
     header: any): Promise<void> {
     if (!(item as any).success) return
     const { target, index } = getRemoveOtherVoteData(item)
-    const referendum = await ctx.store.get(Proposal, { where: { index, type: ProposalType.ReferendumV2 } })
+    const referendum = await getOrCreateReferendumV2(ctx, index, header)
     if (!referendum || referendum.index == undefined || referendum.index == null || referendum.trackNumber == undefined || referendum.trackNumber == null) {
         ctx.log.warn(MissingProposalRecordWarn(ProposalType.ReferendumV2, index))
         return
