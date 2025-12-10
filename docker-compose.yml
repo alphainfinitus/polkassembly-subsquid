@@ -117,6 +117,8 @@ services:
       - DEFAULT_POOL_SIZE=25
       - MIN_POOL_SIZE=5
       - RESERVE_POOL_SIZE=10
+      # Ignore parameters that squid-graphql-server sends but PgBouncer doesn't support in transaction mode
+      - IGNORE_STARTUP_PARAMETERS=extra_float_digits,statement_timeout
     healthcheck:
       test: ["CMD", "pg_isready", "-h", "localhost", "-p", "5432"]
       interval: 5s
