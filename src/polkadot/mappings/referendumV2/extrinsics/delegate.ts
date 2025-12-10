@@ -145,8 +145,8 @@ export async function handleDelegate(ctx: ProcessorContext<Store>,
                         vote.totalVotingPower = vote.selfVotingPower ? vote.selfVotingPower + chainStateDelegations.votes : chainStateDelegations.votes
                     } else {
                         // Fall back to calculated value
-                        vote.delegatedVotingPower = vote.delegatedVotingPower ? delegatedVotePower + votingPower + vote.delegatedVotingPower : delegatedVotePower + votingPower
-                        vote.totalVotingPower = vote.selfVotingPower ? vote.delegatedVotingPower + vote.selfVotingPower : delegatedVotePower
+                    vote.delegatedVotingPower = vote.delegatedVotingPower ? delegatedVotePower + votingPower + vote.delegatedVotingPower : delegatedVotePower + votingPower
+                    vote.totalVotingPower = vote.selfVotingPower ? vote.delegatedVotingPower + vote.selfVotingPower : delegatedVotePower
                     }
 
                     convictionVotes.push(vote)
