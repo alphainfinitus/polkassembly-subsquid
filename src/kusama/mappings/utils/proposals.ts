@@ -843,6 +843,20 @@ export async function createChildBounty(ctx: ProcessorContext<Store>, header: an
 
     const type = ProposalType.ChildBounty
 
+    // Check if this child bounty already exists (idempotency check)
+    const existingProposal = await ctx.store.get(Proposal, {
+        where: {
+            index: index,
+            parentBountyIndex: parentBountyIndex,
+            type: type,
+        }
+    })
+
+    if (existingProposal) {
+        ctx.log.info(`Child bounty ${index} with parent ${parentBountyIndex} already exists, skipping creation`)
+        return existingProposal
+    }
+
     const id = await getProposalId(ctx.store, type)
 
     // const group = await getOrCreateProposalGroup(ctx, index, ProposalType.Bounty)

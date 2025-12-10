@@ -14,7 +14,7 @@ import {
 import { getOriginAccountId } from '@src/shared/tools'
 import { getVoteData } from './getters'
 import { Store } from '@subsquid/typeorm-store'
-import { getDelegations, removeDelegatedVotesReferendum } from './utils'
+import { getDelegations, removeDelegatedVotesReferendum, getChainStateDelegations } from './utils'
 import { addDelegatedVotesReferendumV2 } from './utils'
 import { IsNull } from 'typeorm'
 import { updateCurveData } from '@kusama/common/curveData'
@@ -159,8 +159,17 @@ export async function handleConvictionVote(ctx: ProcessorContext<Store>,
 
     if ([VoteDecision.yes, VoteDecision.no].includes(decision)) {
         const { delegatedVotesNested, delegatedVotePower, flattenedVotesNested } = await addDelegatedVotesReferendumV2(ctx, header.height, header.timestamp, nestedDelegations, convictionVote)
-        convictionVote.delegatedVotingPower = convictionVote.delegatedVotingPower ? convictionVote.delegatedVotingPower + delegatedVotePower : delegatedVotePower
-        convictionVote.totalVotingPower = votingPower + convictionVote.delegatedVotingPower
+        
+        // Try to get delegated voting power from chain state (source of truth)
+        const chainStateDelegations = await getChainStateDelegations(header, from, proposal.trackNumber)
+        if (chainStateDelegations) {
+            convictionVote.delegatedVotingPower = chainStateDelegations.votes
+            convictionVote.totalVotingPower = votingPower ? votingPower + chainStateDelegations.votes : chainStateDelegations.votes
+        } else {
+            // Fallback to calculated value if chain state is not available
+            convictionVote.delegatedVotingPower = convictionVote.delegatedVotingPower ? convictionVote.delegatedVotingPower + delegatedVotePower : delegatedVotePower
+            convictionVote.totalVotingPower = votingPower ? votingPower + convictionVote.delegatedVotingPower : convictionVote.delegatedVotingPower
+        }
         convictionDelegatedVotes.push(...delegatedVotesNested)
         flattenedVotes.push(...flattenedVotesNested)
     }

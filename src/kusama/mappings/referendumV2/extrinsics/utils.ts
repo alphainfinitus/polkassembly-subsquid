@@ -7,9 +7,125 @@ import { randomUUID } from 'crypto'
 import { ProcessorContext } from '@src/processor'
 import { sendGovEvent } from '@kusama/mappings/utils/proposals'
 import { EGovEvent } from '@shared/types'
+import * as storage from '@kusama/types/storage'
+import { ss58codec } from '@src/shared/tools'
 
 export function convictionToLockPeriod(conviction: string): number {
     return conviction === 'None' ? 0 : Number(conviction[conviction.search(/\d/)])
+}
+
+/**
+ * Convert an ss58 address to hex format for storage queries.
+ * ss58codec.decode() returns a hex string with 0x prefix.
+ */
+function ss58ToHex(ss58Address: string): string {
+    try {
+        // ss58codec.decode returns a hex string (0x-prefixed)
+        return ss58codec.decode(ss58Address)
+    } catch (e) {
+        // If decoding fails, return the original (it might already be hex)
+        if (ss58Address.startsWith('0x')) {
+            return ss58Address
+        }
+        throw new Error(`Failed to decode ss58 address: ${ss58Address}`)
+    }
+}
+
+/**
+ * Query chain state to get the actual delegated voting power for a voter on a track.
+ * This is the source of truth as maintained by the Substrate runtime.
+ * Returns { votes: bigint, capital: bigint } where votes is the voting power and capital is the balance.
+ */
+export async function getChainStateDelegations(block: any, voter: string, track: number): Promise<{ votes: bigint, capital: bigint } | null> {
+    try {
+        if (!storage.convictionVoting || !storage.convictionVoting.votingFor) {
+            return null
+        }
+
+        // Check if the storage version is available
+        const storageVersions = Object.keys(storage.convictionVoting.votingFor).filter(k => k.startsWith('v'))
+        if (storageVersions.length === 0) {
+            return null
+        }
+
+        // Use the latest available version
+        const version = storageVersions[storageVersions.length - 1]
+        const storageQuery = (storage.convictionVoting.votingFor as any)[version]
+
+        if (!storageQuery.is(block)) {
+            return null
+        }
+
+        // Convert ss58 address to hex for the storage query
+        const voterHex = ss58ToHex(voter)
+        const votingFor = await storageQuery.get(block, voterHex, track)
+        if (!votingFor) {
+            return null
+        }
+
+        if (votingFor.__kind === 'Casting') {
+            return {
+                votes: votingFor.value.delegations.votes,
+                capital: votingFor.value.delegations.capital
+            }
+        }
+
+        return null
+    } catch (e) {
+        console.error(`Error querying chain state delegations for ${voter} on track ${track}:`, e)
+        return null
+    }
+}
+
+/**
+ * Remove existing ConvictionDelegatedVotes for a delegator when they re-delegate.
+ * Also updates the old delegate's delegatedVotingPower and totalVotingPower.
+ */
+export async function removeDelegatorFromVote(
+    ctx: ProcessorContext<Store>,
+    delegator: string,
+    proposalIndex: number,
+    block: number,
+    blockTime: number
+): Promise<void> {
+    // Find all delegated votes from this delegator for this proposal
+    const delegatedVotes = await ctx.store.find(ConvictionDelegatedVotes, {
+        where: {
+            voter: delegator,
+            proposalIndex,
+            removedAtBlock: IsNull(),
+            type: VoteType.ReferendumV2
+        },
+        relations: {
+            delegatedTo: true
+        }
+    })
+
+    for (const dv of delegatedVotes) {
+        // Mark the delegated vote as removed
+        dv.removedAtBlock = block
+        dv.removedAt = new Date(blockTime)
+        await ctx.store.save(dv)
+
+        // Update the parent vote's delegated power
+        if (dv.delegatedTo && dv.votingPower) {
+            const parentVote = await ctx.store.get(ConvictionVote, {
+                where: { id: dv.delegatedTo.id }
+            })
+            if (parentVote) {
+                if (parentVote.delegatedVotingPower) {
+                    parentVote.delegatedVotingPower -= dv.votingPower
+                }
+                if (parentVote.totalVotingPower) {
+                    parentVote.totalVotingPower -= dv.votingPower
+                }
+                await ctx.store.save(parentVote)
+            }
+        }
+    }
+
+    // Also remove flattened votes for this delegator
+    await removeFlattenedVotes(ctx, [delegator], proposalIndex, block, blockTime)
 }
 
 export async function addDelegatedVotesReferendumV2(ctx: ProcessorContext<Store>, block: number, blockTime: number, nestedDelegations: VotingDelegation[], convictionVote: ConvictionVote): Promise<{ delegatedVotesNested: ConvictionDelegatedVotes[], delegatedVotePower: bigint, flattenedVotesNested: FlattenedConvictionVotes[] }> {
@@ -72,23 +188,31 @@ export async function addDelegatedVotesReferendumV2(ctx: ProcessorContext<Store>
 }
 
 
-export async function getDelegations(ctx: ProcessorContext<Store>, voter: string | undefined, track: number): Promise<any> {
+/**
+ * Get direct delegations to a voter on a specific track.
+ * 
+ * IMPORTANT: The Substrate runtime does NOT support nested/transitive delegations.
+ * From pallet-conviction-voting lib.rs: "We don't support second level delegating"
+ * 
+ * If A delegates to B, and B is casting, A's votes are added to B's delegations.
+ * If A delegates to B, and B is delegating to C, A's votes stay with B (NOT propagated to C).
+ * 
+ * Therefore, we only fetch DIRECT delegations to the voter, not nested ones.
+ * The chain state's `delegations` field on a voter's `Casting` entry is the source of truth.
+ */
+export async function getDelegations(ctx: ProcessorContext<Store>, voter: string | undefined, track: number): Promise<VotingDelegation[]> {
     try {
-        let delegations = await ctx.store.find(VotingDelegation, { where: { to: voter, endedAtBlock: IsNull(), track, type: DelegationType.OpenGov } })
-        if (delegations != null && delegations != undefined && delegations.length > 0) {
-            let nestedDelegations = []
-            for (let i = 0; i < delegations.length; i++) {
-                const delegation = delegations[i]
-                if (delegation.from == voter || delegation.to == voter) {
-                    continue
-                }
-                nestedDelegations.push(...(await getDelegations(ctx, delegation.from, track)))
-            }
-            return [...delegations, ...nestedDelegations]
-        }
-        else {
+        if (!voter) {
             return []
         }
+
+        // Only get DIRECT delegations to this voter (no recursion per Substrate runtime behavior)
+        let delegations = await ctx.store.find(VotingDelegation, {
+            where: { to: voter, endedAtBlock: IsNull(), track, type: DelegationType.OpenGov }
+        })
+
+        // Filter out self-delegations
+        return delegations.filter(d => d.from !== d.to)
     }
     catch (e) {
         return []
