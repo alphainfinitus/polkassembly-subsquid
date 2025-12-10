@@ -14,7 +14,7 @@ import {
 import { getOriginAccountId } from '@src/shared/tools'
 import { getVoteData } from './getters'
 import { Store } from '@subsquid/typeorm-store'
-import { getDelegations, removeDelegatedVotesReferendum, getChainStateDelegations } from './utils'
+import { getDelegations, removeDelegatedVotesReferendum, getChainStateDelegations, getOrCreateReferendumV2 } from './utils'
 import { addDelegatedVotesReferendumV2 } from './utils'
 import { IsNull } from 'typeorm'
 import { updateCurveData } from '@kusama/common/curveData'
@@ -30,7 +30,8 @@ export async function handleConvictionVote(ctx: ProcessorContext<Store>,
 
     const { index, vote } = getVoteData(item)
 
-    const proposal = await ctx.store.get(Proposal, { where: { index, type: ProposalType.ReferendumV2 } })
+    // Use getOrCreateReferendumV2 to handle referenda that may not exist in DB yet
+    const proposal = await getOrCreateReferendumV2(ctx, index, header)
     if (!proposal || proposal.trackNumber === undefined || proposal.trackNumber === null) {
         ctx.log.warn(MissingProposalRecordWarn(ProposalType.ReferendumV2, index))
         return
@@ -159,7 +160,7 @@ export async function handleConvictionVote(ctx: ProcessorContext<Store>,
 
     if ([VoteDecision.yes, VoteDecision.no].includes(decision)) {
         const { delegatedVotesNested, delegatedVotePower, flattenedVotesNested } = await addDelegatedVotesReferendumV2(ctx, header.height, header.timestamp, nestedDelegations, convictionVote)
-        
+
         // Try to get delegated voting power from chain state (source of truth)
         const chainStateDelegations = await getChainStateDelegations(header, from, proposal.trackNumber)
         if (chainStateDelegations) {

@@ -20,6 +20,8 @@ RUN npm ci --production
 
 FROM node AS squid
 WORKDIR /squid
+# Install bash, postgresql-client for migration wait script, and bc for calculations
+RUN apk add --no-cache bash postgresql-client bc
 COPY --from=deps /squid/package.json .
 COPY --from=deps /squid/package-lock.json .
 COPY --from=deps /squid/node_modules node_modules
@@ -27,6 +29,7 @@ COPY --from=builder /squid/lib lib
 RUN echo -e "loglevel=silent\nupdate-notifier=false" > /squid/.npmrc
 ADD db db
 ADD assets assets
+ADD scripts scripts
 ADD schema.graphql .
 # TODO: use shorter PROMETHEUS_PORT
 ENV PROCESSOR_PROMETHEUS_PORT 3000

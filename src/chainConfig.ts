@@ -1,5 +1,10 @@
 export type ChainName = 'kusama' | 'assethub-kusama'
 
+// Migration block constants - when Referenda/ConvictionVoting/etc moved from relay chain to AssetHub
+// See https://migration.paritytech.io/ for details
+export const KUSAMA_MIGRATION_BLOCK = 30_425_590  // Kusama relay chain block
+export const ASSETHUB_KUSAMA_MIGRATION_BLOCK = 7_800_000  // Approximate AssetHub block
+
 export interface ChainConfig {
   name: ChainName
   prefix: string

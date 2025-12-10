@@ -104,11 +104,68 @@ export async function updatePreimageStatusV2(
         data?: ProposalUpdateData
     }
 ) {
-    const proposal = await ctx.store.get(Preimage, { where: { hash: hash }, order: { createdAtBlock: 'DESC' } })
+    let proposal = await ctx.store.get(Preimage, { where: { hash: hash }, order: { createdAtBlock: 'DESC' } })
 
     if (!proposal) {
-        ctx.log.warn(MissingProposalRecordWarn('PreimageV2', `with hash ${hash} not found`,))
-        return
+        // Preimage not found in database - try to create a minimal record
+        // This handles race conditions between processors or migrated preimages
+        ctx.log.info(`Preimage ${hash} not found in database, creating minimal record...`)
+
+        try {
+            // Try to fetch preimage status from chain storage
+            const storageData = await header._runtime.getStorage(header.hash, 'Preimage.StatusFor', hash)
+
+            let proposer: string | undefined = undefined
+            let deposit: bigint | undefined = undefined
+            let length: number | undefined = undefined
+
+            if (storageData) {
+                if (storageData.__kind === 'Unrequested' && storageData.deposit) {
+                    proposer = ss58codec.encode(storageData.deposit[0])
+                    deposit = storageData.deposit[1]
+                    length = storageData.len
+                } else if (storageData.__kind === 'Requested') {
+                    if (storageData.deposit) {
+                        proposer = ss58codec.encode(storageData.deposit[0])
+                        deposit = storageData.deposit[1]
+                    }
+                    length = storageData.len
+                }
+            }
+
+            // Create minimal preimage record
+            const id = await getPreimageId(ctx.store)
+            proposal = new Preimage({
+                id,
+                hash,
+                proposer,
+                deposit,
+                length,
+                status: options.status, // Use the status from the event we're processing
+                createdAtBlock: header.height,
+                createdAt: new Date(header.timestamp),
+                updatedAt: new Date(header.timestamp),
+            })
+
+            await ctx.store.insert(proposal)
+
+            await ctx.store.insert(
+                new StatusHistory({
+                    id: randomUUID(),
+                    block: proposal.createdAtBlock,
+                    timestamp: proposal.createdAt,
+                    status: proposal.status,
+                    extrinsicIndex,
+                    preimage: proposal,
+                })
+            )
+
+            ctx.log.info(`Created minimal preimage record for ${hash}`)
+            return // Already saved with correct status
+        } catch (e) {
+            ctx.log.warn(`Failed to create preimage ${hash} from storage: ${e}`)
+            return
+        }
     }
 
     Object.assign(proposal, options.data)

@@ -90,6 +90,8 @@ services:
     depends_on:
       migrator:
         condition: service_completed_successfully
+      processor-kusama:
+        condition: service_started
     environment:
       DB_HOST: db
       DB_PORT: 5432
@@ -97,7 +99,10 @@ services:
       DB_PASS: squid
       NOTIFICATION_API_KEY: "${NOTIFICATION_API_KEY}"
       TOOLS_PASSPHRASE: "${TOOLS_PASSPHRASE}"
-    command: ["npm", "run", "processor:start:assethub"]
+      # Kusama migration block - AssetHub waits until Kusama passes this block
+      KUSAMA_MIGRATION_BLOCK: "30425590"
+      POLL_INTERVAL: "30"
+    command: ["bash", "scripts/wait-for-kusama-migration.sh"]
 
   api:
     restart: always
