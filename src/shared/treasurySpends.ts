@@ -1,0 +1,401 @@
+import { randomUUID } from 'node:crypto'
+import { Store } from '@subsquid/typeorm-store'
+import { ProcessorContext } from '@src/processor'
+import { decodeHex } from '@subsquid/util-internal-hex'
+import { TreasurySpend, Proposal, ProposalType, ProposalStatus } from '@model/index'
+
+interface SS58Codec {
+    encode(bytes: Uint8Array): string
+}
+
+interface GetAwarderDataFunction {
+    (event: any): { index: number }
+}
+
+function extractAccountIdFromMultiAddress(multiAddress: any): Uint8Array | null {
+    if (!multiAddress || typeof multiAddress !== 'object') {
+        return null
+    }
+
+    // Handle V4 format: { V4: { interior: { X1: [{ AccountId32: { id: ... } }] } } }
+    if (multiAddress.V4?.interior?.X1) {
+        const x1 = Array.isArray(multiAddress.V4.interior.X1) 
+            ? multiAddress.V4.interior.X1[0] 
+            : multiAddress.V4.interior.X1
+        if (x1?.AccountId32?.id) {
+            return toUint8Array(x1.AccountId32.id)
+        }
+    }
+
+    // Handle V3 format: { V3: { interior: { X1: { AccountId32: { id: ... } } } } }
+    if (multiAddress.V3?.interior?.X1?.AccountId32?.id) {
+        return toUint8Array(multiAddress.V3.interior.X1.AccountId32.id)
+    }
+
+    // Handle direct AccountId32 format
+    if (multiAddress.AccountId32?.id) {
+        return toUint8Array(multiAddress.AccountId32.id)
+    }
+
+    // Handle Id format (direct bytes)
+    if (multiAddress.__kind === 'Id') {
+        return toUint8Array(multiAddress.value)
+    }
+
+    return null
+}
+
+function toUint8Array(val: any): Uint8Array {
+    if (typeof val === 'string') {
+        return new Uint8Array(decodeHex(val))
+    }
+    if (val instanceof Uint8Array) {
+        return val
+    }
+    return new Uint8Array(val)
+}
+
+function toBigIntOrNull(value: unknown): bigint | null {
+    if (typeof value === 'bigint') {
+        return value
+    }
+    if (typeof value === 'number' && Number.isFinite(value)) {
+        return BigInt(value)
+    }
+    if (typeof value === 'string' && value.trim() !== '') {
+        try {
+            return BigInt(value)
+        } catch {
+            return null
+        }
+    }
+    return null
+}
+
+function extractGeneralIndex(junction: any): bigint | null {
+    if (junction == null) {
+        return null
+    }
+
+    if (typeof junction === 'object') {
+        const kind = junction.__kind
+
+        if (kind === 'GeneralIndex') {
+            const value = junction.value ?? junction.GeneralIndex ?? junction.index
+            return toBigIntOrNull(value)
+        }
+
+        if ('GeneralIndex' in junction) {
+            return toBigIntOrNull(junction.GeneralIndex)
+        }
+
+        if ('value' in junction && typeof junction.value === 'object' && junction.value !== null) {
+            if ('GeneralIndex' in junction.value) {
+                return toBigIntOrNull(junction.value.GeneralIndex)
+            }
+        }
+    } else {
+        return toBigIntOrNull(junction)
+    }
+
+    return null
+}
+
+function extractJunctions(interior: any): any[] {
+    if (!interior || typeof interior !== 'object') {
+        return []
+    }
+
+    if (typeof interior.__kind === 'string' && interior.__kind.startsWith('X')) {
+        const value = interior.value
+        if (Array.isArray(value)) {
+            return value
+        }
+        if (value !== undefined && value !== null) {
+            return [value]
+        }
+    }
+
+    const keys = ['X8', 'X7', 'X6', 'X5', 'X4', 'X3', 'X2', 'X1']
+    for (const key of keys) {
+        if (key in interior) {
+            const value = (interior as Record<string, any>)[key]
+            if (Array.isArray(value)) {
+                return value
+            }
+            if (value !== undefined && value !== null) {
+                return [value]
+            }
+        }
+    }
+
+    return []
+}
+
+function extractAssetIdFromAssetKind(assetKind: any): bigint | null {
+    if (!assetKind || typeof assetKind !== 'object') {
+        return null
+    }
+
+    const assetKindValue = typeof assetKind.value === 'object' && assetKind.value !== null
+        ? assetKind.value
+        : assetKind
+
+    const rawAssetId = assetKindValue.assetId
+        ?? (assetKindValue.value && typeof assetKindValue.value === 'object' ? assetKindValue.value.assetId : undefined)
+
+    const assetIdValue = rawAssetId && typeof rawAssetId.value === 'object' && rawAssetId.value !== null
+        ? rawAssetId.value
+        : rawAssetId
+
+    const directGeneralIndex = extractGeneralIndex(assetIdValue)
+    if (directGeneralIndex !== null) {
+        return directGeneralIndex
+    }
+
+    const interior = assetIdValue?.interior
+        ?? (assetIdValue && typeof assetIdValue.value === 'object' ? assetIdValue.value.interior : undefined)
+
+    const junctions = extractJunctions(interior)
+    for (const junction of junctions) {
+        const generalIndex = extractGeneralIndex(
+            junction && typeof junction.value === 'object' && junction.value !== null
+                ? junction.value
+                : junction
+        )
+        if (generalIndex !== null) {
+            return generalIndex
+        }
+    }
+
+    return null
+}
+
+function extractAccountIdFromLocation(location: any): Uint8Array | null {
+    if (!location || typeof location !== 'object') {
+        return null
+    }
+
+    // Handle __kind structure: { __kind: "V3", value: { interior: { __kind: "X1", value: { __kind: "AccountId32", id: ... } } } }
+    if (location.__kind === 'V3' || location.__kind === 'V4') {
+        const value = location.value
+        if (value?.interior) {
+            const interior = value.interior
+            // Handle X1 junction with __kind structure
+            if (interior.__kind === 'X1' && interior.value) {
+                const x1Value = interior.value
+                if (x1Value.__kind === 'AccountId32' && x1Value.id) {
+                    return toUint8Array(x1Value.id)
+                }
+            }
+            // Handle X1 as direct property (fallback)
+            if (interior.X1) {
+                const x1 = Array.isArray(interior.X1) ? interior.X1[0] : interior.X1
+                if (x1?.AccountId32?.id || (x1?.__kind === 'AccountId32' && x1.id)) {
+                    return toUint8Array(x1.AccountId32?.id || x1.id)
+                }
+            }
+        }
+    }
+
+    // Handle V4 format: beneficiary.V4.interior.X1[0].AccountId32.id
+    if (location.V4?.interior?.X1) {
+        const x1 = Array.isArray(location.V4.interior.X1) 
+            ? location.V4.interior.X1[0] 
+            : location.V4.interior.X1
+        if (x1?.AccountId32?.id) {
+            return toUint8Array(x1.AccountId32.id)
+        }
+    }
+
+    // Handle V3 format: beneficiary.V3.interior.X1.AccountId32.id
+    if (location.V3?.interior?.X1?.AccountId32?.id) {
+        return toUint8Array(location.V3.interior.X1.AccountId32.id)
+    }
+
+    // Handle other versioned locations - check for V0, V1, V2
+    const locationValue = location.V0 || location.V1 || location.V2 || location
+    
+    // Handle interior junctions - AccountId32 is typically in interior.X1
+    if (locationValue?.interior) {
+        const interior = locationValue.interior
+        
+        // Handle X1 junction: { X1: { AccountId32: { id: ... } } }
+        if (interior.X1) {
+            const x1 = Array.isArray(interior.X1) ? interior.X1[0] : interior.X1
+            if (x1?.AccountId32?.id) {
+                return toUint8Array(x1.AccountId32.id)
+            }
+        }
+        
+        // Handle Here junction (empty interior)
+        if (interior.Here || interior.__kind === 'Here') {
+            // Here means the chain itself, not an account
+            return null
+        }
+    }
+    
+    // Handle direct AccountId32 in location
+    if (locationValue?.AccountId32?.id) {
+        return toUint8Array(locationValue.AccountId32.id)
+    }
+
+    return null
+}
+
+function calculateExpiresAt(expireAtBlock: number | undefined, currentBlock: number, blockTime: Date): Date | null {
+    if (!expireAtBlock) {
+        return null
+    }
+    
+    const blocksDiff = expireAtBlock - currentBlock
+    const blockTimeMs = blockTime.getTime()
+    const blockDurationMs = 6000 // 6 seconds per block (both Polkadot and AssetHub)
+    const expiresAtMs = blockTimeMs + (blocksDiff * blockDurationMs)
+    
+    return new Date(expiresAtMs)
+}
+
+export async function createOrUpdateTreasurySpend(
+    ctx: ProcessorContext<Store>,
+    header: any,
+    index: number,
+    spendData: any,
+    ss58codec: SS58Codec,
+    getAwarderData: GetAwarderDataFunction,
+    block?: any
+): Promise<void> {
+    try {
+        // Try to extract account ID from MultiAddress or Location
+        // For AssetSpendApproved events, beneficiary is typically a VersionedLocation
+        const beneficiaryBytes = extractAccountIdFromLocation(spendData.beneficiary) 
+            ?? extractAccountIdFromMultiAddress(spendData.beneficiary)
+        
+        if (!beneficiaryBytes) {
+            ctx.log.warn(`Could not extract beneficiary from spend ${index} at block ${header.height}`)
+        }
+
+        const beneficiary = beneficiaryBytes ? ss58codec.encode(beneficiaryBytes) : ''
+        const amount = BigInt(spendData.amount || 0)
+        const expireAt = spendData.expireAt ? Number(spendData.expireAt) : undefined
+        const expiresAt = expireAt ? calculateExpiresAt(expireAt, header.height, new Date(header.timestamp)) : null
+
+        // Convert assetKind to JSON-safe format (convert BigInt to string)
+        const assetKindJson = spendData.assetKind ? JSON.parse(JSON.stringify(spendData.assetKind, (key, value) => {
+            if (typeof value === 'bigint') {
+                return value.toString()
+            }
+            return value
+        })) : null
+        const assetId = extractAssetIdFromAssetKind(spendData.assetKind)
+
+        // Find associated treasury proposal using multiple strategies
+        let proposal: Proposal | null = null
+        let proposalIndex: number | null = null
+        
+        const executionBlock = header.height
+
+        // Strategy 1: Match by execution block number
+        // AssetSpendApproved events are triggered when a ReferendumV2 proposal is executed
+        // Match proposals executed at the exact same block where AssetSpendApproved was emitted
+        // Filter by type === ReferendumV2 and status === Executed
+        const executedProposals = await ctx.store.find(Proposal, {
+            where: {
+                type: ProposalType.ReferendumV2,
+                status: ProposalStatus.Executed,
+                executeAtBlockNumber: executionBlock
+            },
+            order: {
+                index: 'DESC'
+            },
+            take: 10
+        })
+        
+        if (executedProposals.length > 0) {
+            // If multiple proposals executed at the same block (rare but possible),
+            // prefer matching by beneficiary if available, otherwise take the first one
+            if (beneficiary) {
+                const beneficiaryMatch = executedProposals.find(p => p.payee === beneficiary)
+                if (beneficiaryMatch) {
+                    proposal = beneficiaryMatch
+                } else {
+                    // Fallback to first proposal if no beneficiary match
+                    proposal = executedProposals[0]
+                }
+            } else {
+                // No beneficiary to match, take the first proposal
+                proposal = executedProposals[0]
+            }
+        }
+        
+        
+        
+        // Strategy 2: Look for Treasury.Awarded events in the same block
+        if (!proposal) {
+            if (block?.events) {
+                for (const event of block.events) {
+                    if (event.name === 'Treasury.Awarded') {
+                        try {
+                            const awardedData = getAwarderData(event)
+                            proposalIndex = awardedData.index
+                            break
+                        } catch {
+                            // Continue to next event if parsing fails
+                        }
+                    }
+                }
+            }
+            
+            // If we found a proposal index from events, use it directly
+            if (proposalIndex !== null) {
+                const foundProposal = await ctx.store.get(Proposal, {
+                    where: {
+                        index: proposalIndex,
+                        type: ProposalType.TreasuryProposal
+                    }
+                })
+                proposal = foundProposal || null
+            }
+        }
+
+        // Check if spend already exists
+        const existingSpend = await ctx.store.get(TreasurySpend, {
+            where: { index }
+        })
+
+        if (existingSpend) {
+            // Update existing spend
+            existingSpend.beneficiary = beneficiary
+            existingSpend.amount = amount
+            existingSpend.expireAt = expireAt
+            existingSpend.expiresAt = expiresAt
+            existingSpend.assetKind = assetKindJson
+            existingSpend.proposal = proposal || null
+            existingSpend.assetId = assetId
+            existingSpend.updatedAtBlock = header.height
+            existingSpend.updatedAt = new Date(header.timestamp)
+            await ctx.store.save(existingSpend)
+        } else {
+            // Create new spend
+            const spend = new TreasurySpend({
+                id: randomUUID(),
+                index,
+                beneficiary,
+                amount,
+                expireAt,
+                expiresAt,
+                assetKind: assetKindJson,
+                assetId,
+                proposal: proposal || null,
+                createdAtBlock: header.height,
+                createdAt: new Date(header.timestamp),
+                updatedAtBlock: header.height,
+                updatedAt: new Date(header.timestamp),
+            })
+            await ctx.store.insert(spend)
+        }
+    } catch (error) {
+        ctx.log.warn(`Error creating/updating TreasurySpend ${index} at block ${header.height}: ${error}`)
+    }
+}
+

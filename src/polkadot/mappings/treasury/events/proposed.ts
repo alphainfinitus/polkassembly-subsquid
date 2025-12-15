@@ -4,7 +4,8 @@ import { ProposalStatus, ProposalType } from '@model/index'
 import { ss58codec } from '@polkadot/common/tools'
 import { storage } from '@polkadot/storage'
 import { createTreasury } from '@polkadot/mappings/utils/proposals'
-import { getProposedData, getSpendApprovedData } from '@polkadot/mappings/treasury/events/getters'
+import { getProposedData, getSpendApprovedData, getAssetSpendApprovedData } from '@polkadot/mappings/treasury/events/getters'
+import { createOrUpdateTreasurySpend } from '@polkadot/mappings/utils/treasurySpends'
 import { Store } from '@subsquid/typeorm-store'
 import { ProcessorContext, Event } from '@src/processor'
 
@@ -46,4 +47,22 @@ export async function handleSpendApproved(ctx: ProcessorContext<Store>,
         deposit: 0 as unknown as bigint,
         payee: ss58codec.encode(beneficiary),
     })
+}
+
+export async function handleAssetSpendApproved(ctx: ProcessorContext<Store>,
+    item: Event,
+    header: any,
+    block?: any) {
+    try {
+        const { index, assetKind, amount, beneficiary, expireAt } = getAssetSpendApprovedData(item)
+        
+        await createOrUpdateTreasurySpend(ctx, header, index, {
+            beneficiary,
+            amount,
+            expireAt,
+            assetKind
+        }, block)
+    } catch (error) {
+        ctx.log.warn(`Error handling Treasury.AssetSpendApproved at block ${header.height}: ${error}`)
+    }
 }

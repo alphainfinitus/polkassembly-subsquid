@@ -35,11 +35,13 @@ export function createProcessor(config: ChainConfig) {
         )
     }
 
-    if (config.hasTreasury && config.hasDemocracy) {
-        calls.push(
-            'Treasury.accept_curator',
-            'Treasury.unassign_curator'
-        )
+    if (config.hasTreasury) {
+        if (config.hasDemocracy) {
+            calls.push(
+                'Treasury.accept_curator',
+                'Treasury.unassign_curator'
+            )
+        }
     }
 
     if (config.hasBounties) {
@@ -146,7 +148,11 @@ export function createProcessor(config: ChainConfig) {
             'Treasury.Proposed',
             'Treasury.Awarded',
             'Treasury.Rejected',
-            'Treasury.SpendApproved'
+            'Treasury.SpendApproved',
+            'Treasury.AssetSpendApproved',
+            'Treasury.Paid',
+            'Treasury.AssetSpendVoided',
+            'Treasury.SpendProcessed'
         )
 
         if (config.hasDemocracy) {
@@ -422,6 +428,9 @@ export async function handleBlocks(ctx: any, config: ChainConfig) {
                 if (item.name == 'Treasury.SpendApproved') {
                     await modules.treasury.events.handleSpendApproved(ctx, item, block.header)
                 }
+                if (item.name == 'Treasury.AssetSpendApproved') {
+                    await modules.treasury.events.handleAssetSpendApproved(ctx, item, block.header, block)
+                }
 
                 if (config.hasDemocracy && config.name === 'polkadot') {
                     if (item.name == 'Treasury.BountyProposed') {
@@ -571,6 +580,7 @@ export async function handleBlocks(ctx: any, config: ChainConfig) {
                 }
             }
         }
+
     }
 }
 

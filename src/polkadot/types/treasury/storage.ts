@@ -2,6 +2,9 @@ import {sts, Block, Bytes, Option, Result, StorageType, RuntimeCtx} from '../sup
 import * as v0 from '../v0'
 import * as v13 from '../v13'
 import * as v25 from '../v25'
+import * as v1001002 from '../v1001002'
+import * as v1002000 from '../v1002000'
+import * as v1005001 from '../v1005001'
 
 export const proposals =  {
     /**
@@ -152,4 +155,70 @@ export interface BountyDescriptionsV25  {
     getPairs(block: Block, key: v25.BountyIndex): Promise<[k: v25.BountyIndex, v: (Bytes | undefined)][]>
     getPairsPaged(pageSize: number, block: Block): AsyncIterable<[k: v25.BountyIndex, v: (Bytes | undefined)][]>
     getPairsPaged(pageSize: number, block: Block, key: v25.BountyIndex): AsyncIterable<[k: v25.BountyIndex, v: (Bytes | undefined)][]>
+}
+
+export const spends =  {
+    /**
+     *  Spends that have been approved and being processed.
+     */
+    v1001002: new StorageType('Treasury.Spends', 'Optional', [sts.number()], v1001002.SpendStatus) as SpendsV1001002,
+    /**
+     *  Spends that have been approved and being processed.
+     */
+    v1002000: new StorageType('Treasury.Spends', 'Optional', [sts.number()], v1002000.SpendStatus) as SpendsV1002000,
+    /**
+     *  Spends that have been approved and being processed.
+     */
+    v1005001: new StorageType('Treasury.Spends', 'Optional', [sts.number()], v1005001.SpendStatus) as SpendsV1005001,
+}
+
+/**
+ *  Spends that have been approved and being processed.
+ */
+export interface SpendsV1001002  {
+    is(block: RuntimeCtx): boolean
+    get(block: Block, key: number): Promise<(v1001002.SpendStatus | undefined)>
+    getMany(block: Block, keys: number[]): Promise<(v1001002.SpendStatus | undefined)[]>
+    getKeys(block: Block): Promise<number[]>
+    getKeys(block: Block, key: number): Promise<number[]>
+    getKeysPaged(pageSize: number, block: Block): AsyncIterable<number[]>
+    getKeysPaged(pageSize: number, block: Block, key: number): AsyncIterable<number[]>
+    getPairs(block: Block): Promise<[k: number, v: (v1001002.SpendStatus | undefined)][]>
+    getPairs(block: Block, key: number): Promise<[k: number, v: (v1001002.SpendStatus | undefined)][]>
+    getPairsPaged(pageSize: number, block: Block): AsyncIterable<[k: number, v: (v1001002.SpendStatus | undefined)][]>
+    getPairsPaged(pageSize: number, block: Block, key: number): AsyncIterable<[k: number, v: (v1001002.SpendStatus | undefined)][]>
+}
+
+/**
+ *  Spends that have been approved and being processed.
+ */
+export interface SpendsV1002000  {
+    is(block: RuntimeCtx): boolean
+    get(block: Block, key: number): Promise<(v1002000.SpendStatus | undefined)>
+    getMany(block: Block, keys: number[]): Promise<(v1002000.SpendStatus | undefined)[]>
+    getKeys(block: Block): Promise<number[]>
+    getKeys(block: Block, key: number): Promise<number[]>
+    getKeysPaged(pageSize: number, block: Block): AsyncIterable<number[]>
+    getKeysPaged(pageSize: number, block: Block, key: number): AsyncIterable<number[]>
+    getPairs(block: Block): Promise<[k: number, v: (v1002000.SpendStatus | undefined)][]>
+    getPairs(block: Block, key: number): Promise<[k: number, v: (v1002000.SpendStatus | undefined)][]>
+    getPairsPaged(pageSize: number, block: Block): AsyncIterable<[k: number, v: (v1002000.SpendStatus | undefined)][]>
+    getPairsPaged(pageSize: number, block: Block, key: number): AsyncIterable<[k: number, v: (v1002000.SpendStatus | undefined)][]>
+}
+
+/**
+ *  Spends that have been approved and being processed.
+ */
+export interface SpendsV1005001  {
+    is(block: RuntimeCtx): boolean
+    get(block: Block, key: number): Promise<(v1005001.SpendStatus | undefined)>
+    getMany(block: Block, keys: number[]): Promise<(v1005001.SpendStatus | undefined)[]>
+    getKeys(block: Block): Promise<number[]>
+    getKeys(block: Block, key: number): Promise<number[]>
+    getKeysPaged(pageSize: number, block: Block): AsyncIterable<number[]>
+    getKeysPaged(pageSize: number, block: Block, key: number): AsyncIterable<number[]>
+    getPairs(block: Block): Promise<[k: number, v: (v1005001.SpendStatus | undefined)][]>
+    getPairs(block: Block, key: number): Promise<[k: number, v: (v1005001.SpendStatus | undefined)][]>
+    getPairsPaged(pageSize: number, block: Block): AsyncIterable<[k: number, v: (v1005001.SpendStatus | undefined)][]>
+    getPairsPaged(pageSize: number, block: Block, key: number): AsyncIterable<[k: number, v: (v1005001.SpendStatus | undefined)][]>
 }

@@ -1,5 +1,5 @@
 import { UnknownVersionError } from '@shared/errors'
-import { awarded, proposed, rejected, spendApproved } from '@polkadot/types/treasury/events'
+import { awarded, proposed, rejected, spendApproved, assetSpendApproved } from '@polkadot/types/treasury/events'
 import { Event } from '@src/processor'
 interface ProposedData {
     index: number
@@ -81,4 +81,45 @@ export function getSpendApprovedData(itemEvent: Event): SpendApprovedData {
         throw new UnknownVersionError(itemEvent.name)
     }
 
+}
+
+interface AssetSpendApprovedData {
+    index: number
+    assetKind: any
+    amount: bigint
+    beneficiary: any
+    expireAt: number
+}
+
+export function getAssetSpendApprovedData(itemEvent: Event): AssetSpendApprovedData {
+    if (assetSpendApproved.v1001002.is(itemEvent)) {
+        const { index, assetKind, amount, beneficiary, expireAt } = assetSpendApproved.v1001002.decode(itemEvent)
+        return {
+            index,
+            assetKind,
+            amount,
+            beneficiary,
+            expireAt
+        }
+    } else if (assetSpendApproved.v1002000.is(itemEvent)) {
+        const { index, assetKind, amount, beneficiary, expireAt } = assetSpendApproved.v1002000.decode(itemEvent)
+        return {
+            index,
+            assetKind,
+            amount,
+            beneficiary,
+            expireAt
+        }
+    } else if (assetSpendApproved.v1005001.is(itemEvent)) {
+        const { index, assetKind, amount, beneficiary, expireAt } = assetSpendApproved.v1005001.decode(itemEvent)
+        return {
+            index,
+            assetKind,
+            amount,
+            beneficiary,
+            expireAt
+        }
+    } else {
+        throw new UnknownVersionError(itemEvent.name)
+    }
 }
