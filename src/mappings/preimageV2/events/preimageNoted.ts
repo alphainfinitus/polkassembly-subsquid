@@ -37,11 +37,26 @@ async function getStorageData(ctx: ProcessorContext<Store>, hash: string, block:
             }
         }
         else {
-            throw new UnknownVersionError('preimage.PreimageFor')
+            return undefined
         }
     }
     else {
-        throw new UnknownVersionError('preimage.PreimageFor')
+        // Fallback: try direct runtime storage access for newer runtime versions
+        // where the typed accessor no longer matches
+        try {
+            if (preimageStatus && preimageStatus.len) {
+                const storageData = await block._runtime.getStorage(block.hash, 'Preimage.PreimageFor', [hash, preimageStatus.len])
+                if (!storageData) return undefined
+                return {
+                    data: storageData,
+                    ...preimageStatus
+                }
+            }
+            return undefined
+        } catch (e) {
+            ctx.log.warn(`Failed to get Preimage.PreimageFor storage: ${e}`)
+            return undefined
+        }
     }
 }
 
@@ -62,7 +77,23 @@ export async function getPreimageStatusData(ctx: ProcessorContext<Store>, hash: 
         }
     }
     else {
-        throw new UnknownVersionError('preimage.StatusFor')
+        // Fallback: try direct runtime storage access for newer runtime versions
+        try {
+            let storageData = await block._runtime.getStorage(block.hash, 'Preimage.StatusFor', hash)
+            // Some runtimes renamed StatusFor to RequestStatusFor
+            if (!storageData) {
+                storageData = await block._runtime.getStorage(block.hash, 'Preimage.RequestStatusFor', hash)
+            }
+            if (!storageData) return undefined
+            return {
+                status: storageData.__kind,
+                value: storageData.deposit,
+                len: storageData.len
+            }
+        } catch (e) {
+            ctx.log.warn(`Failed to get Preimage.StatusFor storage: ${e}`)
+            return undefined
+        }
     }
 }
 
